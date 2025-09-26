@@ -1,0 +1,155 @@
+/* Reset básico para asegurar consistencia */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Header fijo con z-index alto */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 70px;
+  z-index: 9999; /* Z-index muy alto para asegurar que nada lo traspase */
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+}
+
+/* Contenedor Izquierdo */
+.logo-slidebar-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo {
+  height: 50px;
+  object-fit: contain;
+}
+
+.separator {
+  height: 30px;
+  width: 2px;
+  background-color: #ddd;
+}
+
+/* Contenedor Derecho */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-name {
+  font-size: 1rem;
+  color: #1d86d6;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Botón de Logout */
+.logout-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: grid;
+  place-items: center;
+  border-radius: 4px;
+  margin-left: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.logout-button:hover, 
+.logout-button:focus, 
+.logout-button:active {
+  background: transparent;
+  outline: none;
+  box-shadow: none;
+}
+
+.logout-icon {
+  color: #666;
+  font-size: 1.3rem;
+  transition: all 0.2s ease;
+}
+
+.logout-button:hover .logout-icon {
+  color: #d32f2f;
+  transform: scale(1.1);
+}
+
+/* Espacio para el contenido que viene después del header */
+body {
+  /* Padding-top igual a la altura del header (70px) + espacio de un <br> (aproximadamente 16px) */
+  padding-top: calc(70px + 16px);
+  margin: 0;
+  overflow-x: hidden;
+}
+
+/* Clase para añadir a los elementos que están justo después del header */
+.header-spacing {
+  margin-top: 16px; /* Equivalente al espacio de un <br> */
+}
+
+/* Aplicar espacio a todas las secciones principales */
+main, section, .content-container, .main-content {
+  margin-top: 16px;
+}
+
+/* Responsive */
+@media screen and (max-width: 1024px) {
+  .header {
+    height: 65px;
+  }
+  
+  body {
+    padding-top: calc(65px + 16px);
+  }
+  
+  .logo { height: 45px; }
+  .separator { height: 25px; width: 1.5px; }
+}
+
+@media screen and (max-width: 768px) {
+  .header {
+    padding: 8px 15px;
+    height: 60px;
+  }
+  
+  body {
+    padding-top: calc(60px + 16px);
+  }
+  
+  .logo { height: 40px; }
+  .separator { display: none; }
+}
+
+@media screen and (max-width: 480px) {
+  .header {
+    height: 55px;
+  }
+  
+  body {
+    padding-top: calc(55px + 16px);
+  }
+  
+  .logo { height: 35px; }
+  .user-name {
+    font-size: 0.85rem;
+    max-width: 120px;
+  }
+} 
