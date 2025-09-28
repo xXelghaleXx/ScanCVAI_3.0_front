@@ -6,6 +6,9 @@ import authService from '../services/authService';
 import '../styles/Login.css';
 
 const Login = () => {
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [nombre, setNombre] = useState('');
+  const [apellido, setApellido] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -221,7 +224,29 @@ const Login = () => {
     toast.error('Error al conectar con Google');
   };
 
-  const handleRegister = () => navigate('/register');
+  const handleRegister = () => setIsSignUp(true);
+  const handleLoginClick = () => setIsSignUp(false);
+
+  const handleRegisterSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    const formData = {
+      nombre: nombre.trim(),
+      apellido: apellido.trim(),
+      correo: email.trim(),
+      contrasena: password.trim(),
+    };
+    try {
+      await authService.registro(formData);
+      toast.success('¡Registro exitoso! Ahora puedes iniciar sesión.');
+      setIsSignUp(false); // Vuelve al panel de login
+    } catch (err) {
+      const errorMsg = err.response?.data?.detail || err.response?.data?.message || 'Error al registrar el usuario';
+      toast.error(errorMsg);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const handleForgotPassword = () => toast.info('Funcionalidad en desarrollo');
 
   // ========== BOTÓN DE DEBUG ==========
@@ -244,117 +269,67 @@ const Login = () => {
 
   return (
     <div className="tecsup-login-container">
-      <div className="tecsup-unified-card">
-        <div className="tecsup-form-side">
+      <div className={`tecsup-unified-card ${isSignUp ? 'register-mode' : ''}`}>
+
+        {/* Contenedor del Formulario de Registro */}
+        <div className="tecsup-form-side sign-up-container">
           <div className="tecsup-form-container">
-            
-            {/* Header */}
-            <div className="tecsup-header">
-              <div className="tecsup-logo">
-                <span className="tecsup-logo-text">Sistema CV</span>
-                <span className="tecsup-tagline">ENTREVISTAS CON IA</span>
+            <form onSubmit={handleRegisterSubmit} className="tecsup-form">
+              <div className="tecsup-header">
+                <h1 className="tecsup-logo-text">Crear Cuenta</h1>
               </div>
-              <h1 className="tecsup-system-title">
-                Sistema de Análisis CV & Entrevistas
-              </h1>
-            </div>
-
-            {/* Botón de Debug (solo en desarrollo) */}
-            {import.meta.env.DEV && (
-              <div style={{ marginBottom: '20px', textAlign: 'center' }}>
-                <button 
-                  type="button"
-                  onClick={handleDebugTest}
-                  style={{
-                    background: '#ff6b35',
-                    color: 'white',
-                    border: 'none',
-                    padding: '8px 16px',
-                    borderRadius: '4px',
-                    fontSize: '12px'
-                  }}
-                >
-                  🧪 Test Debug
-                </button>
-              </div>
-            )}
-
-            {/* Formulario */}
-            <form className="tecsup-form" onSubmit={handleLogin}>
               <div className="tecsup-input-group">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Correo electrónico"
-                  className="tecsup-input"
-                  required
-                  disabled={isLoading}
-                />
+                <input type="text" placeholder="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} className="tecsup-input" required />
               </div>
-
               <div className="tecsup-input-group">
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Contraseña"
-                  className="tecsup-input"
-                  required
-                  disabled={isLoading}
-                />
+                <input type="text" placeholder="Apellido" value={apellido} onChange={(e) => setApellido(e.target.value)} className="tecsup-input" required />
               </div>
+              <div className="tecsup-input-group">
+                <input type="email" placeholder="Correo Electrónico" value={email} onChange={(e) => setEmail(e.target.value)} className="tecsup-input" required />
+              </div>
+              <div className="tecsup-input-group">
+                <input type="password" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} className="tecsup-input" required />
+              </div>
+              <button type="submit" className="tecsup-login-btn" disabled={isLoading}>{isLoading ? 'Registrando...' : 'Registrarse'}</button>
+            </form>
+          </div>
+        </div>
 
+        {/* Contenedor del Formulario de Login */}
+        <div className="tecsup-form-side sign-in-container">
+          <div className="tecsup-form-container">
+            <form onSubmit={handleLogin} className="tecsup-form">
+              <div className="tecsup-header">
+                <h1 className="tecsup-logo-text">Iniciar Sesión</h1>
+              </div>
+              <div className="tecsup-input-group">
+                <input type="email" placeholder="Correo Electrónico" value={email} onChange={(e) => setEmail(e.target.value)} className="tecsup-input" required />
+              </div>
+              <div className="tecsup-input-group">
+                <input type="password" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} className="tecsup-input" required />
+              </div>
               <div className="tecsup-forgot-password">
-                <a href="#" className="tecsup-forgot-link" onClick={(e) => {
-                  e.preventDefault();
-                  handleForgotPassword();
-                }}>
+                <a href="#" className="tecsup-forgot-link" onClick={(e) => { e.preventDefault(); handleForgotPassword(); }}>
                   ¿Olvidó la contraseña?
                 </a>
               </div>
 
-              <button 
-                type="submit" 
-                className="tecsup-login-btn"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <span className="loading-container">
-                    <div className="loading-spinner"></div>
-                    Iniciando sesión...
-                  </span>
-                ) : (
-                  'Iniciar Sesión'
-                )}
-              </button>
+              <button type="submit" className="tecsup-login-btn" disabled={isLoading}>{isLoading ? 'Iniciando...' : 'Iniciar Sesión'}</button>
 
               <div className="tecsup-divider">
                 <span>o</span>
               </div>
 
               <div className="tecsup-google-container">
-                {import.meta.env.VITE_GOOGLE_CLIENT_ID ? (
-                  <GoogleLogin
-                    onSuccess={handleGoogleSuccess}
-                    onError={handleGoogleError}
-                    theme="outline"
-                    text="signin_with"
-                    size="large"
-                  />
-                ) : (
-                  <div className="google-config-warning">
-                    Google Login no configurado
-                  </div>
-                )}
+                 <button type="button" className="tecsup-google-btn" onClick={() => window.location.href = 'http://localhost:3000/api/auth/google'}>
+                    <img src="https://www.vectorlogo.zone/logos/google/google-icon.svg" alt="Google icon" width="20" height="20" className="tecsup-google-icon" />
+                    <span>Iniciar sesión con Google</span>
+                </button>
               </div>
 
               <div className="tecsup-register">
                 <span>¿No tienes una cuenta? </span>
-                <a href="#" className="tecsup-register-link" onClick={(e) => {
-                  e.preventDefault();
-                  handleRegister();
-                }}>
+                <a href="#" className="tecsup-register-link" onClick={(e) => { e.preventDefault(); handleRegister(); }}>
                   Crear una cuenta
                 </a>
               </div>
@@ -362,24 +337,22 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Lado derecho igual que antes */}
-        <div className="tecsup-image-side">
-          <div className="tecsup-image-overlay">
-            <div className="tecsup-center-image">
-              <img 
-                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1471&q=80"
-                alt="Análisis CV"
-                className="tecsup-main-image"
-              />
-              <div className="tecsup-image-caption">
-                Análisis Inteligente de CV
-              </div>
-              <div className="tecsup-image-subcaption">
-                Preparación para entrevistas con IA
-              </div>
+        {/* Panel de Superposición (Overlay) */}
+        <div className="overlay-container">
+          <div className="overlay">
+            <div className="overlay-panel overlay-left">
+              <h1>¡Bienvenido de Nuevo!</h1>
+              <p>Para mantenerte conectado, por favor inicia sesión con tu información personal.</p>
+              <button className="ghost-btn" onClick={handleLoginClick}>Iniciar Sesión</button>
+            </div>
+            <div className="overlay-panel overlay-right">
+              <h1>¡Hola, Amigo!</h1>
+              <p>Ingresa tus datos personales y comienza tu viaje con nosotros.</p>
+              <button className="ghost-btn" onClick={handleRegister}>Regístrate</button>
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );

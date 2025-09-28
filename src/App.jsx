@@ -13,8 +13,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import authService from "./services/authService";
 
 // IMPORTAR CSS EN EL ORDEN CORRECTO
-import "./styles/layout.css";        // ← PRIMERO: Layout base
-import "./styles/Welcome.css";       // ← SEGUNDO: Welcome específico
+import "./styles/layout-refactorizado.css"; // ← PRIMERO: Layout base refactorizado
+import "./styles/Welcome-refactorizado.css"; // ← SEGUNDO: Welcome específico refactorizado
 import "./styles/Chat.css";          // ← TERCERO: Chat específico
 import "./index.css";                // ← ÚLTIMO: Overrides globales
 

@@ -1,291 +1,124 @@
-/* ===== ESTILOS PARA EL HISTORIAL DE CVs ===== */
+/* ===== ESTILOS PARA EL HISTORIAL DE CVs (REFACTORIZADO) ===== */
 
 /* Contenedor principal */
 .historial-container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto; /* Quitamos el margen superior */
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  position: relative;
-  z-index: 1;
+  background: var(--bg-primary);
+  padding: var(--space-xl);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
 }
 
-/* Ajuste para el contenido principal de la página */
-body {
-  padding-top: 100px; /* Espacio para el header fijo */
-  overflow-y: auto; /* Aseguramos que el scroll vertical funcione */
-  height: 100%;
-}
-
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-}
-
-/* Encabezado del historial */
+/* Encabezado */
 .historial-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 25px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--border);
 }
 
 .historial-title {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 1.8rem;
-  color: #2c3e50;
-  margin: 0;
+  gap: var(--space-md);
+  font-size: var(--text-3xl);
+  color: var(--text-primary);
+  font-weight: 700;
 }
 
 .header-icon {
-  color: #3498db;
+  color: var(--primary);
 }
 
-/* Contenedor de la tabla */
+/* Tabla */
 .table-container {
   width: 100%;
-  overflow-x: auto; /* Permite desplazamiento horizontal en pantallas pequeñas */
-  border-radius: 8px;
-  background-color: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
 }
 
-/* Estilos de la tabla */
 .cvs-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
+  border-collapse: collapse;
 }
 
 .table-header {
-  background-color: #f1f5f9;
-  color: #475569;
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
   font-weight: 600;
   text-align: left;
-  padding: 16px;
-  font-size: 1rem;
-  border-bottom: 2px solid #e2e8f0;
-}
-
-.table-row {
-  transition: background-color 0.2s ease;
+  padding: var(--space-md);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .table-row:hover {
-  background-color: #f8fafc;
+  background-color: var(--bg-tertiary);
 }
 
 .table-cell {
-  padding: 16px;
-  border-bottom: 1px solid #e2e8f0;
-  color: #334155;
-  font-size: 0.95rem;
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: var(--text-base);
 }
 
-/* Información del archivo */
+/* Contenido de celdas */
 .file-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-sm);
 }
 
 .file-icon {
-  color: #3498db;
-  font-size: 1.2rem;
+  color: var(--primary);
 }
 
-.file-name {
-  font-weight: 500;
-  word-break: break-word;
-}
-
-/* Información de fecha */
-.date-info {
-  color: #64748b;
-  font-size: 0.9rem;
-}
-
-/* Estilos para las insignias de estado */
 .status-badge {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 50px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-align: center;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 600;
 }
 
 .status-processed {
-  background-color: #dcfce7;
-  color: #166534;
-}
-
-.status-pending {
-  background-color: #fef3c7;
-  color: #92400e;
+  background-color: var(--secondary-bg);
+  color: var(--secondary-dark);
 }
 
 /* Botones de acción */
 .action-buttons {
   display: flex;
-  gap: 10px;
-  justify-content: flex-end;
+  gap: var(--space-sm);
 }
 
 .view-button,
 .delete-button {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-}
-
-.view-button {
-  background-color: #e0f2fe;
-  color: #0284c7;
-}
-
-.view-button:hover {
-  background-color: #bae6fd;
+  padding: var(--space-sm) var(--space-md);
 }
 
 .delete-button {
-  background-color: #fee2e2;
-  color: #b91c1c;
+  background-color: var(--error);
 }
 
 .delete-button:hover {
-  background-color: #fecaca;
+  background-color: var(--error-dark);
 }
 
-.delete-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.action-icon {
-  font-size: 1rem;
-}
-
-/* Estados de carga y error */
+/* Estados */
 .loader-container,
 .error-container,
 .empty-container {
+  min-height: 300px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 400px;
-  width: 100%;
-  margin-top: 100px; /* Espacio para el header */
-  text-align: center;
-  padding: 20px;
-}
-
-.loader-content,
-.error-content,
-.empty-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  border-left-color: #3498db;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.loader-text,
-.error-message,
-.empty-message {
-  color: #64748b;
-  font-size: 1rem;
-}
-
-.error-icon,
-.empty-icon {
-  font-size: 3rem;
-  color: #ef4444;
-}
-
-.empty-icon {
-  color: #94a3b8;
-}
-
-.error-title,
-.empty-title {
-  font-size: 1.5rem;
-  color: #334155;
-  margin: 0;
 }
 
 /* Responsive */
-@media screen and (max-width: 768px) {
-  .historial-container {
-    padding: 15px;
-    margin-top: 80px;
-  }
-  
+@media (max-width: 768px) {
   .historial-title {
-    font-size: 1.5rem;
+    font-size: var(--text-2xl);
   }
-  
-  .table-header,
-  .table-cell {
-    padding: 12px;
-  }
-  
   .action-buttons {
     flex-direction: column;
-    gap: 8px;
-  }
-  
-  .view-button,
-  .delete-button {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .historial-title {
-    font-size: 1.3rem;
-  }
-  
-  .table-header {
-    font-size: 0.9rem;
-  }
-  
-  .table-cell {
-    padding: 10px;
-    font-size: 0.85rem;
-  }
-  
-  .status-badge {
-    font-size: 0.75rem;
-    padding: 4px 8px;
   }
 }

@@ -783,6 +783,141 @@
   }
 }
 
+/* ===== ANIMACIÓN DE PANELES DESLIZANTES ===== */
+
+.tecsup-unified-card {
+  position: relative; /* Necesario para posicionar los paneles hijos */
+  overflow: hidden;
+}
+
+/* Los contenedores de formulario se posicionan absolutamente dentro del 50% izquierdo */
+.tecsup-form-side.sign-in-container,
+.tecsup-form-side.sign-up-container {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  transition: all 0.6s ease-in-out;
+  width: 50%;
+}
+
+.sign-in-container {
+  left: 0;
+  z-index: 2;
+}
+
+.sign-up-container {
+  left: 0;
+  opacity: 0;
+  z-index: 1;
+}
+
+/* Contenedor del panel de imagen (Overlay) que se desliza */
+.overlay-container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  transition: transform 0.6s ease-in-out;
+  z-index: 100;
+}
+
+/* El contenido del overlay que se mueve */
+.overlay {
+  background: linear-gradient(135deg, rgba(0, 191, 255, 0.1), rgba(0, 191, 255, 0.05)), 
+              linear-gradient(rgba(248, 249, 250, 0.3), rgba(248, 249, 250, 0.3)),
+              url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80') center center;
+  background-size: cover;
+  position: relative;
+  left: -100%;
+  height: 100%;
+  width: 200%;
+  transform: translateX(0);
+  transition: transform 0.6s ease-in-out;
+}
+
+/* Paneles de texto y botones dentro del overlay */
+.overlay-panel {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 0 40px;
+  text-align: center;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  transition: transform 0.6s ease-in-out;
+}
+
+.overlay-left {
+  transform: translateX(-20%);
+  color: var(--tecsup-gris-oscuro);
+}
+
+.overlay-right {
+  right: 0;
+  transform: translateX(0);
+}
+
+.ghost-btn {
+  padding: 12px 30px;
+  border-radius: 25px;
+  border: 2px solid var(--tecsup-gris-oscuro);
+  background: transparent;
+  color: var(--tecsup-gris-oscuro);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ghost-btn:hover {
+  background: var(--tecsup-gris-oscuro);
+  color: white;
+}
+
+/* Movimiento de los paneles al activar el modo registro */
+.tecsup-unified-card.register-mode .sign-in-container {
+  transform: translateX(100%);
+}
+
+.tecsup-unified-card.register-mode .sign-up-container {
+  transform: translateX(100%);
+  opacity: 1;
+  z-index: 5;
+  animation: show 0.6s;
+}
+
+.tecsup-unified-card.register-mode .overlay-container {
+  transform: translateX(-100%);
+}
+
+.tecsup-unified-card.register-mode .overlay {
+  transform: translateX(50%);
+}
+
+.tecsup-unified-card.register-mode .overlay-left {
+  transform: translateX(0);
+}
+
+.tecsup-unified-card.register-mode .overlay-right {
+  transform: translateX(20%);
+}
+
+@keyframes show {
+  0%, 49.99% {
+    opacity: 0;
+    z-index: 1;
+  }
+  50%, 100% {
+    opacity: 1;
+    z-index: 5;
+  }
+}
+
 /* ===== FORZAR TEMA CLARO ===== */
 @media (prefers-color-scheme: dark) {
   *, *::before, *::after {
