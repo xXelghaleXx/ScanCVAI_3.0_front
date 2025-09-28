@@ -2,8 +2,6 @@
   text-align: center;
   padding: 15px;
   background: rgba(255, 255, 255, 0.411); /* Fondo translúcido */
-  position: fixed;
-  bottom: 0;
   width: 100%;
   backdrop-filter: blur(10px); /* Efecto Glass */
   border-top: 1px solid rgba(255, 255, 255, 0.767); /* Bordes suaves */

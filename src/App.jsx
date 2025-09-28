@@ -8,11 +8,15 @@ import LectorCV from "./components/LectorCV";
 import HistorialCV from "./components/HistorialCV";
 import ChatEntrevista from "./components/Entrevista";
 import Background from "./components/Background";
+import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import authService from "./services/authService";
-import "./styles/Chat.css";
-import "./styles/layout.css";
-import "./index.css";
+
+// IMPORTAR CSS EN EL ORDEN CORRECTO
+import "./styles/layout.css";        // ← PRIMERO: Layout base
+import "./styles/Welcome.css";       // ← SEGUNDO: Welcome específico
+import "./styles/Chat.css";          // ← TERCERO: Chat específico
+import "./index.css";                // ← ÚLTIMO: Overrides globales
 
 const App = () => {
   const location = useLocation();
@@ -27,49 +31,74 @@ const App = () => {
 
   return (
     <GoogleOAuthProvider clientId="TU_CLIENT_ID_DE_GOOGLE">
-      {/* Estructura principal completamente reorganizada */}
       <div className="app-root">
-        {/* Header fijo en la parte superior */}
+        {/* Fondo global - siempre presente */}
+        <div className="background-wrapper">
+          <Background />
+        </div>
+
+        {/* Header - UNA SOLA VEZ, NO fixed */}
         {!isLoginPage && (
           <div className="header-container">
             <Header onLogout={handleLogout} />
           </div>
         )}
-        
-        {/* Contenedor para el fondo */}
-        <div className="background-wrapper">
-          <Background />
-        </div>
-        
-        {/* Contenido principal con espacio para evitar el header */}
-        <div className={`content-wrapper ${!isLoginPage ? 'with-header' : ''}`}>
+
+        {/* Contenido principal - flex: 1 */}
+        <div className="main-content-wrapper">
           <Routes>
+            {/* Páginas de autenticación - sin layout adicional */}
             <Route path="/" element={<Login />} />
             <Route path="/register" element={<Register />} />
             
-            {/* Rutas protegidas */}
+            {/* Welcome - layout específico SIN Header/Footer internos */}
             <Route path="/welcome" element={
               <ProtectedRoute>
-                <Welcome />
+                <div className="welcome-main-wrapper">
+                  <Welcome />
+                </div>
               </ProtectedRoute>
             } />
+            
+            {/* Otras páginas - layout estándar */}
             <Route path="/lector-cv" element={
               <ProtectedRoute>
-                <LectorCV />
+                <div className="content-with-header">
+                  <div className="page-container">
+                    <LectorCV />
+                  </div>
+                </div>
               </ProtectedRoute>
             } />
+            
             <Route path="/entrevista" element={
               <ProtectedRoute>
-                <ChatEntrevista />
+                <div className="content-with-header">
+                  <div className="page-container">
+                    <ChatEntrevista />
+                  </div>
+                </div>
               </ProtectedRoute>
             } />
+            
             <Route path="/historialCV" element={
               <ProtectedRoute>
-                <HistorialCV />
+                <div className="content-with-header">
+                  <div className="page-container">
+                    <HistorialCV />
+                  </div>
+                </div>
               </ProtectedRoute>
             } />
           </Routes>
         </div>
+
+        {/* Footer - UNA SOLA VEZ, NO fixed */}
+        {!isLoginPage && (
+          <div className="footer-container">
+            <Footer />
+          </div>
+        )}
       </div>
     </GoogleOAuthProvider>
   );

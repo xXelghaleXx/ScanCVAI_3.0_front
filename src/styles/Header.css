@@ -7,17 +7,14 @@
 
 /* Header fijo con z-index alto */
 .header {
-  display: flex;
   align-items: center;
   padding: 10px 20px;
   position: fixed;
-  top: 0;
   left: 0;
   width: 100%;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   height: 70px;
-  z-index: 9999; /* Z-index muy alto para asegurar que nada lo traspase */
 }
 
 .header-content {
@@ -94,8 +91,6 @@
 
 /* Espacio para el contenido que viene después del header */
 body {
-  /* Padding-top igual a la altura del header (70px) + espacio de un <br> (aproximadamente 16px) */
-  padding-top: calc(70px + 16px);
   margin: 0;
   overflow-x: hidden;
 }
