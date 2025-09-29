@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, X, Download, Search, FileText } from "lucide-react";
+import { toast } from 'react-toastify';
 import '../styles/LectorCV.css';
-
-const API_BASE_URL = "http://127.0.0.1:8000";
 
 // Hook personalizado para el efecto de escritura tipo Gemini
 const useGeminiTypewriter = () => {
@@ -14,7 +13,7 @@ const useGeminiTypewriter = () => {
 
   const typeText = (text, options = {}) => {
     const { 
-      speed = 8,            // Súper rápido como Gemini
+      speed = 8,
       pauseAfterPunctuation = 40,
       pauseAfterComma = 20,
       showThinkingTime = 300
@@ -24,7 +23,6 @@ const useGeminiTypewriter = () => {
     setIsTyping(true);
     indexRef.current = 0;
 
-    // Simular "pensando" inicial
     setTimeout(() => {
       const typeCharacter = () => {
         if (indexRef.current < text.length) {
@@ -32,9 +30,8 @@ const useGeminiTypewriter = () => {
           
           setDisplayedText(prev => prev + char);
           
-          let delay = speed + Math.random() * 10; // Menos variación para más velocidad
+          let delay = speed + Math.random() * 10;
           
-          // Pausas más breves y naturales
           if (indexRef.current > 0) {
             const prevChar = text[indexRef.current - 1];
             if (/[.!?]/.test(prevChar)) {
@@ -42,7 +39,7 @@ const useGeminiTypewriter = () => {
             } else if (prevChar === ',') {
               delay += pauseAfterComma;
             } else if (char === ' ') {
-              delay = Math.max(5, delay * 0.3); // Espacios mucho más rápidos
+              delay = Math.max(5, delay * 0.3);
             }
           }
           
@@ -94,6 +91,14 @@ const ThinkingDots = () => (
           repeat: Infinity,
           delay: index * 0.2,
           ease: "easeInOut"
+        }}
+        style={{
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          backgroundColor: 'var(--primary)',
+          margin: '0 2px',
+          display: 'inline-block'
         }}
       />
     ))}
@@ -190,8 +195,16 @@ const LoadingSpheresAnimation = ({ text = "Procesando..." }) => (
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     exit={{ opacity: 0 }}
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '1rem',
+      padding: '2rem'
+    }}
   >
-    <div className="loading-spheres">
+    <div className="loading-spheres" style={{ display: 'flex', gap: '0.5rem' }}>
       {[0, 1, 2].map((index) => (
         <motion.div
           key={index}
@@ -207,6 +220,12 @@ const LoadingSpheresAnimation = ({ text = "Procesando..." }) => (
             delay: index * 0.2,
             ease: "easeInOut"
           }}
+          style={{
+            width: '12px',
+            height: '12px',
+            borderRadius: '50%',
+            backgroundColor: 'var(--primary)'
+          }}
         />
       ))}
     </div>
@@ -214,6 +233,7 @@ const LoadingSpheresAnimation = ({ text = "Procesando..." }) => (
       className="loading-text"
       animate={{ opacity: [0.7, 1, 0.7] }}
       transition={{ duration: 1.5, repeat: Infinity }}
+      style={{ color: 'var(--text-secondary)', fontWeight: '500' }}
     >
       {text}
     </motion.p>
@@ -231,6 +251,7 @@ const LectorCV = () => {
   const [reportId, setReportId] = useState(null);
   const [analysisText, setAnalysisText] = useState("");
   const [loadingText, setLoadingText] = useState("Procesando...");
+  const [analysisData, setAnalysisData] = useState(null);
 
   // Usar nuestro hook personalizado de escritura
   const { displayedText, isTyping, typeText, resetText } = useGeminiTypewriter();
@@ -239,117 +260,294 @@ const LectorCV = () => {
   useEffect(() => {
     if (reportReady && analysisText) {
       typeText(analysisText, {
-        speed: 8,               // Súper rápido como Gemini
+        speed: 8,
         pauseAfterPunctuation: 40,
         pauseAfterComma: 20,
-        showThinkingTime: 400   // Menos tiempo de "pensando"
+        showThinkingTime: 400
       });
     }
   }, [reportReady, analysisText]);
 
+  // RF-100: Subir CV
   const uploadCVToAPI = async (file) => {
-    const formData = new FormData();
-    formData.append("archivo", file);
-    formData.append("alumno_id", 1);
-
+    setLoading(true);
+    setLoadingText("Subiendo CV...");
+    
     try {
-      setLoading(true);
-      setLoadingText("Subiendo archivo...");
+      console.log('📤 Subiendo CV:', file.name);
       
-      const response = await fetch(`${API_BASE_URL}/api/subir-cv/`, {
-        method: "POST",
-        body: formData,
+      const formData = new FormData();
+      formData.append('cv', file);
+      
+      const token = localStorage.getItem('access_token');
+      
+      if (!token) {
+        throw new Error('No hay token de autenticación. Por favor, inicia sesión.');
+      }
+      
+      const response = await fetch('http://localhost:3000/api/cv/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
       });
-
+      
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Error al subir el CV");
+        throw new Error(errorData.error || 'Error subiendo CV');
       }
-
+      
       const data = await response.json();
-      console.log("✅ CV subido con éxito:", data);
-
-      setCvId(data.cv.id);
+      console.log('✅ CV subido exitosamente:', data);
+      
+      // Actualizar estado tras subida exitosa
       setCvUploaded(true);
       setFileName(file.name);
+      setCvId(data.cv.id);
       setUploadError(null);
+      
+      toast.success('CV subido correctamente');
+      return data;
+      
     } catch (error) {
-      console.error("❌ Error:", error);
-      setUploadError(error.message || "Error al subir el CV. Inténtalo de nuevo.");
+      console.error('❌ Error subiendo CV:', error);
+      setUploadError(error.message);
+      toast.error(error.message);
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
+  // RF-102: Procesar CV con IA
   const analyzeCV = async () => {
     if (!cvId) {
-      setUploadError("Primero sube un CV antes de analizarlo.");
+      const errorMsg = "Primero sube un CV antes de analizarlo.";
+      setUploadError(errorMsg);
+      toast.error(errorMsg);
       return;
     }
 
     setLoading(true);
     setLoadingText("Analizando con IA...");
-    resetText(); // Limpiar texto anterior
+    resetText();
     
     try {
-      const response = await fetch(`${API_BASE_URL}/api/analizar-cv/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv_id: cvId }),
+      console.log('🧠 Procesando CV con IA:', cvId);
+      
+      const token = localStorage.getItem('access_token');
+      
+      if (!token) {
+        throw new Error('No hay token de autenticación. Por favor, inicia sesión.');
+      }
+      
+      const response = await fetch(`http://localhost:3000/api/cv/${cvId}/procesar`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
-
+      
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Error al analizar el CV");
+        throw new Error(errorData.error || 'Error analizando CV');
       }
-
+      
       const data = await response.json();
-      console.log("✅ Análisis completado:", data);
+      console.log('✅ Análisis completado:', data);
 
-      setAnalysisText(data.informe.resumen);
+      // Extraer datos del análisis
+      const { analisis, validation, processing_time } = data;
+      
+      setAnalysisData({
+        ...analisis,
+        validation,
+        processing_time
+      });
+
+      // Crear texto para mostrar en pantalla
+      const analysisDisplayText = formatAnalysisForDisplay(analisis, validation);
+      setAnalysisText(analysisDisplayText);
       setReportReady(true);
-      setReportId(data.informe.id);
       setUploadError(null);
+      
+      toast.success('Análisis completado correctamente');
     } catch (error) {
-      console.error("❌ Error:", error);
-      setUploadError(error.message || "Error al analizar el CV. Inténtalo de nuevo.");
+      console.error('❌ Error analizando CV:', error);
+      setUploadError(error.message);
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const downloadReport = async () => {
-    if (!reportId) {
-      setUploadError("No hay informe disponible para descargar.");
+  // RF-103: Generar informe detallado
+  const generateReport = async () => {
+    if (!cvId) {
+      const errorMsg = "No hay CV para generar informe.";
+      setUploadError(errorMsg);
+      toast.error(errorMsg);
       return;
     }
 
+    setLoading(true);
+    setLoadingText("Generando informe detallado...");
+    
     try {
-      const response = await fetch(`${API_BASE_URL}/api/descargar-informe/${reportId}/`, {
-        method: "GET",
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al descargar el informe");
+      console.log('📊 Generando informe para CV:', cvId);
+      
+      const token = localStorage.getItem('access_token');
+      
+      if (!token) {
+        throw new Error('No hay token de autenticación. Por favor, inicia sesión.');
       }
+      
+      const response = await fetch(`http://localhost:3000/api/cv/${cvId}/informe`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error generando informe');
+      }
+      
+      const data = await response.json();
+      console.log('✅ Informe generado:', data);
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "Informe_CV.pdf";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      setReportId(data.informe.id);
+      setUploadError(null);
+      
+      toast.success('Informe generado correctamente');
     } catch (error) {
-      console.error("❌ Error:", error);
-      setUploadError("Error al descargar el informe.");
+      console.error('❌ Error generando informe:', error);
+      setUploadError(error.message);
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Formatear análisis para mostrar
+  const formatAnalysisForDisplay = (analisis, validation) => {
+    let text = "📋 **ANÁLISIS DE CV COMPLETADO**\n\n";
+    
+    // Validación
+    if (validation) {
+      text += `**Puntuación de Validación:** ${validation.score}/100\n`;
+      text += `**Estado:** ${validation.is_valid ? '✅ Válido' : '⚠️ Necesita mejoras'}\n\n`;
+    }
+
+    // Fortalezas
+    if (analisis.fortalezas && analisis.fortalezas.length > 0) {
+      text += "🌟 **FORTALEZAS IDENTIFICADAS:**\n";
+      analisis.fortalezas.forEach((fortaleza, index) => {
+        text += `${index + 1}. ${fortaleza}\n`;
+      });
+      text += "\n";
+    }
+
+    // Habilidades técnicas
+    if (analisis.habilidades_tecnicas && analisis.habilidades_tecnicas.length > 0) {
+      text += "💻 **HABILIDADES TÉCNICAS:**\n";
+      text += analisis.habilidades_tecnicas.join(", ") + "\n\n";
+    }
+
+    // Habilidades blandas
+    if (analisis.habilidades_blandas && analisis.habilidades_blandas.length > 0) {
+      text += "🤝 **HABILIDADES BLANDAS:**\n";
+      text += analisis.habilidades_blandas.join(", ") + "\n\n";
+    }
+
+    // Experiencia
+    if (analisis.experiencia_resumen) {
+      text += "💼 **RESUMEN DE EXPERIENCIA:**\n";
+      text += analisis.experiencia_resumen + "\n\n";
+    }
+
+    // Educación
+    if (analisis.educacion_resumen) {
+      text += "🎓 **RESUMEN DE EDUCACIÓN:**\n";
+      text += analisis.educacion_resumen + "\n\n";
+    }
+
+    // Áreas de mejora
+    if (analisis.areas_mejora && analisis.areas_mejora.length > 0) {
+      text += "🔧 **ÁREAS DE MEJORA:**\n";
+      analisis.areas_mejora.forEach((area, index) => {
+        text += `${index + 1}. ${area}\n`;
+      });
+      text += "\n";
+    }
+
+    text += "📊 **¿Quieres un informe más detallado?** Haz clic en 'Generar Informe Completo' para obtener un análisis PDF descargable.";
+
+    return text;
+  };
+
+  // Descargar informe en PDF (simulado - el backend devuelve JSON actualmente)
+  const downloadReport = async () => {
+  if (!reportId) {
+    // Si no hay reportId, generar el informe primero
+    await generateReport();
+    return;
+  }
+
+  try {
+    console.log('📥 Descargando informe:', reportId);
+    
+    const token = localStorage.getItem('access_token');
+    
+    if (!token) {
+      throw new Error('No hay token de autenticación. Por favor, inicia sesión.');
+    }
+    
+    const response = await fetch(`http://localhost:3000/api/informes/${reportId}/pdf`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      // Para errores, sí intentamos leer JSON
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error descargando informe');
+    }
+    
+    // CAMBIO PRINCIPAL: Leer como blob, no como JSON
+    const blob = await response.blob();
+    
+    // Crear URL del blob y descargar
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Informe_CV_${fileName || 'analisis'}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    toast.success('Informe descargado correctamente');
+    
+  } catch (error) {
+    console.error('❌ Error descargando informe:', error);
+    setUploadError(error.message);
+    toast.error(error.message);
+  }
+};
+
+  // Cancelar/Eliminar CV
   const handleCancel = async () => {
     if (!cvId) {
-      setUploadError("No hay un CV para cancelar.");
+      const errorMsg = "No hay un CV para cancelar.";
+      setUploadError(errorMsg);
+      toast.error(errorMsg);
       return;
     }
 
@@ -357,44 +555,65 @@ const LectorCV = () => {
     setLoadingText("Cancelando...");
     
     try {
-      const response = await fetch(`${API_BASE_URL}/api/eliminar-cv/${cvId}/`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al cancelar el CV");
+      console.log('🗑️ Eliminando CV:', cvId);
+      
+      const token = localStorage.getItem('access_token');
+      
+      if (!token) {
+        throw new Error('No hay token de autenticación. Por favor, inicia sesión.');
       }
+      
+      const response = await fetch(`http://localhost:3000/api/cv/${cvId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error eliminando CV');
+      }
+      
+      console.log('✅ CV eliminado con éxito');
 
-      console.log("✅ CV cancelado con éxito");
-
+      // Reset del estado
       setCvUploaded(false);
       setFileName("");
       setCvId(null);
       setReportReady(false);
       setReportId(null);
       setAnalysisText("");
+      setAnalysisData(null);
       resetText();
       setUploadError(null);
+      
+      toast.success('CV eliminado correctamente');
     } catch (error) {
-      console.error("❌ Error:", error);
-      setUploadError("Error al cancelar el CV. Inténtalo de nuevo.");
+      console.error('❌ Error eliminando CV:', error);
+      setUploadError(error.message);
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
   };
 
+  // Manejar subida de archivo
   const handleUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      const allowedTypes = ["application/pdf"];
+      // Validaciones del archivo
+      const allowedTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
       if (!allowedTypes.includes(file.type)) {
-        setUploadError("Solo se permiten archivos PDF.");
+        setUploadError("Solo se permiten archivos PDF y DOCX.");
+        toast.error("Solo se permiten archivos PDF y DOCX.");
         return;
       }
 
-      const maxSize = 5 * 1024 * 1024; // 5MB
+      const maxSize = 10 * 1024 * 1024; // 10MB
       if (file.size > maxSize) {
-        setUploadError("El archivo no puede ser mayor a 5MB.");
+        setUploadError("El archivo no puede ser mayor a 10MB.");
+        toast.error("El archivo no puede ser mayor a 10MB.");
         return;
       }
 
@@ -404,127 +623,227 @@ const LectorCV = () => {
   };
 
   return (
-      <div className="lector-cv-content">
-        {/* Lector de CV (Izquierda) */}
-        <motion.div
-          className="cv-panel"
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          {loading ? (
-            <LoadingSpheresAnimation text={loadingText} />
-          ) : cvUploaded ? (
-            <motion.div
-              className="uploaded-file"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <FileText size={24} className="file-icon" />
-              <span className="file-name">{fileName}</span>
-              <CheckCircle size={24} className="file-success" />
-            </motion.div>
-          ) : (
-            <label className="upload-label">
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={handleUpload}
-                hidden
-              />
-              <EmptyStateIllustration />
-              <motion.span
-                className="upload-text"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.3 }}
-              >
-                Arrastra tu CV aquí o haz clic para subir
-              </motion.span>
-              <motion.span
-                className="upload-subtext"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1, duration: 0.3 }}
-              >
-                Formatos soportados: PDF (máx. 5MB)
-              </motion.span>
-            </label>
-          )}
-
-          {uploadError && (
-            <motion.p
-              className="error-message"
+    <div className="lector-cv-content">
+      {/* Lector de CV (Izquierda) */}
+      <motion.div
+        className="cv-panel"
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        {loading ? (
+          <LoadingSpheresAnimation text={loadingText} />
+        ) : cvUploaded ? (
+          <motion.div
+            className="uploaded-file"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '1rem',
+              padding: '2rem',
+              textAlign: 'center'
+            }}
+          >
+            <FileText size={48} style={{ color: 'var(--secondary)' }} />
+            <div>
+              <h3 style={{ color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
+                Archivo subido
+              </h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                {fileName}
+              </p>
+            </div>
+            <CheckCircle size={24} style={{ color: 'var(--secondary)' }} />
+          </motion.div>
+        ) : (
+          <label className="upload-label">
+            <input
+              type="file"
+              accept=".pdf,.docx"
+              onChange={handleUpload}
+              hidden
+            />
+            <EmptyStateIllustration />
+            <motion.span
+              className="upload-text"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.3 }}
             >
-              {uploadError}
-            </motion.p>
-          )}
-
-          {/* Barra de revisión */}
-          {cvUploaded && !loading && (
-            <motion.div
-              className="review-bar"
-              initial={{ opacity: 0, y: 20 }}
+              Arrastra tu CV aquí o haz clic para subir
+            </motion.span>
+            <motion.span
+              className="upload-subtext"
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
+              transition={{ delay: 1, duration: 0.3 }}
             >
-              <motion.button
-                className="btn-analyze"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={analyzeCV}
-                disabled={loading}
-              >
-                <Search size={20} /> Analizar CV
-              </motion.button>
-              
-              <motion.button
-                className="btn-cancel"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleCancel}
-                disabled={loading}
-              >
-                <X size={20} /> Cancelar
-              </motion.button>
-            </motion.div>
-          )}
-        </motion.div>
+              Formatos soportados: PDF, DOCX (máx. 10MB)
+            </motion.span>
+          </label>
+        )}
 
-        {/* Panel de Análisis (Derecha) */}
-        <AnimatePresence>
-          {reportReady && (
-            <motion.div
-              className="analysis-panel"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 50 }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
+        {uploadError && (
+          <motion.p
+            className="error-message"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{
+              color: 'var(--error)',
+              textAlign: 'center',
+              margin: '1rem 0',
+              padding: '0.75rem',
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              border: '1px solid rgba(239, 68, 68, 0.2)',
+              borderRadius: 'var(--radius-md)'
+            }}
+          >
+            {uploadError}
+          </motion.p>
+        )}
+
+        {/* Barra de revisión */}
+        {cvUploaded && !loading && (
+          <motion.div
+            className="review-bar"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem',
+              marginTop: '2rem'
+            }}
+          >
+            <motion.button
+              className="btn-analyze"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={analyzeCV}
+              disabled={loading}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                padding: '0.75rem 1.5rem',
+                backgroundColor: 'var(--primary)',
+                color: 'white',
+                border: 'none',
+                borderRadius: 'var(--radius-lg)',
+                fontWeight: '600',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.6 : 1
+              }}
             >
-              <h3 className="analysis-title">
-                Análisis del CV
-                {isTyping && <ThinkingDots />}
-              </h3>
-              
-              <div className="analysis-content">
-                {displayedText}
-                {/* Cursor parpadeante tipo Gemini */}
-                {isTyping && (
-                  <motion.span
-                    className="typing-cursor"
-                    animate={{ opacity: [1, 0, 1] }}
-                    transition={{
-                      duration: 0.8,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  />
-                )}
-              </div>
-              
+              <Search size={20} /> Analizar CV con IA
+            </motion.button>
+            
+            <motion.button
+              className="btn-cancel"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleCancel}
+              disabled={loading}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                padding: '0.75rem 1.5rem',
+                backgroundColor: 'transparent',
+                color: 'var(--error)',
+                border: '2px solid var(--error)',
+                borderRadius: 'var(--radius-lg)',
+                fontWeight: '600',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.6 : 1
+              }}
+            >
+              <X size={20} /> Cancelar
+            </motion.button>
+          </motion.div>
+        )}
+      </motion.div>
+
+      {/* Panel de Análisis (Derecha) */}
+      <AnimatePresence>
+        {reportReady && (
+          <motion.div
+            className="analysis-panel"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 50 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            style={{
+              background: 'var(--bg-primary)',
+              padding: '2rem',
+              borderRadius: 'var(--radius-xl)',
+              border: '1px solid var(--border)',
+              boxShadow: 'var(--shadow-lg)',
+              minHeight: '500px'
+            }}
+          >
+            <h3 
+              className="analysis-title"
+              style={{
+                fontSize: '1.5rem',
+                fontWeight: '700',
+                color: 'var(--text-primary)',
+                marginBottom: '1.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+            >
+              Análisis del CV
+              {isTyping && <ThinkingDots />}
+            </h3>
+            
+            <div 
+              className="analysis-content"
+              style={{
+                whiteSpace: 'pre-wrap',
+                lineHeight: '1.7',
+                fontSize: '0.875rem',
+                color: 'var(--text-secondary)',
+                marginBottom: '2rem',
+                minHeight: '200px',
+                maxHeight: '400px',
+                overflowY: 'auto',
+                padding: '1rem',
+                backgroundColor: 'var(--bg-tertiary)',
+                borderRadius: 'var(--radius-lg)',
+                fontFamily: 'inherit'
+              }}
+            >
+              {displayedText}
+              {isTyping && (
+                <motion.span
+                  className="typing-cursor"
+                  animate={{ opacity: [1, 0, 1] }}
+                  transition={{
+                    duration: 0.8,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  style={{
+                    display: 'inline-block',
+                    width: '2px',
+                    height: '1em',
+                    backgroundColor: 'var(--primary)',
+                    marginLeft: '2px'
+                  }}
+                />
+              )}
+            </div>
+            
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
               <motion.button
                 className="download-btn"
                 initial={{ scale: 0.8, opacity: 0 }}
@@ -533,13 +852,51 @@ const LectorCV = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={downloadReport}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.75rem 1.5rem',
+                  backgroundColor: 'var(--secondary)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 'var(--radius-lg)',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
               >
-                <Download size={18} /> Descargar el informe
+                <Download size={18} /> Generar Informe PDF
               </motion.button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+              
+              {!reportId && (
+                <motion.button
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.3, delay: 0.7 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={generateReport}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.75rem 1.5rem',
+                    backgroundColor: 'transparent',
+                    color: 'var(--primary)',
+                    border: '2px solid var(--primary)',
+                    borderRadius: 'var(--radius-lg)',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                >
+                  📊 Informe Completo
+                </motion.button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 
