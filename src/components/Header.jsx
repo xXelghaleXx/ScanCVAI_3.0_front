@@ -3,50 +3,70 @@ import { useNavigate } from "react-router-dom";
 import "../styles/Header.css";
 import Slidebar from "./Slidebar";
 import logo from "../assets/logo.png";
-import { FaPowerOff } from "react-icons/fa";
+import { FaPowerOff, FaUserCircle } from "react-icons/fa";
+import authService from "../services/authService";
 
 const Header = ({ onLogout }) => {
   const navigate = useNavigate();
   
-  // Obtén el nombre completo del localStorage
-  const nombreCompleto = localStorage.getItem("nombre");
+  // Obtener usuario del authService
+  const user = authService.getUser();
   
-  // Extrae solo la primera palabra (primer nombre)
-  const primerNombre = nombreCompleto ? nombreCompleto.split(' ')[0] : "Usuario";
+  // Prioridad: user.nombre > localStorage.nombre > email sin @dominio > Usuario
+  let nombreCompleto = "Usuario";
+  
+  if (user?.nombre) {
+    nombreCompleto = user.nombre;
+  } else if (localStorage.getItem("nombre") && !localStorage.getItem("nombre").includes("@")) {
+    nombreCompleto = localStorage.getItem("nombre");
+  } else if (user?.email) {
+    nombreCompleto = user.email.split('@')[0];
+  } else if (user?.correo) {
+    nombreCompleto = user.correo.split('@')[0];
+  }
+  
+  const primerNombre = nombreCompleto.split(' ')[0];
 
   const handleLogout = () => {
-    // Limpiar el localStorage
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    localStorage.removeItem("alumno_id");
-    localStorage.removeItem("nombre");
+    authService.logout(); // Usa el método de authService que ya limpia todo
     
-    // Ejecutar la función onLogout si existe
     if (onLogout) {
       onLogout();
     }
     
-    // Redirigir al login
     navigate("/");
+  };
+
+  const handleProfileClick = () => {
+    navigate("/perfil");
   };
 
   return (
     <header className="header">
       <div className="header-content">
-        {/* Lado izquierdo */}
         <div className="logo-slidebar-container">
           <img src={logo} alt="Tecsup logo" className="logo" />
           <div className="separator"></div>
           <Slidebar />
         </div>
 
-        {/* Lado derecho */}
         <div className="user-info">
           <span className="user-name">{primerNombre}</span>
+          
+          <button 
+            className="profile-button"
+            onClick={handleProfileClick}
+            aria-label="Ver perfil"
+            title="Mi perfil"
+          >
+            <FaUserCircle className="profile-icon" />
+          </button>
+          
           <button 
             className="logout-button"
             onClick={handleLogout}
             aria-label="Cerrar sesión"
+            title="Cerrar sesión"
           >
             <FaPowerOff className="logout-icon" />
           </button>

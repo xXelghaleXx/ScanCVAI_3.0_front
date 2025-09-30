@@ -35,15 +35,17 @@ const Registro = () => {
     setError('');
 
     try {
-      await authService.registro(formData);
-      navigate('/login');
+      const result = await authService.registro(formData);
+      if (result.success) {
+        console.log('✅ Registro exitoso');
+        navigate('/login');
+      } else {
+        setError(result.error || 'Error al registrar el usuario');
+      }
     } catch (err) {
-      const errorMsg = err.response?.data?.detail 
-        || err.response?.data?.message 
-        || 'Error al registrar el usuario';
-      
+      console.error('❌ Error en registro:', err);
+      const errorMsg = err.message || 'Error al registrar el usuario';
       setError(errorMsg);
-      console.error('Registro error:', err);
     }
   };
 

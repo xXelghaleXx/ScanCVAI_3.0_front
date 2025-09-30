@@ -1,106 +1,106 @@
-/* ===== RESET Y ESTILOS BASE ===== */
+  /* ===== RESET Y ESTILOS BASE ===== */
 
-/*
-  1. Usar un box-sizing más intuitivo.
-*/
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+  /*
+    1. Usar un box-sizing más intuitivo.
+  */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-/*
-  2. Mejorar la legibilidad y el suavizado de fuentes.
-*/
-html {
-  line-height: 1.5;
-  -webkit-text-size-adjust: 100%;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-family: var(--font-family-sans);
-}
+  /*
+    2. Mejorar la legibilidad y el suavizado de fuentes.
+  */
+  html {
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: var(--font-family-sans);
+  }
 
-/*
-  3. Establecer los estilos base del body.
-*/
-body {
-  min-height: 100vh;
-  font-family: var(--font-family-sans);
-  color: var(--text-primary);
-  background-color: var(--bg-secondary);
-  overflow-x: hidden;
-}
+  /*
+    3. Establecer los estilos base del body.
+  */
+  body {
+    min-height: 100vh;
+    font-family: var(--font-family-sans);
+    color: var(--text-primary);
+    background-color: var(--bg-secondary);
+    overflow-x: hidden;
+  }
 
-/* Ocultar la barra de scroll */
-body::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
-}
+  /* Ocultar la barra de scroll */
+  body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
 
-body {
-  -ms-overflow-style: none;  /* IE y Edge */
-  scrollbar-width: none;  /* Firefox */
-}
+  body {
+    -ms-overflow-style: none;  /* IE y Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
 
-/*
-  4. Estilos base para elementos comunes.
-*/
-a {
-  font-weight: 500;
-  color: var(--primary);
-  text-decoration: none;
-  transition: color var(--transition-fast);
-}
+  /*
+    4. Estilos base para elementos comunes.
+  */
+  a {
+    font-weight: 500;
+    color: var(--primary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
 
-a:hover {
-  color: var(--primary-dark);
-}
+  a:hover {
+    color: var(--primary-dark);
+  }
 
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--text-primary);
-}
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-primary);
+  }
 
-h1 { font-size: var(--text-4xl); }
-h2 { font-size: var(--text-3xl); }
-h3 { font-size: var(--text-2xl); }
+  h1 { font-size: var(--text-4xl); }
+  h2 { font-size: var(--text-3xl); }
+  h3 { font-size: var(--text-2xl); }
 
-button {
-  font-family: inherit;
-  font-size: var(--text-base);
-  font-weight: 500;
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-md);
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  background-color: var(--primary);
-  color: var(--text-inverse);
-}
+  button {
+    font-family: inherit;
+    font-size: var(--text-base);
+    font-weight: 500;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    background-color: var(--primary);
+    color: var(--text-inverse);
+  }
 
-button:hover {
-  background-color: var(--primary-dark);
-  box-shadow: var(--shadow-md);
-}
+  button:hover {
+    background-color: var(--primary-dark);
+    box-shadow: var(--shadow-md);
+  }
 
-button:focus, button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-  outline-color: var(--primary-light);
-}
+  button:focus, button:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+    outline-color: var(--primary-light);
+  }
 
-/*
-  5. Estructura principal de la aplicación.
-*/
-.app-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
+  /*
+    5. Estructura principal de la aplicación.
+  */
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
 
-.main-content {
-  flex: 1;
-  padding-top: 100px; /* Espacio para el header */
-  padding-bottom: 80px; /* Espacio para el footer */
-}
+  .main-content {
+    flex: 1;
+    padding-top: 100px; /* Espacio para el header */
+    padding-bottom: 80px; /* Espacio para el footer */
+  }

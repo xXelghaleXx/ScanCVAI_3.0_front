@@ -26,6 +26,10 @@ class AuthService {
     return user ? JSON.parse(user) : null;
   }
 
+    getCurrentUser() {
+    return this.getUser();
+  }
+  
   isAuthenticated() {
     const token = this.getToken();
     if (!token) return false;
@@ -100,63 +104,51 @@ class AuthService {
   }
 
   // ========== LOGIN CON GOOGLE ==========
-  
   async loginWithGoogle(googleCredential) {
-    try {
-      console.log('🔐 AuthService: Iniciando login con Google');
-      console.log('🎫 Enviando credential al backend...');
-      
-      const response = await fetch(`${this.baseURL}/auth/google/callback`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          credential: googleCredential,
-          client_id: 'frontend_app',
-          client_secret: '123456'
-        })
-      });
+  try {
+    console.log('🔐 AuthService: Iniciando login con Google');
+    console.log('🎫 Credential recibido:', googleCredential.substring(0, 20) + '...');
+    
+    const response = await fetch(`${this.baseURL}/auth/google/callback`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        credential: googleCredential,  // ← Asegurarse de que se envía como 'credential'
+        client_id: 'frontend_app',
+        client_secret: '123456'
+      })
+    });
 
-      console.log('📥 Respuesta del backend:', response.status);
+    console.log('📥 Respuesta del backend:', response.status);
 
-      const responseText = await response.text();
-      console.log('📄 Respuesta texto:', responseText);
+    const data = await response.json();
+    console.log('📄 Datos recibidos:', data);
 
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error('❌ Error parseando respuesta JSON:', parseError);
-        return { 
-          success: false, 
-          error: 'Respuesta del servidor inválida' 
-        };
-      }
-
-      if (response.ok && data.access_token) {
-        console.log('✅ Login con Google exitoso');
-        this.handleSuccessfulLogin(data);
-        return { 
-          success: true, 
-          user: this.getUser() 
-        };
-      } else {
-        console.error('❌ Login con Google fallido:', data);
-        return { 
-          success: false, 
-          error: data.error || data.message || `Error ${response.status}` 
-        };
-      }
-    } catch (error) {
-      console.error('❌ Error en loginWithGoogle:', error);
+    if (response.ok && data.access_token) {
+      console.log('✅ Login con Google exitoso');
+      this.handleSuccessfulLogin(data);
+      return { 
+        success: true, 
+        user: this.getUser() 
+      };
+    } else {
+      console.error('❌ Login con Google fallido:', data);
       return { 
         success: false, 
-        error: `Error de conexión: ${error.message}` 
+        error: data.error || data.message || 'Error de autenticación' 
       };
     }
+  } catch (error) {
+    console.error('❌ Error en loginWithGoogle:', error);
+    return { 
+      success: false, 
+      error: error.message 
+    };
   }
+}
 
   // ========== REGISTRO ==========
   
@@ -347,8 +339,6 @@ class AuthService {
 // Crear una instancia única del servicio
 const authService = new AuthService();
 
-// Verificar que se exporta correctamente
-console.log('🔧 Exportando authService desde FRONTEND:', authService);
-console.log('🔧 Métodos disponibles:', Object.getOwnPropertyNames(Object.getPrototypeOf(authService)));
-
+// Exportar de ambas formas para mayor compatibilidad
+export { authService };
 export default authService;

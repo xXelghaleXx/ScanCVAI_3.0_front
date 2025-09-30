@@ -64,6 +64,11 @@
 .greeting-section {
   flex: 1;
   max-width: 60%;
+  font-size: 2.5rem; /* o el tamaño que uses */
+  font-weight: 700;
+  line-height: 1.2;
+  color: #1a1a1a;
+
 }
 
 .greeting-text {
@@ -73,6 +78,15 @@
   margin-bottom: var(--space-sm);
   line-height: 1.1;
   letter-spacing: -0.025em;
+}
+
+.greeting-text .user-name {
+  font-size: 2.5rem; /* mismo tamaño que el saludo */
+  font-weight: 700; /* mismo peso que el saludo */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .user-name {

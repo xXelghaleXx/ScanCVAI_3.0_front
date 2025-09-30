@@ -475,32 +475,6 @@ const Login = () => {
                 </a>
               </div>
             </form>
-
-            {/* Botón de Debug */}
-            {import.meta.env.DEV && (
-              <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                <button 
-                  type="button" 
-                  onClick={handleDebugTest}
-                  style={{ 
-                    padding: '8px 16px', 
-                    fontSize: '12px', 
-                    backgroundColor: '#ff6b6b',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    marginRight: '10px'
-                  }}
-                >
-                  🧪 Debug Completo
-                </button>
-                <small style={{ color: '#666', display: 'block', marginTop: '5px' }}>
-                  AuthService: {typeof authService.loginWithGoogle === 'function' ? '✅' : '❌'} | 
-                  Client ID: {import.meta.env.VITE_GOOGLE_CLIENT_ID ? '✅' : '❌'}
-                </small>
-              </div>
-            )}
           </div>
         </div>
 

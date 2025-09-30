@@ -7,31 +7,29 @@ import Welcome from "./components/Welcome";
 import LectorCV from "./components/LectorCV";
 import HistorialCV from "./components/HistorialCV";
 import ChatEntrevista from "./components/Entrevista";
+import Perfil from './components/Perfil';
 import Background from "./components/Background";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import authService from "./services/authService";
 
 // IMPORTAR CSS EN EL ORDEN CORRECTO
-import "./styles/layout-refactorizado.css"; // ← PRIMERO: Layout base refactorizado
-import "./styles/Welcome-refactorizado.css"; // ← SEGUNDO: Welcome específico refactorizado
-import "./styles/Chat.css";          // ← TERCERO: Chat específico
-import "./index.css";                // ← ÚLTIMO: Overrides globales
+import "./styles/layout-refactorizado.css";
+import "./styles/Welcome-refactorizado.css";
+import "./styles/Chat.css";
+import "./index.css";
 
 const App = () => {
   const location = useLocation();
   const isLoginPage = location.pathname === "/" || location.pathname === "/register";
 
-  // 🔑 OBTENER GOOGLE CLIENT ID DE VARIABLES DE ENTORNO
   const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
-  // 🔍 DEBUGGING - Solo en desarrollo
   if (import.meta.env.DEV) {
     console.log('🔑 Google Client ID configurado:', GOOGLE_CLIENT_ID ? 'SÍ' : 'NO');
     console.log('🔑 Client ID (primeros 30 chars):', GOOGLE_CLIENT_ID?.substring(0, 30) + '...');
     console.log('🔑 Client ID válido:', GOOGLE_CLIENT_ID?.includes('.apps.googleusercontent.com') ? 'SÍ' : 'NO');
     
-    // Advertencias si hay problemas
     if (!GOOGLE_CLIENT_ID) {
       console.error('❌ VITE_GOOGLE_CLIENT_ID no está definido en .env');
       console.warn('📝 Agrega VITE_GOOGLE_CLIENT_ID=tu_client_id.apps.googleusercontent.com en tu archivo .env');
@@ -44,11 +42,9 @@ const App = () => {
   const handleLogout = () => {
     console.log("Usuario ha cerrado sesión");
     authService.logout();
-    // Redirigir al login
     window.location.href = "/";
   };
 
-  // 🚨 SI NO HAY CLIENT ID, MOSTRAR MENSAJE DE ERROR EN DESARROLLO
   if (!GOOGLE_CLIENT_ID && import.meta.env.DEV) {
     return (
       <div style={{
@@ -106,26 +102,23 @@ const App = () => {
       }}
     >
       <div className="app-root">
-        {/* Fondo global - siempre presente */}
         <div className="background-wrapper">
           <Background />
         </div>
 
-        {/* Header - UNA SOLA VEZ, NO fixed */}
         {!isLoginPage && (
           <div className="header-container">
             <Header onLogout={handleLogout} />
           </div>
         )}
 
-        {/* Contenido principal - flex: 1 */}
         <div className="main-content-wrapper">
           <Routes>
-            {/* Páginas de autenticación - sin layout adicional */}
+            {/* Páginas de autenticación */}
             <Route path="/" element={<Login />} />
             <Route path="/register" element={<Register />} />
             
-            {/* Welcome - layout específico SIN Header/Footer internos */}
+            {/* Welcome */}
             <Route path="/welcome" element={
               <ProtectedRoute>
                 <div className="welcome-main-wrapper">
@@ -134,7 +127,7 @@ const App = () => {
               </ProtectedRoute>
             } />
             
-            {/* Otras páginas - layout estándar */}
+            {/* Lector CV */}
             <Route path="/lector-cv" element={
               <ProtectedRoute>
                 <div className="content-with-header">
@@ -145,6 +138,7 @@ const App = () => {
               </ProtectedRoute>
             } />
             
+            {/* Entrevista */}
             <Route path="/entrevista" element={
               <ProtectedRoute>
                 <div className="content-with-header">
@@ -155,6 +149,7 @@ const App = () => {
               </ProtectedRoute>
             } />
             
+            {/* Historial CV */}
             <Route path="/historialCV" element={
               <ProtectedRoute>
                 <div className="content-with-header">
@@ -164,10 +159,20 @@ const App = () => {
                 </div>
               </ProtectedRoute>
             } />
+            
+            {/* Perfil - NUEVA RUTA */}
+            <Route path="/perfil" element={
+              <ProtectedRoute>
+                <div className="content-with-header">
+                  <div className="page-container">
+                    <Perfil />
+                  </div>
+                </div>
+              </ProtectedRoute>
+            } />
           </Routes>
         </div>
 
-        {/* Footer - UNA SOLA VEZ, NO fixed */}
         {!isLoginPage && (
           <div className="footer-container">
             <Footer />
