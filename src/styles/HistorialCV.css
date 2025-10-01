@@ -63,7 +63,7 @@
   background: var(--warning);
   color: white;
   border: none;
-  borderRadius: var(--radius-md);
+  border-radius: var(--radius-md);
   font-size: var(--text-xs);
   font-weight: 600;
   cursor: pointer;
