@@ -7,7 +7,7 @@ const API_BASE_URL = 'http://localhost:3000/api';
 class EntrevistaService {
   
   // ========== INICIAR NUEVA ENTREVISTA ==========
-  async iniciarEntrevista() {
+  async iniciarEntrevista(carreraId, carreraNombre) {
     try {
       const token = authService.getToken();
       if (!token) {
@@ -21,7 +21,11 @@ class EntrevistaService {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({
+          carrera_id: carreraId,
+          carrera_nombre: carreraNombre
+        })
       });
 
       if (!response.ok) {
@@ -139,152 +143,13 @@ class EntrevistaService {
     }
   }
 
-  // ========== OBTENER DIAGNÓSTICO ==========
-  async obtenerDiagnostico(entrevistaId) {
-    try {
-      const token = authService.getToken();
-      if (!token) {
-        throw new Error('No hay sesión activa');
-      }
-
-      console.log('📊 Obteniendo diagnóstico de entrevista:', entrevistaId);
-
-      const response = await fetch(`${API_BASE_URL}/entrevistas/${entrevistaId}/diagnostico`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al obtener diagnóstico');
-      }
-
-      const data = await response.json();
-      console.log('✅ Diagnóstico obtenido');
-      
-      return { success: true, data };
-    } catch (error) {
-      console.error('❌ Error al obtener diagnóstico:', error);
-      return { success: false, error: error.message };
-    }
-  }
-
-  // ========== OBTENER HISTORIAL DE ENTREVISTA ==========
-  async obtenerHistorialEntrevista(entrevistaId) {
-    try {
-      const token = authService.getToken();
-      if (!token) {
-        throw new Error('No hay sesión activa');
-      }
-
-      console.log('📜 Obteniendo historial de entrevista:', entrevistaId);
-
-      const response = await fetch(`${API_BASE_URL}/entrevistas/${entrevistaId}/historial`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al obtener historial');
-      }
-
-      const data = await response.json();
-      console.log('✅ Historial obtenido');
-      
-      return { success: true, data };
-    } catch (error) {
-      console.error('❌ Error al obtener historial:', error);
-      return { success: false, error: error.message };
-    }
-  }
-
-  // ========== OBTENER LISTA DE ENTREVISTAS ==========
-  async obtenerEntrevistas(params = {}) {
-    try {
-      const token = authService.getToken();
-      if (!token) {
-        throw new Error('No hay sesión activa');
-      }
-
-      console.log('📋 Obteniendo lista de entrevistas...');
-
-      // Construir query params
-      const queryParams = new URLSearchParams();
-      if (params.page) queryParams.append('page', params.page);
-      if (params.limit) queryParams.append('limit', params.limit);
-      if (params.estado) queryParams.append('estado', params.estado);
-      
-      const url = `${API_BASE_URL}/entrevistas${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
-
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al obtener entrevistas');
-      }
-
-      const data = await response.json();
-      console.log('✅ Lista de entrevistas obtenida:', data.entrevistas?.length || 0);
-      
-      return { success: true, data };
-    } catch (error) {
-      console.error('❌ Error al obtener entrevistas:', error);
-      return { success: false, error: error.message };
-    }
-  }
-
-  // ========== OBTENER ESTADÍSTICAS ==========
-  async obtenerEstadisticas() {
-    try {
-      const token = authService.getToken();
-      if (!token) {
-        throw new Error('No hay sesión activa');
-      }
-
-      console.log('📊 Obteniendo estadísticas generales...');
-
-      const response = await fetch(`${API_BASE_URL}/entrevistas/estadisticas/resumen`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al obtener estadísticas');
-      }
-
-      const data = await response.json();
-      console.log('✅ Estadísticas obtenidas');
-      
-      return { success: true, data };
-    } catch (error) {
-      console.error('❌ Error al obtener estadísticas:', error);
-      return { success: false, error: error.message };
-    }
-  }
-
   // ========== GUARDAR ENTREVISTA EN LOCALSTORAGE ==========
-  guardarEntrevistaLocal(entrevistaId, chatHistory) {
+  guardarEntrevistaLocal(entrevistaId, chatHistory, carrera) {
     try {
       const datos = {
         id: entrevistaId,
         chatHistory: chatHistory || [],
+        carrera: carrera || null,
         timestamp: Date.now()
       };
 
@@ -310,7 +175,7 @@ class EntrevistaService {
       const data = JSON.parse(entrevistaGuardada);
       
       // Verificar si la entrevista no es muy antigua (24 horas)
-      const TIEMPO_EXPIRACION = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
+      const TIEMPO_EXPIRACION = 24 * 60 * 60 * 1000;
       const tiempoTranscurrido = Date.now() - data.timestamp;
       
       if (tiempoTranscurrido > TIEMPO_EXPIRACION) {
@@ -350,7 +215,6 @@ class EntrevistaService {
         return false;
       }
 
-      // Verificar si no ha expirado
       const data = JSON.parse(entrevista);
       const TIEMPO_EXPIRACION = 24 * 60 * 60 * 1000;
       const tiempoTranscurrido = Date.now() - data.timestamp;
@@ -367,44 +231,9 @@ class EntrevistaService {
       return false;
     }
   }
-
-  // ========== OBTENER ID DE ENTREVISTA ACTUAL ==========
-  getEntrevistaActualId() {
-    try {
-      const resultado = this.recuperarEntrevistaLocal();
-      if (resultado.success) {
-        return resultado.data.id;
-      }
-      return null;
-    } catch (error) {
-      console.error('❌ Error al obtener ID de entrevista actual:', error);
-      return null;
-    }
-  }
-
-  // ========== ACTUALIZAR CHAT EN LOCALSTORAGE ==========
-  actualizarChatLocal(nuevoMensaje) {
-    try {
-      const resultado = this.recuperarEntrevistaLocal();
-      
-      if (resultado.success) {
-        const { id, chatHistory } = resultado.data;
-        const chatActualizado = [...chatHistory, nuevoMensaje];
-        this.guardarEntrevistaLocal(id, chatActualizado);
-        return { success: true };
-      }
-      
-      return { success: false, error: 'No hay entrevista activa' };
-    } catch (error) {
-      console.error('❌ Error al actualizar chat:', error);
-      return { success: false, error: error.message };
-    }
-  }
 }
 
-// Crear instancia única del servicio
 const entrevistaService = new EntrevistaService();
 
-// Exportar de ambas formas para mayor compatibilidad
 export { entrevistaService };
 export default entrevistaService;

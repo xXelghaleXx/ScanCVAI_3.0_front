@@ -1,3 +1,4 @@
+// src/components/Entrevista.jsx
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -6,80 +7,136 @@ import {
   Sparkles,
   AlertCircle
 } from "lucide-react";
+import { toast } from 'react-toastify';
 import ChatBox from "./Chatbox";
 import ChatInput from "./Chatinput";
+import CarreraSelector from "./CarreraSelector";
+import ResultadosEntrevista from "./ResultadosEntrevista";
 import entrevistaService from "../services/entrevistaService";
 import "../styles/Chat.css";
 
 const EntrevistaChat = () => {
-  // Estados principales
+  // ========== ESTADOS PRINCIPALES ==========
   const [entrevistaId, setEntrevistaId] = useState(null);
   const [chat, setChat] = useState([]);
   const [mensaje, setMensaje] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  // Estados del flujo
+  const [mostrarSelectorCarrera, setMostrarSelectorCarrera] = useState(true);
+  const [carreraSeleccionada, setCarreraSeleccionada] = useState(null);
+  const [dificultadSeleccionada, setDificultadSeleccionada] = useState(null);
   const [entrevistaFinalizada, setEntrevistaFinalizada] = useState(false);
-  const [estadisticas, setEstadisticas] = useState(null);
-  const [showDiagnostico, setShowDiagnostico] = useState(false);
-  const [diagnostico, setDiagnostico] = useState(null);
+  const [resultados, setResultados] = useState(null);
   
   const chatBoxRef = useRef(null);
 
-  // ========== INICIAR ENTREVISTA ==========
+  // ========== VERIFICAR ENTREVISTA EXISTENTE AL CARGAR ==========
   useEffect(() => {
-    const entrevistaGuardada = entrevistaService.recuperarEntrevistaLocal();
-    
-    if (entrevistaGuardada.success) {
-      const { id, chatHistory } = entrevistaGuardada.data;
-      setEntrevistaId(id);
-      setChat(chatHistory || []);
-      console.log('✅ Entrevista recuperada:', id);
-    } else {
-      iniciarNuevaEntrevista();
-    }
+    verificarEntrevistaExistente();
   }, []);
 
-  // Guardar estado automáticamente
+  const verificarEntrevistaExistente = () => {
+    console.log('🔍 Verificando si hay entrevista guardada...');
+    
+    const entrevistaGuardada = entrevistaService.recuperarEntrevistaLocal();
+    const carreraGuardada = localStorage.getItem('carreraSeleccionada');
+    const dificultadGuardada = localStorage.getItem('dificultadSeleccionada');
+    
+    if (entrevistaGuardada.success && carreraGuardada) {
+      const { id, chatHistory } = entrevistaGuardada.data;
+      const carrera = JSON.parse(carreraGuardada);
+      const dificultad = dificultadGuardada ? JSON.parse(dificultadGuardada) : null;
+      
+      setEntrevistaId(id);
+      setChat(chatHistory || []);
+      setCarreraSeleccionada(carrera);
+      setDificultadSeleccionada(dificultad);
+      setMostrarSelectorCarrera(false);
+      
+      console.log('✅ Entrevista recuperada:', id);
+      console.log('✅ Carrera recuperada:', carrera.nombre);
+      if (dificultad) {
+        console.log('✅ Dificultad recuperada:', dificultad.nombre);
+      }
+    } else {
+      console.log('📝 No hay entrevista guardada, mostrando selector de carrera...');
+      setMostrarSelectorCarrera(true);
+    }
+  };
+
+  // ========== GUARDAR ESTADO AUTOMÁTICAMENTE ==========
   useEffect(() => {
     if (entrevistaId && chat.length > 0 && !entrevistaFinalizada) {
       entrevistaService.guardarEntrevistaLocal(entrevistaId, chat);
+      if (carreraSeleccionada) {
+        localStorage.setItem('carreraSeleccionada', JSON.stringify(carreraSeleccionada));
+      }
+      if (dificultadSeleccionada) {
+        localStorage.setItem('dificultadSeleccionada', JSON.stringify(dificultadSeleccionada));
+      }
     }
-  }, [entrevistaId, chat, entrevistaFinalizada]);
+  }, [entrevistaId, chat, entrevistaFinalizada, carreraSeleccionada, dificultadSeleccionada]);
 
-  // ========== FUNCIÓN: INICIAR NUEVA ENTREVISTA ==========
-  const iniciarNuevaEntrevista = async () => {
+  // ========== MANEJAR INICIO DE ENTREVISTA (CON CARRERA Y DIFICULTAD) ==========
+  const handleEntrevistaIniciada = async (data) => {
     try {
       setLoading(true);
       setError(null);
       
-      console.log('🎯 Iniciando nueva entrevista...');
+      const { entrevista, carrera, dificultad } = data;
       
-      const result = await entrevistaService.iniciarEntrevista();
-
-      if (result.success) {
-        const { entrevista_id, mensaje: mensajeBienvenida } = result.data;
-        
-        setEntrevistaId(entrevista_id);
-        setChat([{ 
-          tipo: "ia", 
-          texto: mensajeBienvenida || "¡Hola! Soy tu asistente de entrevistas. Estoy aquí para ayudarte a practicar. ¿Listo para comenzar?"
-        }]);
-        setEntrevistaFinalizada(false);
-        
-        console.log('✅ Entrevista iniciada:', entrevista_id);
-      } else {
-        throw new Error(result.error);
-      }
+      console.log('🎯 Entrevista iniciada desde CarreraSelector');
+      console.log('📚 Carrera:', carrera.nombre);
+      console.log('📊 Dificultad:', dificultad.nombre);
+      console.log('🆔 Entrevista ID:', entrevista.entrevista_id || entrevista.id);
+      console.log('💬 Mensaje inicial:', entrevista.mensaje);
+      
+      // Guardar estados
+      setCarreraSeleccionada(carrera);
+      setDificultadSeleccionada(dificultad);
+      
+      // El ID puede venir como entrevista_id o id dependiendo del backend
+      const idEntrevista = entrevista.entrevista_id || entrevista.id;
+      setEntrevistaId(idEntrevista);
+      
+      // Establecer el mensaje inicial de la IA
+      const mensajeInicial = entrevista.mensaje || 
+        `¡Hola! Bienvenido a la entrevista de ${carrera.nombre} en nivel ${dificultad.nombre}. Estoy aquí para ayudarte a practicar. ¿Listo para comenzar?`;
+      
+      setChat([{ 
+        tipo: "ia", 
+        texto: mensajeInicial
+      }]);
+      
+      // Guardar en localStorage
+      entrevistaService.guardarEntrevistaLocal(idEntrevista, [{
+        tipo: "ia",
+        texto: mensajeInicial
+      }]);
+      localStorage.setItem('carreraSeleccionada', JSON.stringify(carrera));
+      localStorage.setItem('dificultadSeleccionada', JSON.stringify(dificultad));
+      
+      // Ocultar selector y mostrar chat
+      setMostrarSelectorCarrera(false);
+      setEntrevistaFinalizada(false);
+      
+      toast.success(`Entrevista iniciada: ${carrera.nombre} - ${dificultad.nombre}`);
       
     } catch (error) {
-      console.error('❌ Error al iniciar entrevista:', error);
-      setError(error.message || 'Error al iniciar la entrevista');
+      console.error('❌ Error al procesar entrevista iniciada:', error);
+      setError(error.message || 'Error al procesar la entrevista');
+      toast.error(error.message);
+      
+      // Mantener el selector visible en caso de error
+      setMostrarSelectorCarrera(true);
     } finally {
       setLoading(false);
     }
   };
 
-  // ========== FUNCIÓN: ENVIAR MENSAJE ==========
+  // ========== ENVIAR MENSAJE ==========
   const handleEnviarMensaje = async () => {
     if (mensaje.trim() === "") return;
     if (!entrevistaId) {
@@ -95,7 +152,6 @@ const EntrevistaChat = () => {
       setLoading(true);
       setError(null);
 
-      // Agregar mensaje del usuario inmediatamente
       const mensajeUsuario = { tipo: "usuario", texto: mensaje };
       setChat(prevChat => [...prevChat, mensajeUsuario]);
       setMensaje("");
@@ -107,7 +163,6 @@ const EntrevistaChat = () => {
       if (result.success) {
         const { respuesta, finalizada } = result.data;
 
-        // Agregar respuesta de la IA
         if (respuesta) {
           setTimeout(() => {
             setChat(prevChat => [...prevChat, {
@@ -117,7 +172,6 @@ const EntrevistaChat = () => {
           }, 500);
         }
 
-        // Verificar si la entrevista finalizó
         if (finalizada) {
           setTimeout(() => {
             finalizarEntrevista();
@@ -130,12 +184,13 @@ const EntrevistaChat = () => {
     } catch (error) {
       console.error('❌ Error al enviar mensaje:', error);
       setError(error.message || 'Error al enviar tu respuesta');
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // ========== FUNCIÓN: FINALIZAR ENTREVISTA ==========
+  // ========== FINALIZAR ENTREVISTA ==========
   const finalizarEntrevista = async () => {
     if (!entrevistaId) return;
 
@@ -144,60 +199,43 @@ const EntrevistaChat = () => {
       
       console.log('🏁 Finalizando entrevista...');
       
-      const result = await entrevistaService.finalizarEntrevista(entrevistaId);
+      const token = localStorage.getItem('access_token');
+      const response = await fetch(`http://localhost:3000/api/entrevistas/${entrevistaId}/finalizar`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
 
-      if (result.success) {
-        setEntrevistaFinalizada(true);
-        setEstadisticas(result.data.estadisticas);
-        
-        setChat(prevChat => [...prevChat, {
-          tipo: "ia",
-          texto: "¡Excelente trabajo! La entrevista ha finalizado. Puedes ver tu diagnóstico detallado haciendo clic en el botón inferior."
-        }]);
-
-        entrevistaService.limpiarEntrevistaLocal();
-        
-        console.log('✅ Entrevista finalizada');
-      } else {
-        throw new Error(result.error);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al finalizar entrevista');
       }
+
+      const data = await response.json();
+      console.log('✅ Entrevista finalizada:', data);
+      
+      setEntrevistaFinalizada(true);
+      setResultados(data.resultados);
+      
+      // Limpiar localStorage
+      entrevistaService.limpiarEntrevistaLocal();
+      localStorage.removeItem('carreraSeleccionada');
+      localStorage.removeItem('dificultadSeleccionada');
+      
+      toast.success('¡Entrevista finalizada!');
 
     } catch (error) {
       console.error('❌ Error al finalizar entrevista:', error);
       setError(error.message || 'Error al finalizar la entrevista');
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // ========== FUNCIÓN: OBTENER DIAGNÓSTICO ==========
-  const obtenerDiagnostico = async () => {
-    if (!entrevistaId) return;
-
-    try {
-      setLoading(true);
-      
-      console.log('📊 Obteniendo diagnóstico...');
-      
-      const result = await entrevistaService.obtenerDiagnostico(entrevistaId);
-
-      if (result.success) {
-        setDiagnostico(result.data);
-        setShowDiagnostico(true);
-        console.log('✅ Diagnóstico obtenido');
-      } else {
-        throw new Error(result.error);
-      }
-
-    } catch (error) {
-      console.error('❌ Error al obtener diagnóstico:', error);
-      setError(error.message || 'Error al obtener diagnóstico');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ========== FUNCIÓN: ABANDONAR ENTREVISTA ==========
+  // ========== ABANDONAR ENTREVISTA ==========
   const abandonarEntrevista = async () => {
     if (!entrevistaId) return;
     
@@ -213,18 +251,19 @@ const EntrevistaChat = () => {
 
       if (result.success) {
         entrevistaService.limpiarEntrevistaLocal();
+        localStorage.removeItem('carreraSeleccionada');
+        localStorage.removeItem('dificultadSeleccionada');
         
         // Reiniciar estado
         setEntrevistaId(null);
         setChat([]);
+        setCarreraSeleccionada(null);
+        setDificultadSeleccionada(null);
         setEntrevistaFinalizada(false);
-        setEstadisticas(null);
-        setDiagnostico(null);
-        setShowDiagnostico(false);
+        setResultados(null);
+        setMostrarSelectorCarrera(true);
         
-        // Iniciar nueva entrevista
-        iniciarNuevaEntrevista();
-        
+        toast.info('Entrevista abandonada');
         console.log('✅ Entrevista abandonada');
       } else {
         throw new Error(result.error);
@@ -233,11 +272,56 @@ const EntrevistaChat = () => {
     } catch (error) {
       console.error('❌ Error al abandonar entrevista:', error);
       setError(error.message || 'Error al abandonar entrevista');
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
   };
 
+  // ========== NUEVA ENTREVISTA ==========
+  const handleNuevaEntrevista = () => {
+    // Limpiar todo
+    entrevistaService.limpiarEntrevistaLocal();
+    localStorage.removeItem('carreraSeleccionada');
+    localStorage.removeItem('dificultadSeleccionada');
+    
+    setEntrevistaId(null);
+    setChat([]);
+    setCarreraSeleccionada(null);
+    setDificultadSeleccionada(null);
+    setEntrevistaFinalizada(false);
+    setResultados(null);
+    setMostrarSelectorCarrera(true);
+    setError(null);
+    
+    toast.info('Selecciona una carrera para comenzar');
+  };
+
+  // ========== RENDER ==========
+  
+  // Si la entrevista está finalizada, mostrar resultados
+  if (entrevistaFinalizada && resultados) {
+    return (
+      <ResultadosEntrevista 
+        resultados={resultados}
+        onNuevaEntrevista={handleNuevaEntrevista}
+      />
+    );
+  }
+
+  // Si hay que mostrar el selector de carrera
+  if (mostrarSelectorCarrera) {
+    return (
+      <AnimatePresence>
+        <CarreraSelector 
+          onEntrevistaIniciada={handleEntrevistaIniciada}
+          onCancel={null}
+        />
+      </AnimatePresence>
+    );
+  }
+
+  // Mostrar el chat de entrevista
   return (
     <div className="entrevista-container">
       {/* Header */}
@@ -253,7 +337,15 @@ const EntrevistaChat = () => {
           <div className="header-text">
             <h2 className="entrevista-title">Simulador de Entrevista con IA</h2>
             <p className="entrevista-subtitle">
-              Practica y mejora tus habilidades de entrevista
+              {carreraSeleccionada && dificultadSeleccionada ? (
+                <>
+                  <strong>{carreraSeleccionada.nombre}</strong> - Nivel: <strong>{dificultadSeleccionada.nombre}</strong>
+                </>
+              ) : carreraSeleccionada ? (
+                <>Carrera: <strong>{carreraSeleccionada.nombre}</strong></>
+              ) : (
+                'Practica y mejora tus habilidades de entrevista'
+              )}
             </p>
           </div>
         </div>
@@ -299,7 +391,7 @@ const EntrevistaChat = () => {
         <ChatBox 
           chat={chat}
           loading={loading}
-          preguntaInicial="¡Hola! Estoy aquí para ayudarte a practicar tus habilidades de entrevista."
+          preguntaInicial={chat.length === 0 ? "¡Hola! Estoy aquí para ayudarte a practicar tu entrevista." : ""}
           ref={chatBoxRef}
         />
 
@@ -311,153 +403,6 @@ const EntrevistaChat = () => {
           loading={loading}
         />
       </div>
-
-      {/* Estadísticas y Diagnóstico */}
-      {entrevistaFinalizada && (
-        <motion.div 
-          className="entrevista-footer"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          {estadisticas && (
-            <div className="estadisticas-card">
-              <h3 className="estadisticas-title">
-                <TrendingUp size={20} />
-                Resumen de la Entrevista
-              </h3>
-              <div className="estadisticas-grid">
-                <div className="stat-item">
-                  <MessageCircle size={18} />
-                  <div className="stat-content">
-                    <span className="stat-label">Mensajes</span>
-                    <span className="stat-value">{estadisticas.total_mensajes || 0}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="action-buttons">
-            <button 
-              className="btn-primary"
-              onClick={obtenerDiagnostico}
-              disabled={loading || showDiagnostico}
-            >
-              <Sparkles size={18} />
-              Ver Diagnóstico Detallado
-            </button>
-            <button 
-              className="btn-secondary"
-              onClick={iniciarNuevaEntrevista}
-              disabled={loading}
-            >
-              <MessageCircle size={18} />
-              Nueva Entrevista
-            </button>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Modal de Diagnóstico */}
-      <AnimatePresence>
-        {showDiagnostico && diagnostico && (
-          <motion.div 
-            className="diagnostico-modal-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowDiagnostico(false)}
-          >
-            <motion.div 
-              className="diagnostico-modal"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="modal-header">
-                <h3>
-                  <Sparkles size={24} />
-                  Diagnóstico Detallado
-                </h3>
-                <button 
-                  className="close-button"
-                  onClick={() => setShowDiagnostico(false)}
-                >
-                  ×
-                </button>
-              </div>
-
-              <div className="modal-content">
-                {diagnostico.fortalezas && diagnostico.fortalezas.length > 0 && (
-                  <div className="diagnostico-section">
-                    <h4 className="section-title success">
-                      ✓ Fortalezas Identificadas
-                    </h4>
-                    <ul className="diagnostico-list">
-                      {diagnostico.fortalezas.map((item, index) => (
-                        <li key={index}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {diagnostico.areas_mejora && diagnostico.areas_mejora.length > 0 && (
-                  <div className="diagnostico-section">
-                    <h4 className="section-title warning">
-                      ⚠ Áreas de Mejora
-                    </h4>
-                    <ul className="diagnostico-list">
-                      {diagnostico.areas_mejora.map((item, index) => (
-                        <li key={index}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {diagnostico.recomendaciones && diagnostico.recomendaciones.length > 0 && (
-                  <div className="diagnostico-section">
-                    <h4 className="section-title info">
-                      💡 Recomendaciones
-                    </h4>
-                    <ul className="diagnostico-list">
-                      {diagnostico.recomendaciones.map((item, index) => (
-                        <li key={index}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {diagnostico.puntuacion_general && (
-                  <div className="puntuacion-general">
-                    <h4>Puntuación General</h4>
-                    <div className="puntuacion-bar">
-                      <motion.div 
-                        className="puntuacion-fill"
-                        initial={{ width: 0 }}
-                        animate={{ width: `${diagnostico.puntuacion_general}%` }}
-                        transition={{ duration: 1, ease: "easeOut" }}
-                      />
-                    </div>
-                    <span className="puntuacion-value">
-                      {diagnostico.puntuacion_general}%
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <div className="modal-footer">
-                <button 
-                  className="btn-primary"
-                  onClick={() => setShowDiagnostico(false)}
-                >
-                  Cerrar
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };

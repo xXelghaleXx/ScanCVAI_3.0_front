@@ -1,5 +1,7 @@
+// src/App.jsx
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import Login from "./components/Login";
 import Register from "./components/Register";
@@ -11,7 +13,9 @@ import Perfil from './components/Perfil';
 import Background from "./components/Background";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CarreraSelector from "./components/CarreraSelector";
 import authService from "./services/authService";
+import entrevistaService from "./services/entrevistaService";
 
 // IMPORTAR CSS EN EL ORDEN CORRECTO
 import "./styles/layout-refactorizado.css";
@@ -21,9 +25,34 @@ import "./index.css";
 
 const App = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isLoginPage = location.pathname === "/" || location.pathname === "/register";
+  
+  // Estado para controlar el selector de carreras
+  const [mostrarSelectorCarrera, setMostrarSelectorCarrera] = useState(false);
+  const [destinoEntrevista, setDestinoEntrevista] = useState(null);
 
   const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+  // Verificar si hay una entrevista en curso al cargar
+  useEffect(() => {
+    const verificarEntrevistaEnCurso = () => {
+      if (location.pathname === "/entrevista") {
+        const hayEntrevista = entrevistaService.hayEntrevistaEnCurso();
+        
+        if (!hayEntrevista) {
+          // No hay entrevista, mostrar selector
+          const entrevistaData = entrevistaService.recuperarEntrevistaLocal();
+          if (!entrevistaData.success) {
+            setMostrarSelectorCarrera(true);
+            setDestinoEntrevista("/entrevista");
+          }
+        }
+      }
+    };
+
+    verificarEntrevistaEnCurso();
+  }, [location.pathname]);
 
   if (import.meta.env.DEV) {
     console.log('🔑 Google Client ID configurado:', GOOGLE_CLIENT_ID ? 'SÍ' : 'NO');
@@ -42,7 +71,50 @@ const App = () => {
   const handleLogout = () => {
     console.log("Usuario ha cerrado sesión");
     authService.logout();
+    entrevistaService.limpiarEntrevistaLocal();
     window.location.href = "/";
+  };
+
+  // Manejar cuando se selecciona una carrera
+  const handleCarreraSeleccionada = async (carrera) => {
+    try {
+      console.log('🎯 Carrera seleccionada:', carrera);
+      
+      // Iniciar entrevista con el backend
+      const result = await entrevistaService.iniciarEntrevista(carrera.id, carrera.nombre);
+      
+      if (result.success) {
+        const { entrevista_id, mensaje } = result.data;
+        
+        // Guardar en localStorage
+        entrevistaService.guardarEntrevistaLocal(
+          entrevista_id,
+          [{ tipo: "ia", texto: mensaje }],
+          carrera
+        );
+        
+        // Ocultar selector y navegar a la entrevista
+        setMostrarSelectorCarrera(false);
+        
+        if (destinoEntrevista) {
+          navigate(destinoEntrevista);
+        }
+        
+      } else {
+        alert(`Error: ${result.error}`);
+      }
+      
+    } catch (error) {
+      console.error('❌ Error al iniciar entrevista:', error);
+      alert(`Error: ${error.message}`);
+    }
+  };
+
+  // Manejar cancelación del selector
+  const handleCancelarSelector = () => {
+    setMostrarSelectorCarrera(false);
+    setDestinoEntrevista(null);
+    navigate("/welcome");
   };
 
   if (!GOOGLE_CLIENT_ID && import.meta.env.DEV) {
@@ -160,7 +232,7 @@ const App = () => {
               </ProtectedRoute>
             } />
             
-            {/* Perfil - NUEVA RUTA */}
+            {/* Perfil */}
             <Route path="/perfil" element={
               <ProtectedRoute>
                 <div className="content-with-header">
@@ -177,6 +249,14 @@ const App = () => {
           <div className="footer-container">
             <Footer />
           </div>
+        )}
+
+        {/* Modal del Selector de Carreras */}
+        {mostrarSelectorCarrera && (
+          <CarreraSelector
+            onCarreraSelected={handleCarreraSeleccionada}
+            onCancel={handleCancelarSelector}
+          />
         )}
       </div>
     </GoogleOAuthProvider>

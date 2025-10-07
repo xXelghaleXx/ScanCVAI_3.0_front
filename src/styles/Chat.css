@@ -1942,4 +1942,182 @@
     width: 40px;
     height: 40px;
   }
+
+  /* ===== BADGE DE CARRERA SELECCIONADA ===== */
+/* Añadir estos estilos al archivo Chat.css existente */
+
+.carrera-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  background: var(--secondary-bg);
+  border: 1px solid var(--secondary);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  animation: slideInDown 0.5s ease-out;
+}
+
+.badge-label {
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-value {
+  color: var(--secondary);
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== RESPONSIVE PARA EL BADGE ===== */
+@media (max-width: 768px) {
+  .entrevista-header {
+    flex-wrap: wrap;
+  }
+  
+  .carrera-badge {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    margin-top: var(--space-md);
+  }
+}
+
+/* ===== ESTILOS PARA SELECTOR DE CARRERAS ===== */
+
+/* Overlay del selector */
+.selector-carreras-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justifyContent: center;
+  z-index: 9999;
+  padding: 1rem;
+}
+
+/* Modal del selector */
+.selector-carreras-modal {
+  background: white;
+  border-radius: 24px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+/* Carrera item hover */
+.carrera-item {
+  padding: 1rem 1.5rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.carrera-item:hover {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.carrera-item.selected {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+/* Badge de carrera */
+.carrera-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* ===== ANIMACIONES ADICIONALES ===== */
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.selector-carreras-modal {
+  animation: scaleIn 0.3s ease-out;
+}
+
+/* ===== RESPONSIVE PARA SELECTOR ===== */
+
+@media (max-width: 768px) {
+  .selector-carreras-modal {
+    max-width: 95%;
+    max-height: 90vh;
+  }
+  
+  .carrera-item {
+    padding: 0.875rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .selector-carreras-overlay {
+    padding: 0.5rem;
+  }
+  
+  .selector-carreras-modal {
+    border-radius: 16px;
+  }
+  
+  .carrera-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+}
 }
