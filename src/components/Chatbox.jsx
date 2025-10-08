@@ -83,16 +83,15 @@ const ChatBox = forwardRef(({ chat, loading, preguntaInicial }, ref) => {
 
   return (
     <div className="chat-box" ref={ref}>
-      <AnimatePresence mode="popLayout">
+      <AnimatePresence mode="sync">
         {chat.map((mensaje, index) => (
           <motion.div
-            key={`${mensaje.tipo}-${index}-${Date.now()}`}
+            key={`mensaje-${index}`}
             className={`mensaje-wrapper ${mensaje.tipo}`}
             variants={messageVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
-            layout
           >
             {mensaje.tipo === "ia" ? (
               // Mensaje de la IA

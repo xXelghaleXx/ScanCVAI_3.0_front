@@ -72,8 +72,8 @@ const Welcome = () => {
       const informesData = await informesResponse.json();
       console.log('✅ Informes obtenidos:', informesData);
 
-      // 🎯 Obtener historial de entrevistas del endpoint GET /api/entrevistas/historial
-      const entrevistasResponse = await fetch('http://localhost:3000/api/entrevistas/historial', {
+      // 🎯 Obtener historial de entrevistas del endpoint GET /api/entrevistas
+      const entrevistasResponse = await fetch('http://localhost:3000/api/entrevistas', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

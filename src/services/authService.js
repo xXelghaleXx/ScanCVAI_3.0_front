@@ -321,9 +321,9 @@ class AuthService {
         method: 'PUT',
         body: JSON.stringify(profileData)
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok) {
         return { success: true, user: data };
       } else {
@@ -332,6 +332,37 @@ class AuthService {
     } catch (error) {
       console.error('❌ Error actualizando perfil:', error);
       return { success: false, error: error.message };
+    }
+  }
+
+  // ========== OBTENER CARRERAS ==========
+
+  async getCarreras() {
+    try {
+      console.log('📚 AuthService: Obteniendo carreras...');
+
+      const response = await this.authenticatedRequest(`${this.baseURL}/carreras`);
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('✅ Carreras obtenidas:', data.carreras?.length || 0);
+        return {
+          success: true,
+          carreras: data.carreras || []
+        };
+      } else {
+        console.error('❌ Error obteniendo carreras:', data);
+        return {
+          success: false,
+          error: data.error || data.message || 'Error al obtener carreras'
+        };
+      }
+    } catch (error) {
+      console.error('❌ Error en getCarreras:', error);
+      return {
+        success: false,
+        error: error.message || 'Error de conexión'
+      };
     }
   }
 }

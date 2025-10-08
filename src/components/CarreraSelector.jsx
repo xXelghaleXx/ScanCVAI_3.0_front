@@ -1,10 +1,13 @@
-// src/components/CarreraSelector.jsx
+// src/components/CarreraSelector.jsx - VERSIÓN CORREGIDA
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Briefcase, ChevronRight, CheckCircle, Zap, Award, Trophy, Flame } from 'lucide-react';
+import { Search, Briefcase, ChevronRight, CheckCircle, Zap, Award, Flame } from 'lucide-react';
+import authService from '../services/authService';
+import entrevistaService from '../services/entrevistaService';
+import { toast } from 'react-toastify';
 
 const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
-  const [paso, setPaso] = useState(1); // 1: Seleccionar carrera, 2: Seleccionar dificultad
+  const [paso, setPaso] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [carreras, setCarreras] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,17 +16,18 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
   const [iniciandoEntrevista, setIniciandoEntrevista] = useState(false);
   const [error, setError] = useState(null);
 
+  // IMPORTANTE: Mapeo de dificultades frontend ↔ backend
   const dificultades = [
     {
-      id: 'facil', // Sin tilde - exactamente como lo espera el backend
-      nombre: 'Fácil',
+      id: 'basica', // Backend espera 'basica'
+      nombre: 'Básica',
       descripcion: 'Preguntas básicas y fundamentales',
       icon: Zap,
       color: '#10b981',
       gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
     },
     {
-      id: 'intermedia', // Exactamente como lo espera el backend
+      id: 'intermedia', // Backend espera 'intermedia'
       nombre: 'Intermedia',
       descripcion: 'Preguntas de nivel medio con casos prácticos',
       icon: Award,
@@ -31,8 +35,8 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
       gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
     },
     {
-      id: 'avanzado', // Exactamente como lo espera el backend
-      nombre: 'Avanzado',
+      id: 'avanzada', // Backend espera 'avanzada'
+      nombre: 'Avanzada',
       descripcion: 'Preguntas complejas y desafiantes',
       icon: Flame,
       color: '#ef4444',
@@ -47,20 +51,23 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
   const cargarCarreras = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('access_token');
+      setError(null);
       
-      const response = await fetch('http://localhost:3000/api/carreras', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setCarreras(data.carreras || []);
+      console.log('📚 Cargando carreras...');
+      
+      // Usar authService para obtener carreras
+      const result = await authService.getCarreras();
+      
+      if (result.success) {
+        console.log('✅ Carreras cargadas:', result.carreras.length);
+        setCarreras(result.carreras || []);
+      } else {
+        throw new Error(result.error);
       }
     } catch (error) {
-      console.error('Error cargando carreras:', error);
+      console.error('❌ Error cargando carreras:', error);
+      setError('Error al cargar las carreras');
+      toast.error('Error al cargar las carreras');
     } finally {
       setLoading(false);
     }
@@ -71,70 +78,100 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
   );
 
   const handleSelectCarrera = (carrera) => {
+    console.log('📚 Carrera seleccionada:', carrera.nombre);
     setSelectedCarrera(carrera);
+    setError(null);
   };
 
   const handleSelectDificultad = (dificultad) => {
+    console.log('📊 Dificultad seleccionada:', dificultad.nombre);
     setSelectedDificultad(dificultad);
+    setError(null);
   };
 
   const handleContinuarADificultad = () => {
     if (selectedCarrera) {
+      console.log('➡️ Avanzando a selección de dificultad');
       setPaso(2);
+      setError(null);
     }
   };
 
   const handleVolverACarreras = () => {
+    console.log('⬅️ Volviendo a selección de carreras');
     setPaso(1);
     setSelectedDificultad(null);
     setError(null);
   };
 
   const iniciarEntrevista = async () => {
-    if (!selectedCarrera || !selectedDificultad) return;
+    if (!selectedCarrera || !selectedDificultad) {
+      toast.error('Selecciona una carrera y dificultad');
+      return;
+    }
 
     try {
       setIniciandoEntrevista(true);
       setError(null);
-      const token = localStorage.getItem('access_token');
 
-      // Preparar el body según lo que espera el API
-      const requestBody = {
-        carreraid: selectedCarrera.id,
-        dificultad: selectedDificultad.id
-      };
+      console.log('🚀 Iniciando entrevista...');
+      console.log('  📚 Carrera:', selectedCarrera.nombre, `(ID: ${selectedCarrera.id})`);
+      console.log('  📊 Dificultad:', selectedDificultad.nombre, `(${selectedDificultad.id})`);
 
-      console.log('📤 Enviando request a /api/entrevistas/iniciar:', requestBody);
+      // Llamar al servicio
+      const result = await entrevistaService.iniciarEntrevista(
+        selectedCarrera.id,
+        selectedDificultad.id
+      );
 
-      const response = await fetch('http://localhost:3000/api/entrevistas/iniciar', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBody)
-      });
-
-      console.log('📥 Response status:', response.status);
-
-      const responseData = await response.json();
-      console.log('📥 Response data:', responseData);
-
-      if (response.ok) {
+      if (result.success) {
         console.log('✅ Entrevista iniciada exitosamente');
-        // Llamar al callback con los datos de la entrevista iniciada
+        console.log('  🆔 ID:', result.data.entrevistaId);
+        console.log('  💬 Mensaje inicial:', result.data.mensajeInicial.substring(0, 50) + '...');
+        
+        toast.success(`Entrevista iniciada: ${selectedCarrera.nombre}`);
+        
+        // Llamar callback con estructura correcta
         onEntrevistaIniciada({
-          entrevista: responseData,
+          entrevistaId: result.data.entrevistaId,
           carrera: selectedCarrera,
-          dificultad: selectedDificultad
+          dificultad: selectedDificultad,
+          mensajeInicial: result.data.mensajeInicial,
+          aiDisponible: result.data.aiDisponible
         });
+        
       } else {
-        console.error('❌ Error del servidor:', responseData);
-        setError(responseData.message || responseData.error || 'Error al iniciar la entrevista');
+        // Manejar error específico de entrevista activa
+        if (result.entrevistaActiva) {
+          const confirmar = window.confirm(
+            `Ya tienes una entrevista activa de ${result.entrevistaActiva.carrera_id || 'una carrera'}.\n\n` +
+            `¿Deseas abandonarla e iniciar una nueva?`
+          );
+          
+          if (confirmar) {
+            // Abandonar la entrevista activa
+            const abandonResult = await entrevistaService.abandonarEntrevista(
+              result.entrevistaActiva.id
+            );
+            
+            if (abandonResult.success) {
+              // Intentar iniciar nuevamente
+              toast.info('Entrevista anterior abandonada. Iniciando nueva...');
+              setTimeout(() => iniciarEntrevista(), 500);
+            } else {
+              throw new Error('Error al abandonar entrevista anterior');
+            }
+          }
+          return;
+        }
+        
+        throw new Error(result.error);
       }
+      
     } catch (error) {
-      console.error('Error iniciando entrevista:', error);
-      setError('Error de conexión. Por favor, intenta de nuevo.');
+      console.error('❌ Error al iniciar entrevista:', error);
+      setError(error.message || 'Error al iniciar la entrevista');
+      toast.error(error.message || 'Error al iniciar la entrevista');
     } finally {
       setIniciandoEntrevista(false);
     }
@@ -191,7 +228,7 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
             {paso === 1 ? (
               <Briefcase size={32} color="white" />
             ) : (
-              <Trophy size={32} color="white" />
+              <Flame size={32} color="white" />
             )}
             <h2 style={{ margin: 0, color: 'white', fontSize: '1.75rem', fontWeight: 700 }}>
               {paso === 1 ? 'Selecciona una Carrera' : 'Selecciona la Dificultad'}
@@ -226,7 +263,7 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
           </div>
         </div>
 
-        {/* Contenido según el paso */}
+        {/* Contenido */}
         <AnimatePresence mode="wait">
           {paso === 1 ? (
             <motion.div
@@ -238,11 +275,7 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
             >
               {/* Buscador */}
               <div style={{ padding: '1.5rem', borderBottom: '1px solid #e5e7eb' }}>
-                <div style={{
-                  position: 'relative',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}>
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                   <Search 
                     size={20} 
                     style={{
@@ -263,58 +296,28 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
                       borderRadius: '12px',
                       fontSize: '1rem',
                       outline: 'none',
-                      transition: 'all 0.2s',
                       fontFamily: 'inherit'
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = '#667eea';
-                      e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = '#e5e7eb';
-                      e.target.style.boxShadow = 'none';
                     }}
                   />
                 </div>
               </div>
 
               {/* Lista de Carreras */}
-              <div style={{
-                flex: 1,
-                overflowY: 'auto',
-                padding: '1rem'
-              }}>
+              <div style={{ flex: 1, overflowY: 'auto', padding: '1rem' }}>
                 {loading ? (
                   <div style={{ textAlign: 'center', padding: '3rem' }}>
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        border: '4px solid #e5e7eb',
-                        borderTopColor: '#667eea',
-                        borderRadius: '50%',
-                        margin: '0 auto 1rem'
-                      }}
-                    />
                     <p style={{ color: '#6b7280' }}>Cargando carreras...</p>
                   </div>
                 ) : carrerasFiltradas.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '3rem' }}>
                     <Briefcase size={48} style={{ color: '#d1d5db', margin: '0 auto 1rem' }} />
-                    <p style={{ color: '#6b7280', margin: 0 }}>
-                      No se encontraron carreras
-                    </p>
+                    <p style={{ color: '#6b7280', margin: 0 }}>No se encontraron carreras</p>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    {carrerasFiltradas.map((carrera, index) => (
+                    {carrerasFiltradas.map((carrera) => (
                       <motion.div
                         key={carrera.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.05 }}
                         onClick={() => handleSelectCarrera(carrera)}
                         style={{
                           padding: '1rem 1.5rem',
@@ -323,7 +326,6 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
                             : '2px solid #e5e7eb',
                           borderRadius: '12px',
                           cursor: 'pointer',
-                          transition: 'all 0.2s',
                           background: selectedCarrera?.id === carrera.id 
                             ? 'rgba(102, 126, 234, 0.05)' 
                             : 'white',
@@ -331,10 +333,7 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
                           alignItems: 'center',
                           justifyContent: 'space-between'
                         }}
-                        whileHover={{
-                          scale: 1.02,
-                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-                        }}
+                        whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
@@ -361,25 +360,19 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
                             }}>
                               {carrera.nombre}
                             </h3>
-                            {carrera.descripcion && (
+                            {carrera.area && (
                               <p style={{
                                 margin: '0.25rem 0 0 0',
                                 fontSize: '0.75rem',
                                 color: '#6b7280'
                               }}>
-                                {carrera.descripcion}
+                                {carrera.area}
                               </p>
                             )}
                           </div>
                         </div>
                         {selectedCarrera?.id === carrera.id ? (
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-                          >
-                            <CheckCircle size={24} color="#667eea" />
-                          </motion.div>
+                          <CheckCircle size={24} color="#667eea" />
                         ) : (
                           <ChevronRight size={20} color="#d1d5db" />
                         )}
@@ -404,14 +397,11 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
               }}
             >
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {dificultades.map((dificultad, index) => {
+                {dificultades.map((dificultad) => {
                   const Icon = dificultad.icon;
                   return (
                     <motion.div
                       key={dificultad.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
                       onClick={() => handleSelectDificultad(dificultad)}
                       style={{
                         padding: '1.5rem',
@@ -420,7 +410,6 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
                           : '2px solid #e5e7eb',
                         borderRadius: '16px',
                         cursor: 'pointer',
-                        transition: 'all 0.2s',
                         background: selectedDificultad?.id === dificultad.id 
                           ? `${dificultad.color}10` 
                           : 'white',
@@ -428,10 +417,7 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
                         alignItems: 'center',
                         gap: '1.5rem'
                       }}
-                      whileHover={{
-                        scale: 1.02,
-                        boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)'
-                      }}
+                      whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
                       <div style={{
@@ -464,13 +450,7 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
                         </p>
                       </div>
                       {selectedDificultad?.id === dificultad.id && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-                        >
-                          <CheckCircle size={28} color={dificultad.color} />
-                        </motion.div>
+                        <CheckCircle size={28} color={dificultad.color} />
                       )}
                     </motion.div>
                   );
@@ -499,7 +479,7 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
           )}
         </AnimatePresence>
 
-        {/* Footer con Botones */}
+        {/* Footer */}
         <div style={{
           padding: '1.5rem',
           borderTop: '1px solid #e5e7eb',
@@ -520,19 +500,8 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
               fontWeight: 600,
               cursor: iniciandoEntrevista ? 'not-allowed' : 'pointer',
               fontSize: '1rem',
-              transition: 'all 0.2s',
               fontFamily: 'inherit',
               opacity: iniciandoEntrevista ? 0.5 : 1
-            }}
-            onMouseEnter={(e) => {
-              if (!iniciandoEntrevista) {
-                e.target.style.background = '#f9fafb';
-                e.target.style.borderColor = '#d1d5db';
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.background = 'white';
-              e.target.style.borderColor = '#e5e7eb';
             }}
           >
             {paso === 1 ? 'Cancelar' : 'Volver'}
@@ -554,23 +523,12 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
                 fontWeight: 600,
                 cursor: selectedCarrera ? 'pointer' : 'not-allowed',
                 fontSize: '1rem',
-                transition: 'all 0.2s',
                 opacity: selectedCarrera ? 1 : 0.5,
                 fontFamily: 'inherit',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '0.5rem'
-              }}
-              onMouseEnter={(e) => {
-                if (selectedCarrera) {
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.boxShadow = '0 10px 20px rgba(102, 126, 234, 0.3)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = 'none';
               }}
             >
               Continuar
@@ -592,7 +550,6 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
                 fontWeight: 600,
                 cursor: (selectedDificultad && !iniciandoEntrevista) ? 'pointer' : 'not-allowed',
                 fontSize: '1rem',
-                transition: 'all 0.2s',
                 opacity: (selectedDificultad && !iniciandoEntrevista) ? 1 : 0.5,
                 fontFamily: 'inherit',
                 display: 'flex',
@@ -600,32 +557,9 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
                 justifyContent: 'center',
                 gap: '0.5rem'
               }}
-              onMouseEnter={(e) => {
-                if (selectedDificultad && !iniciandoEntrevista) {
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.boxShadow = '0 10px 20px rgba(16, 185, 129, 0.3)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = 'none';
-              }}
             >
               {iniciandoEntrevista ? (
-                <>
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                    style={{
-                      width: '20px',
-                      height: '20px',
-                      border: '2px solid rgba(255, 255, 255, 0.3)',
-                      borderTopColor: 'white',
-                      borderRadius: '50%'
-                    }}
-                  />
-                  Iniciando...
-                </>
+                <>Iniciando...</>
               ) : (
                 <>
                   Iniciar Entrevista
