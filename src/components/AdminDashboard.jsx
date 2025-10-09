@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import adminService from "../services/adminService";
 import LoadingSpinner from "./common/LoadingSpiner";
+import Background from "./Background";
 import { toast } from "react-toastify";
 import "../styles/AdminDashboard.css";
 import {
@@ -60,23 +61,29 @@ function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="admin-loading">
-        <div className="admin-spinner"></div>
-        <p>Cargando dashboard...</p>
-      </div>
+      <>
+        <Background />
+        <div className="admin-loading">
+          <div className="admin-spinner"></div>
+          <p>Cargando dashboard...</p>
+        </div>
+      </>
     );
   }
 
   if (!dashboardData) {
     return (
-      <div className="admin-dashboard-wrapper">
-        <div className="admin-dashboard-container">
-          <div className="admin-dashboard-header">
-            <h1 className="admin-dashboard-title">Dashboard de <span>Administrador</span></h1>
-            <p className="admin-dashboard-subtitle">No se pudieron cargar los datos del dashboard.</p>
+      <>
+        <Background />
+        <div className="admin-dashboard-wrapper">
+          <div className="admin-dashboard-container">
+            <div className="admin-dashboard-header">
+              <h1 className="admin-dashboard-title">Dashboard de <span>Administrador</span></h1>
+              <p className="admin-dashboard-subtitle">No se pudieron cargar los datos del dashboard.</p>
+            </div>
           </div>
-        </div>
       </div>
+      </>
     );
   }
 
@@ -142,8 +149,10 @@ function AdminDashboard() {
   };
 
   return (
-    <div className="admin-dashboard-wrapper">
-      <div className="admin-dashboard-container">
+    <>
+      <Background />
+      <div className="admin-dashboard-wrapper">
+        <div className="admin-dashboard-container">
         {/* Header */}
         <div className="admin-dashboard-header">
           <div>
@@ -349,6 +358,7 @@ function AdminDashboard() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

@@ -14,6 +14,7 @@ import {
   TrendingUp,
   Award
 } from 'lucide-react';
+import Background from './Background';
 import entrevistaService from '../services/entrevistaService';
 import '../styles/HistorialEntrevistas.css';
 
@@ -173,10 +174,12 @@ const HistorialEntrevistas = () => {
   }
 
   return (
-    <div className="historial-entrevistas-container">
-      {/* Header */}
-      <motion.div 
-        className="historial-header"
+    <>
+      <Background />
+      <div className="historial-entrevistas-container">
+        {/* Header */}
+        <motion.div
+          className="historial-header"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
@@ -499,6 +502,7 @@ const HistorialEntrevistas = () => {
         )}
       </AnimatePresence>
     </div>
+    </>
   );
 };
 

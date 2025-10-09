@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FileText, MessageCircle, TrendingUp, Clock, Award, Brain } from "lucide-react";
+import Background from "./Background";
 import authService from "../services/authService";
 
 const Welcome = () => {
@@ -243,13 +244,15 @@ const getUserName = () => {
   };
 
   return (
-    <div className="welcome-container">
-      <motion.div 
-        className="welcome-content"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
+    <>
+      <Background />
+      <div className="welcome-container">
+        <motion.div
+          className="welcome-content"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
         {/* Error State */}
         {error && (
           <motion.div 
@@ -488,6 +491,7 @@ const getUserName = () => {
         )}
       </motion.div>
     </div>
+    </>
   );
 };
 

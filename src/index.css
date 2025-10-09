@@ -11,7 +11,12 @@
 @import './styles/base.css';
 
 /*
-  3. Importar media queries para responsive design (DEBE IR AL FINAL)
+  3. Importar estilos responsive globales
+*/
+@import './styles/responsive-global.css';
+
+/*
+  4. Importar media queries para responsive design (DEBE IR AL FINAL)
 */
 @import './styles/responsive.css';
 

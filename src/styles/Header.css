@@ -13,10 +13,18 @@
   align-items: center;
   gap: var(--space-md);
   justify-content: flex-start; /* Asegura la alineación a la izquierda */
+  min-width: 0; /* Permite que el contenedor se encoja */
+  flex-shrink: 1; /* Permite que se comprima si es necesario */
 }
 
 .logo {
   height: 50px;
+  width: auto;
+  max-width: 150px;
+  object-fit: contain;
+  object-position: left center;
+  flex-shrink: 0; /* Evita que el logo se aplaste */
+  display: block;
 }
 
 .separator {
@@ -95,16 +103,110 @@
   transform: scale(1.1);
 }
 
-/* Responsive */
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .header-content {
+    padding: 0 var(--space-md);
+  }
+
+  .logo {
+    height: 45px;
+    max-width: 140px;
+  }
+
+  .logo-slidebar-container {
+    gap: var(--space-sm);
+  }
+}
+
 @media (max-width: 768px) {
+  .header-content {
+    padding: 0 var(--space-sm);
+    gap: var(--space-sm); /* Añade gap entre grupos principales */
+  }
+
+  .logo {
+    height: 40px;
+    max-width: 120px;
+  }
+
   .separator {
     display: none;
+  }
+
+  .user-info {
+    gap: var(--space-xs);
+    flex-shrink: 0; /* Evita que los botones se compriman */
+  }
+
+  .admin-button,
+  .profile-button {
+    padding: 0.4rem;
+  }
+
+  .admin-icon,
+  .profile-icon {
+    font-size: 1.1rem;
+  }
+
+  .logo-slidebar-container {
+    gap: var(--space-xs);
+    max-width: 60%; /* Limita el ancho máximo del contenedor del logo */
   }
 }
 
 @media (max-width: 480px) {
+  .header-content {
+    padding: 0 0.5rem;
+  }
+
+  .logo {
+    height: 32px;
+    max-width: 90px;
+  }
+
   .user-name {
-    font-size: 0.85rem;
-    max-width: 120px;
+    display: none; /* Ocultar nombre en móviles muy pequeños para dar espacio */
+  }
+
+  .admin-button,
+  .profile-button,
+  .logout-button {
+    padding: 0.25rem;
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .admin-icon,
+  .profile-icon,
+  .logout-icon {
+    font-size: 1rem;
+  }
+
+  .logo-slidebar-container {
+    gap: 0.25rem;
+    max-width: 55%;
+  }
+
+  .user-info {
+    gap: 0.25rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .logo {
+    height: 28px;
+    max-width: 70px;
+  }
+
+  .admin-button,
+  .profile-button,
+  .logout-button {
+    padding: 0.2rem;
+    min-width: 32px;
+    min-height: 32px;
   }
 }

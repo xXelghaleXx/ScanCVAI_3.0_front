@@ -11,6 +11,7 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react';
+import Background from './Background';
 import '../styles/HistorialCV.css';
 
 const API_BASE_URL = 'http://localhost:3000/api';
@@ -227,10 +228,12 @@ const HistorialCV = () => {
 
   // Main Content
   return (
-    <div className="historial-container">
-      {/* Header */}
-      <div className="historial-header">
-        <div className="header-content-wrapper">
+    <>
+      <Background />
+      <div className="historial-container">
+        {/* Header */}
+        <div className="historial-header">
+          <div className="header-content-wrapper">
           <div className="header-icon-wrapper">
             <Clock size={24} />
           </div>
@@ -360,6 +363,7 @@ const HistorialCV = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

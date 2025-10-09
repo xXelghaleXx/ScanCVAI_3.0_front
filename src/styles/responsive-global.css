@@ -1,0 +1,347 @@
+/* ===== ESTILOS GLOBALES RESPONSIVE ===== */
+
+/*
+  Breakpoints estándar:
+  - Mobile: 320px - 480px
+  - Mobile Large: 481px - 768px
+  - Tablet: 769px - 1024px
+  - Desktop: 1025px+
+*/
+
+/* ===== IMÁGENES RESPONSIVAS ===== */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ===== CONTENEDORES RESPONSIVOS ===== */
+.container-responsive {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+}
+
+@media (max-width: 768px) {
+  .container-responsive {
+    padding: 0 var(--space-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .container-responsive {
+    padding: 0 var(--space-sm);
+  }
+}
+
+/* ===== GRIDS RESPONSIVOS ===== */
+.grid-responsive-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+}
+
+.grid-responsive-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+}
+
+.grid-responsive-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+}
+
+@media (max-width: 1024px) {
+  .grid-responsive-3,
+  .grid-responsive-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-responsive-2,
+  .grid-responsive-3,
+  .grid-responsive-4 {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+}
+
+/* ===== TABLAS RESPONSIVAS ===== */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive table {
+  min-width: 600px;
+}
+
+/* ===== TEXTOS RESPONSIVOS ===== */
+.text-responsive-xl {
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.text-responsive-lg {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.text-responsive-md {
+  font-size: clamp(1.25rem, 3vw, 2rem);
+}
+
+.text-responsive-sm {
+  font-size: clamp(1rem, 2vw, 1.5rem);
+}
+
+/* ===== ESPACIADO RESPONSIVO ===== */
+.padding-responsive {
+  padding: var(--space-2xl) var(--space-lg);
+}
+
+@media (max-width: 768px) {
+  .padding-responsive {
+    padding: var(--space-lg) var(--space-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .padding-responsive {
+    padding: var(--space-md) var(--space-sm);
+  }
+}
+
+/* ===== BOTONES RESPONSIVOS ===== */
+.btn-responsive {
+  padding: var(--space-md) var(--space-xl);
+  font-size: var(--text-base);
+}
+
+@media (max-width: 768px) {
+  .btn-responsive {
+    width: 100%;
+    padding: var(--space-md);
+  }
+}
+
+/* ===== OCULTAR/MOSTRAR EN DIFERENTES TAMAÑOS ===== */
+.hide-on-mobile {
+  display: block;
+}
+
+.show-on-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
+
+  .show-on-mobile {
+    display: block !important;
+  }
+}
+
+/* ===== FLEX RESPONSIVO ===== */
+.flex-responsive {
+  display: flex;
+  gap: var(--space-lg);
+}
+
+@media (max-width: 768px) {
+  .flex-responsive {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+}
+
+/* ===== MODALES RESPONSIVOS ===== */
+.modal-responsive {
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .modal-responsive {
+    max-width: 95vw;
+    max-height: 95vh;
+    border-radius: var(--radius-lg);
+  }
+}
+
+/* ===== CARDS RESPONSIVOS ===== */
+.card-responsive {
+  padding: var(--space-xl);
+  border-radius: var(--radius-xl);
+}
+
+@media (max-width: 768px) {
+  .card-responsive {
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .card-responsive {
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+  }
+}
+
+/* ===== CHARTS RESPONSIVOS ===== */
+.chart-responsive {
+  position: relative;
+  height: 400px;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .chart-responsive {
+    height: 350px;
+  }
+}
+
+@media (max-width: 768px) {
+  .chart-responsive {
+    height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chart-responsive {
+    height: 250px;
+  }
+}
+
+/* ===== NAVEGACIÓN RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .nav-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .nav-responsive::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ===== INPUTS RESPONSIVOS ===== */
+.input-responsive {
+  width: 100%;
+  padding: var(--space-md);
+  font-size: var(--text-base);
+}
+
+@media (max-width: 480px) {
+  .input-responsive {
+    padding: var(--space-sm);
+    font-size: 16px; /* Evita zoom en iOS */
+  }
+}
+
+/* ===== ASPECT RATIO RESPONSIVE (para imágenes/videos) ===== */
+.aspect-ratio-16-9 {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 */
+  overflow: hidden;
+}
+
+.aspect-ratio-16-9 > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.aspect-ratio-4-3 {
+  position: relative;
+  width: 100%;
+  padding-bottom: 75%; /* 4:3 */
+  overflow: hidden;
+}
+
+.aspect-ratio-4-3 > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.aspect-ratio-1-1 {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%; /* 1:1 */
+  overflow: hidden;
+}
+
+.aspect-ratio-1-1 > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ===== SCROLL HORIZONTAL TOUCH-FRIENDLY ===== */
+.scroll-horizontal {
+  display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  gap: var(--space-md);
+  padding-bottom: var(--space-sm);
+}
+
+.scroll-horizontal::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-horizontal > * {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+/* ===== TOUCH-FRIENDLY ELEMENTS ===== */
+@media (max-width: 768px) {
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px; /* Tamaño mínimo recomendado para touch */
+  }
+}
+
+/* ===== VIEWPORT META FIX ===== */
+@media (max-width: 480px) {
+  html {
+    font-size: 14px; /* Reduce base font size en móviles */
+  }
+}
+
+/* ===== ANIMACIONES REDUCIDAS EN MÓVIL ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

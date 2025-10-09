@@ -10,6 +10,7 @@ import ChatBox from "./Chatbox";
 import ChatInput from "./Chatinput";
 import CarreraSelector from "./CarreraSelector";
 import ResultadosEntrevista from "./ResultadosEntrevista";
+import Background from "./Background";
 import entrevistaService from "../services/entrevistaService";
 import "../styles/Chat.css";
 
@@ -421,15 +422,17 @@ const EntrevistaChat = () => {
 
   // Mostrar el chat de entrevista
   return (
-    <div className="entrevista-container">
-      {/* Header */}
-      <motion.div 
-        className="entrevista-header"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <div className="header-content-wrapper">
-          <div className="header-icon-wrapper">
+    <>
+      <Background />
+      <div className="entrevista-container">
+        {/* Header */}
+        <motion.div
+          className="entrevista-header"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="header-content-wrapper">
+            <div className="header-icon-wrapper">
             <MessageCircle size={24} />
           </div>
           <div className="header-text">
@@ -547,6 +550,7 @@ const EntrevistaChat = () => {
         />
       </div>
     </div>
+    </>
   );
 };
 

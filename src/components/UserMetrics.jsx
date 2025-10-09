@@ -1,9 +1,32 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import adminService from "../services/adminService";
+import Background from "./Background";
 import { toast } from "react-toastify";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Star, FileText, MessageCircle } from "lucide-react";
 import { Line } from "react-chartjs-2";
 import "../styles/UserMetrics.css";
+
+// Registrar componentes de Chart.js
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 function UserMetrics() {
   const { userId } = useParams();
@@ -13,15 +36,19 @@ function UserMetrics() {
 
   useEffect(() => {
     loadUserMetrics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   const loadUserMetrics = async () => {
     try {
       setLoading(true);
+      console.log("Cargando métricas para usuario ID:", userId);
       const response = await adminService.getUserMetrics(userId);
+      console.log("Respuesta del servidor:", response);
       setUserMetrics(response.data);
     } catch (error) {
       console.error("Error cargando métricas del usuario:", error);
+      console.error("Error response:", error.response);
       toast.error("Error cargando métricas del usuario");
 
       if (error.response?.status === 403) {
@@ -38,35 +65,56 @@ function UserMetrics() {
 
   if (loading) {
     return (
-      <div className="user-metrics-loading">
-        <div className="user-metrics-spinner"></div>
-        <p>Cargando métricas...</p>
-      </div>
+      <>
+        <Background />
+        <div className="user-metrics-loading">
+          <div className="user-metrics-spinner"></div>
+          <p>Cargando métricas...</p>
+        </div>
+      </>
     );
   }
 
   if (!userMetrics) {
     return (
-      <div className="user-metrics-wrapper">
-        <div className="user-metrics-container">
-          <h1 className="user-metrics-header-content">Métricas de Usuario</h1>
-          <p>No se pudieron cargar las métricas del usuario.</p>
+      <>
+        <Background />
+        <div className="user-metrics-wrapper">
+          <div className="user-metrics-container">
+            <h1 className="user-metrics-header-content">Métricas de Usuario</h1>
+            <p>No se pudieron cargar las métricas del usuario.</p>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   const { usuario, metricas } = userMetrics;
 
+  // Validar que las métricas existan
+  if (!usuario || !metricas) {
+    return (
+      <>
+        <Background />
+        <div className="user-metrics-wrapper">
+          <div className="user-metrics-container">
+            <h1>Error en datos de métricas</h1>
+            <p>Los datos del usuario o las métricas no están disponibles.</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   // Datos para gráfico de tendencia de entrevistas
   const tendenciaData = {
-    labels: metricas.tendencia_entrevistas.map((item) =>
+    labels: (metricas.tendencia_entrevistas || []).map((item) =>
       new Date(item.fecha).toLocaleDateString("es", { day: "2-digit", month: "short" })
     ),
     datasets: [
       {
         label: "Puntuación",
-        data: metricas.tendencia_entrevistas.map((item) => item.promedio_puntuacion),
+        data: (metricas.tendencia_entrevistas || []).map((item) => item.promedio_puntuacion),
         borderColor: "#667eea",
         backgroundColor: "rgba(102, 126, 234, 0.1)",
         tension: 0.4,
@@ -76,8 +124,10 @@ function UserMetrics() {
   };
 
   return (
-    <div className="user-metrics-wrapper">
-      <div className="user-metrics-container">
+    <>
+      <Background />
+      <div className="user-metrics-wrapper">
+        <div className="user-metrics-container">
         {/* Header */}
         <div className="user-metrics-header">
           <div className="user-metrics-header-content">
@@ -139,7 +189,7 @@ function UserMetrics() {
             <div className="metrics-card-content">
               <div className="metrics-card-text">
                 <p className="metrics-card-label">Total CVs</p>
-                <p className="metrics-card-value">{metricas.resumen.total_cvs}</p>
+                <p className="metrics-card-value">{metricas.resumen?.total_cvs || 0}</p>
               </div>
               <div className="metrics-card-icon blue">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,7 +208,7 @@ function UserMetrics() {
             <div className="metrics-card-content">
               <div className="metrics-card-text">
                 <p className="metrics-card-label">Total Entrevistas</p>
-                <p className="metrics-card-value">{metricas.resumen.total_entrevistas}</p>
+                <p className="metrics-card-value">{metricas.resumen?.total_entrevistas || 0}</p>
               </div>
               <div className="metrics-card-icon purple">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -177,7 +227,7 @@ function UserMetrics() {
             <div className="metrics-card-content">
               <div className="metrics-card-text">
                 <p className="metrics-card-label">Total Informes</p>
-                <p className="metrics-card-value">{metricas.resumen.total_informes}</p>
+                <p className="metrics-card-value">{metricas.resumen?.total_informes || 0}</p>
               </div>
               <div className="metrics-card-icon green">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -197,7 +247,7 @@ function UserMetrics() {
               <div className="metrics-card-text">
                 <p className="metrics-card-label">Promedio</p>
                 <p className="metrics-card-value">
-                  {metricas.resumen.estadisticas_entrevistas?.promedio
+                  {metricas.resumen?.estadisticas_entrevistas?.promedio
                     ? parseFloat(metricas.resumen.estadisticas_entrevistas.promedio).toFixed(2)
                     : "N/A"}
                 </p>
@@ -217,7 +267,7 @@ function UserMetrics() {
         </div>
 
         {/* Gráfico de tendencia */}
-        {metricas.tendencia_entrevistas.length > 0 && (
+        {metricas.tendencia_entrevistas && metricas.tendencia_entrevistas.length > 0 && (
           <div className="metrics-chart-card">
             <h2 className="metrics-chart-title">
               Tendencia de Entrevistas (Últimos 3 meses)
@@ -252,7 +302,7 @@ function UserMetrics() {
           {/* CVs recientes */}
           <div className="metrics-list-card">
             <h2 className="metrics-list-title">CVs Recientes</h2>
-            {metricas.cvs_recientes.length > 0 ? (
+            {metricas.cvs_recientes && metricas.cvs_recientes.length > 0 ? (
               <div className="metrics-list-items">
                 {metricas.cvs_recientes.map((cv) => (
                   <div key={cv.id} className="cv-item">
@@ -276,7 +326,7 @@ function UserMetrics() {
           {/* Entrevistas recientes */}
           <div className="metrics-list-card">
             <h2 className="metrics-list-title">Entrevistas Recientes</h2>
-            {metricas.entrevistas_recientes.length > 0 ? (
+            {metricas.entrevistas_recientes && metricas.entrevistas_recientes.length > 0 ? (
               <div className="metrics-list-items">
                 {metricas.entrevistas_recientes.map((entrevista) => (
                   <div key={entrevista.id} className="entrevista-item">
@@ -286,7 +336,7 @@ function UserMetrics() {
                       </p>
                       {entrevista.promedio_puntuacion && (
                         <span className="entrevista-item-score">
-                          ⭐ {entrevista.promedio_puntuacion.toFixed(1)}
+                          <Star size={14} /> {entrevista.promedio_puntuacion.toFixed(1)}
                         </span>
                       )}
                     </div>
@@ -305,13 +355,13 @@ function UserMetrics() {
         {/* Últimas actividades */}
         <div className="activities-card">
           <h2 className="activities-title">Últimas Actividades</h2>
-          {metricas.ultimas_actividades.length > 0 ? (
+          {metricas.ultimas_actividades && metricas.ultimas_actividades.length > 0 ? (
             <div className="activities-list">
               {metricas.ultimas_actividades.map((actividad, index) => (
                 <div key={index} className="activity-item">
                   <div className="activity-content">
                     <span className="activity-icon">
-                      {actividad.tipo === "cv" ? "📄" : "💬"}
+                      {actividad.tipo === "cv" ? <FileText size={18} /> : <MessageCircle size={18} />}
                     </span>
                     <p className="activity-description">{actividad.descripcion}</p>
                   </div>
@@ -332,6 +382,7 @@ function UserMetrics() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

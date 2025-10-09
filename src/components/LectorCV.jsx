@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, X, Download, Search, FileText } from "lucide-react";
+import Background from "./Background";
 import { toast } from 'react-toastify';
 import '../styles/LectorCV.css';
 
@@ -623,14 +624,16 @@ const LectorCV = () => {
   };
 
   return (
-    <div className="lector-cv-content">
-      {/* Lector de CV (Izquierda) */}
-      <motion.div
-        className="cv-panel"
-        initial={{ opacity: 0, x: -50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+    <>
+      <Background />
+      <div className="lector-cv-content">
+        {/* Lector de CV (Izquierda) */}
+        <motion.div
+          className="cv-panel"
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
         {loading ? (
           <LoadingSpheresAnimation text={loadingText} />
         ) : cvUploaded ? (
@@ -897,6 +900,7 @@ const LectorCV = () => {
         )}
       </AnimatePresence>
     </div>
+    </>
   );
 };
 

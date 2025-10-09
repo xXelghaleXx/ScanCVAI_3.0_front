@@ -53,19 +53,19 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
       setLoading(true);
       setError(null);
       
-      console.log('📚 Cargando carreras...');
-      
+      console.log('[Carreras] Cargando carreras...');
+
       // Usar authService para obtener carreras
       const result = await authService.getCarreras();
-      
+
       if (result.success) {
-        console.log('✅ Carreras cargadas:', result.carreras.length);
+        console.log('[Carreras] Carreras cargadas:', result.carreras.length);
         setCarreras(result.carreras || []);
       } else {
         throw new Error(result.error);
       }
     } catch (error) {
-      console.error('❌ Error cargando carreras:', error);
+      console.error('[Carreras] Error cargando carreras:', error);
       setError('Error al cargar las carreras');
       toast.error('Error al cargar las carreras');
     } finally {
@@ -78,27 +78,27 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
   );
 
   const handleSelectCarrera = (carrera) => {
-    console.log('📚 Carrera seleccionada:', carrera.nombre);
+    console.log('[Selector] Carrera seleccionada:', carrera.nombre);
     setSelectedCarrera(carrera);
     setError(null);
   };
 
   const handleSelectDificultad = (dificultad) => {
-    console.log('📊 Dificultad seleccionada:', dificultad.nombre);
+    console.log('[Selector] Dificultad seleccionada:', dificultad.nombre);
     setSelectedDificultad(dificultad);
     setError(null);
   };
 
   const handleContinuarADificultad = () => {
     if (selectedCarrera) {
-      console.log('➡️ Avanzando a selección de dificultad');
+      console.log('[Selector] Avanzando a selección de dificultad');
       setPaso(2);
       setError(null);
     }
   };
 
   const handleVolverACarreras = () => {
-    console.log('⬅️ Volviendo a selección de carreras');
+    console.log('[Selector] Volviendo a selección de carreras');
     setPaso(1);
     setSelectedDificultad(null);
     setError(null);
@@ -114,9 +114,9 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
       setIniciandoEntrevista(true);
       setError(null);
 
-      console.log('🚀 Iniciando entrevista...');
-      console.log('  📚 Carrera:', selectedCarrera.nombre, `(ID: ${selectedCarrera.id})`);
-      console.log('  📊 Dificultad:', selectedDificultad.nombre, `(${selectedDificultad.id})`);
+      console.log('[Entrevista] Iniciando entrevista...');
+      console.log('[Entrevista] Carrera:', selectedCarrera.nombre, `(ID: ${selectedCarrera.id})`);
+      console.log('[Entrevista] Dificultad:', selectedDificultad.nombre, `(${selectedDificultad.id})`);
 
       // Llamar al servicio
       const result = await entrevistaService.iniciarEntrevista(
@@ -125,9 +125,9 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
       );
 
       if (result.success) {
-        console.log('✅ Entrevista iniciada exitosamente');
-        console.log('  🆔 ID:', result.data.entrevistaId);
-        console.log('  💬 Mensaje inicial:', result.data.mensajeInicial.substring(0, 50) + '...');
+        console.log('[Entrevista] Entrevista iniciada exitosamente');
+        console.log('[Entrevista] ID:', result.data.entrevistaId);
+        console.log('[Entrevista] Mensaje inicial:', result.data.mensajeInicial.substring(0, 50) + '...');
         
         toast.success(`Entrevista iniciada: ${selectedCarrera.nombre}`);
         
@@ -169,7 +169,7 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
       }
       
     } catch (error) {
-      console.error('❌ Error al iniciar entrevista:', error);
+      console.error('[Entrevista] Error al iniciar entrevista:', error);
       setError(error.message || 'Error al iniciar la entrevista');
       toast.error(error.message || 'Error al iniciar la entrevista');
     } finally {

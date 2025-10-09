@@ -11,6 +11,7 @@ import {
   Check,
   AlertCircle
 } from 'lucide-react';
+import Background from './Background';
 import authService from '../services/authService';
 import '../styles/Perfil.css';
 
@@ -154,10 +155,12 @@ const Perfil = () => {
   }
 
   return (
-    <div className="perfil-container">
-      <motion.div 
-        className="perfil-card"
-        initial={{ opacity: 0, y: 20 }}
+    <>
+      <Background />
+      <div className="perfil-container">
+        <motion.div
+          className="perfil-card"
+          initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
         {/* Header */}
@@ -271,6 +274,7 @@ const Perfil = () => {
         </div>
       </motion.div>
     </div>
+    </>
   );
 };
 

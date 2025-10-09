@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { FileText, MessageCircle, BarChart3, Star } from "lucide-react";
 import adminService from "../services/adminService";
+import Background from "./Background";
 import { toast } from "react-toastify";
 import "../styles/UserList.css";
 
@@ -70,16 +72,21 @@ function UserList() {
 
   if (loading && users.length === 0) {
     return (
-      <div className="user-list-loading">
-        <div className="user-list-spinner"></div>
-        <p>Cargando usuarios...</p>
-      </div>
+      <>
+        <Background />
+        <div className="user-list-loading">
+          <div className="user-list-spinner"></div>
+          <p>Cargando usuarios...</p>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="user-list-wrapper">
-      <div className="user-list-container">
+    <>
+      <Background />
+      <div className="user-list-wrapper">
+        <div className="user-list-container">
         {/* Header */}
         <div className="user-list-header">
           <div className="user-list-header-content">
@@ -196,18 +203,18 @@ function UserList() {
                       <div className="user-metrics-cell">
                         <div className="user-metrics-row">
                           <span className="user-metric-item" title="CVs">
-                            📄 {user.metricas.total_cvs}
+                            <FileText size={14} /> {user.metricas.total_cvs}
                           </span>
                           <span className="user-metric-item" title="Entrevistas">
-                            💬 {user.metricas.total_entrevistas}
+                            <MessageCircle size={14} /> {user.metricas.total_entrevistas}
                           </span>
                           <span className="user-metric-item" title="Informes">
-                            📊 {user.metricas.total_informes}
+                            <BarChart3 size={14} /> {user.metricas.total_informes}
                           </span>
                         </div>
                         {user.metricas.promedio_entrevistas && (
                           <div className="user-metric-label">
-                            ⭐ {user.metricas.promedio_entrevistas}
+                            <Star size={12} /> {user.metricas.promedio_entrevistas}
                           </div>
                         )}
                       </div>
@@ -268,6 +275,7 @@ function UserList() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

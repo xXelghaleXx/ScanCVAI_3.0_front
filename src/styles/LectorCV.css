@@ -252,3 +252,107 @@
     border-color: var(--tecsup-border) !important;
   }
 }
+
+/* ===== RESPONSIVE ADICIONAL PARA MÓVIL ===== */
+@media (max-width: 1023px) {
+  .lector-cv-content {
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .cv-panel,
+  .analysis-panel {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .analysis-panel {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .lector-cv-container {
+    padding: var(--space-lg);
+  }
+
+  .lector-cv-content {
+    gap: var(--space-md);
+  }
+
+  .upload-area {
+    padding: var(--space-xl);
+  }
+
+  .upload-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .review-bar {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .btn-analyze,
+  .btn-cancel {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cv-preview h3,
+  .analysis-content h3 {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .lector-cv-container {
+    padding: var(--space-md);
+  }
+
+  .upload-area {
+    padding: var(--space-lg);
+  }
+
+  .upload-title {
+    font-size: 1.25rem;
+  }
+
+  .upload-subtitle {
+    font-size: 0.875rem;
+  }
+
+  .file-info {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .file-name {
+    font-size: 0.875rem;
+  }
+
+  .btn-analyze,
+  .btn-cancel,
+  .download-btn {
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.875rem;
+  }
+}
+
+/* ===== IMÁGENES RESPONSIVE ===== */
+.cv-preview img,
+.analysis-content img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* ===== SCROLL HORIZONTAL PARA TABLAS EN MÓVIL ===== */
+@media (max-width: 768px) {
+  .analysis-content table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
