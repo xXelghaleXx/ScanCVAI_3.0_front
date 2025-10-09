@@ -39,6 +39,7 @@
   font-weight: 600;
 }
 
+.admin-button,
 .profile-button {
   display: flex;
   align-items: center;
@@ -52,17 +53,26 @@
   transition: all 0.3s ease;
 }
 
-.profile-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.admin-button:hover,
+.profile-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.admin-icon,
+.profile-icon {
+  font-size: 1.25rem;
+}
+
+.admin-button {
+  background: rgba(249, 115, 22, 0.2);
+  border-color: rgba(249, 115, 22, 0.4);
+}
+
+.admin-button:hover {
+  background: rgba(249, 115, 22, 0.3);
+  border-color: rgba(249, 115, 22, 0.6);
 }
 
 

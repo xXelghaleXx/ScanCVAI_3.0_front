@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../styles/Header.css";
 import Slidebar from "./Slidebar";
 import logo from "../assets/logo.png";
-import { FaPowerOff, FaUserCircle } from "react-icons/fa";
+import { FaPowerOff, FaUserCircle, FaUserShield } from "react-icons/fa";
 import authService from "../services/authService";
 
 const Header = ({ onLogout }) => {
@@ -41,6 +41,13 @@ const Header = ({ onLogout }) => {
     navigate("/perfil");
   };
 
+  const handleAdminClick = () => {
+    navigate("/admin");
+  };
+
+  // Verificar si el usuario es administrador
+  const isAdmin = user?.rol === 'administrador';
+
   return (
     <header className="header">
       <div className="header-content">
@@ -52,8 +59,19 @@ const Header = ({ onLogout }) => {
 
         <div className="user-info">
           <span className="user-name">{primerNombre}</span>
-          
-          <button 
+
+          {isAdmin && (
+            <button
+              className="admin-button"
+              onClick={handleAdminClick}
+              aria-label="Panel de administrador"
+              title="Panel de administrador"
+            >
+              <FaUserShield className="admin-icon" />
+            </button>
+          )}
+
+          <button
             className="profile-button"
             onClick={handleProfileClick}
             aria-label="Ver perfil"
@@ -61,8 +79,8 @@ const Header = ({ onLogout }) => {
           >
             <FaUserCircle className="profile-icon" />
           </button>
-          
-          <button 
+
+          <button
             className="logout-button"
             onClick={handleLogout}
             aria-label="Cerrar sesión"

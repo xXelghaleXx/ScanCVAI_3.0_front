@@ -10,3 +10,8 @@
 */
 @import './styles/base.css';
 
+/*
+  3. Importar media queries para responsive design (DEBE IR AL FINAL)
+*/
+@import './styles/responsive.css';
+

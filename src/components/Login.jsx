@@ -56,7 +56,13 @@ const Login = () => {
     // Verificar si ya está autenticado
     if (authService.isAuthenticated()) {
       console.log('✅ Usuario ya autenticado, redirigiendo...');
-      navigate('/welcome');
+      const user = authService.getUser();
+      // Redirigir según el rol
+      if (user?.rol === 'administrador') {
+        navigate('/admin');
+      } else {
+        navigate('/welcome');
+      }
     }
     
     // Test de conectividad básica
@@ -130,7 +136,13 @@ const Login = () => {
       if (result.success) {
         console.log('✅ Login tradicional exitoso:', result.user);
         toast.success(`¡Bienvenido ${result.user.email}!`);
-        navigate('/welcome');
+
+        // Redirigir según el rol
+        if (result.user.rol === 'administrador') {
+          navigate('/admin');
+        } else {
+          navigate('/welcome');
+        }
       } else {
         console.error('❌ Login tradicional fallido:', result.error);
         toast.error(result.error);
@@ -203,7 +215,13 @@ const Login = () => {
       if (result && result.success) {
         console.log('✅ Login con Google exitoso:', result.user);
         toast.success(`¡Bienvenido ${result.user.email || result.user.nombre}!`);
-        navigate('/welcome');
+
+        // Redirigir según el rol
+        if (result.user.rol === 'administrador') {
+          navigate('/admin');
+        } else {
+          navigate('/welcome');
+        }
       } else {
         console.error('❌ Login con Google fallido:', result);
         const errorMessage = result?.error || 'Error al iniciar sesión con Google';

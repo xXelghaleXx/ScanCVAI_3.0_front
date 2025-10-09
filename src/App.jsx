@@ -9,6 +9,9 @@ import LectorCV from "./components/LectorCV";
 import HistorialCV from "./components/HistorialCV";
 import ChatEntrevista from "./components/Entrevista";
 import Perfil from './components/Perfil';
+import AdminDashboard from './components/AdminDashboard';
+import UserList from './components/UserList';
+import UserMetrics from './components/UserMetrics';
 import Background from "./components/Background";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -171,6 +174,25 @@ const App = () => {
                     <Perfil />
                   </div>
                 </div>
+              </ProtectedRoute>
+            } />
+
+            {/* Admin Routes */}
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/admin/usuarios" element={
+              <ProtectedRoute>
+                <UserList />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/admin/usuarios/:userId" element={
+              <ProtectedRoute>
+                <UserMetrics />
               </ProtectedRoute>
             } />
           </Routes>

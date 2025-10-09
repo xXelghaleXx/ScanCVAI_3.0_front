@@ -198,13 +198,14 @@ class AuthService {
         nombre: payload.nombre || payload.name,
         apellido: payload.apellido || payload.family_name,
         picture: payload.picture,
+        rol: payload.rol || 'alumno',  // NUEVO: Guardar rol del usuario
         iat: payload.iat,
         exp: payload.exp
       };
-      
+
       localStorage.setItem(this.userKey, JSON.stringify(userData));
       localStorage.setItem('nombre', userData.nombre || userData.email);
-      
+
       console.log('👤 Datos de usuario guardados:', userData);
     } catch (jwtError) {
       console.warn('⚠️ Error decodificando JWT:', jwtError);
