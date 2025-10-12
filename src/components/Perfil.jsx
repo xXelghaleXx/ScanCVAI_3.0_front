@@ -120,6 +120,9 @@ const Perfil = () => {
       setSuccess('Perfil actualizado correctamente');
       setEditing(false);
 
+      // Disparar evento para que el Header se actualice
+      window.dispatchEvent(new Event('profileUpdated'));
+
       setTimeout(() => setSuccess(null), 3000);
 
     } catch (err) {

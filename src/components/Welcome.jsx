@@ -154,26 +154,28 @@ const Welcome = () => {
 const getUserName = () => {
   // Obtener usuario desde authService
   const currentUser = authService.getUser();
-  
-  // Prioridad: nombre del user object > localStorage > email sin dominio
-  if (currentUser?.nombre && !currentUser.nombre.includes('@')) {
-    return currentUser.nombre; // Retorna nombre completo
-  }
-  
+
+  // Prioridad 1: localStorage 'nombre' (actualizado desde perfil)
   const nombreStorage = localStorage.getItem("nombre");
-  if (nombreStorage && !nombreStorage.includes('@')) {
-    return nombreStorage; // Retorna nombre completo
+  if (nombreStorage && nombreStorage.trim() && !nombreStorage.includes('@')) {
+    return nombreStorage.trim();
   }
-  
-  // Si solo hay email, extraer la parte antes del @
+
+  // Prioridad 2: user.nombre del objeto parseado
+  if (currentUser?.nombre && !currentUser.nombre.includes('@')) {
+    return currentUser.nombre;
+  }
+
+  // Prioridad 3: email sin dominio
   if (currentUser?.email) {
     return currentUser.email.split('@')[0];
   }
-  
+
   if (currentUser?.correo) {
     return currentUser.correo.split('@')[0];
   }
-  
+
+  // Fallback
   return "Usuario";
 };
 

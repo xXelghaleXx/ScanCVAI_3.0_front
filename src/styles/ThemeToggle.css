@@ -1,0 +1,45 @@
+/* ===== BOTÓN DE CAMBIO DE TEMA ===== */
+
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(32px, 5.5vw, 40px);
+  height: clamp(32px, 5.5vw, 40px);
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-lg, 8px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(102, 126, 234, 0.1);
+  transform: translateY(-1px);
+}
+
+.theme-icon {
+  color: var(--text-secondary, #6b7280);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  display: block;
+}
+
+.theme-toggle-btn:hover .theme-icon {
+  color: var(--primary, #667eea);
+  transform: rotate(15deg);
+}
+
+/* Animación al cambiar */
+[data-theme="dark"] .theme-icon {
+  color: #fbbf24;
+}
+
+[data-theme="dark"] .theme-toggle-btn:hover .theme-icon {
+  color: #fcd34d;
+}

@@ -289,14 +289,10 @@ const EntrevistaChat = () => {
           nivel_desempenio: evaluacion.nivel_desempenio,
           fortalezas: evaluacion.fortalezas || [],
           areas_mejora: evaluacion.areas_mejora || [],
-          evaluacion_detallada: evaluacion.evaluacion_detallada || {},
-          recomendacion: evaluacion.recomendacion || '',
           comentario_final: evaluacion.comentario_final || '',
-          proximos_pasos: evaluacion.proximos_pasos || [],
-          estadisticas: estadisticas || {},
           carrera: carreraSeleccionada?.nombre || 'Carrera',
-          dificultad: dificultadSeleccionada?.nombre || 'N/A',
           fecha_entrevista: new Date().toLocaleDateString('es-ES'),
+          metricas_puntuacion: evaluacion.metricas_puntuacion || null,
           ai_disponible: aiDisponible
         });
         

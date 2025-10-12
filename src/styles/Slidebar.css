@@ -18,12 +18,17 @@
 }
 
 .menu-header {
-  padding: var(--space-lg) 0;
-  text-align: center;
+  padding: var(--space-xl) var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--border);
 }
 
 .logo-slidebar {
-  width: 150px;
+  width: 140px;
+  height: auto;
+  object-fit: contain;
 }
 
 .menu-list {

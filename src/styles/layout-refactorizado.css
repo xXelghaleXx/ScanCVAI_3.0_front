@@ -81,82 +81,7 @@
   box-shadow: var(--shadow-sm);
   flex-shrink: 0;
   z-index: 1000;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 var(--space-xl);
-  height: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.header-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.logo-slidebar-container {
-  display: flex;
-  align-items: center;
-  gap: var(--space-lg);
-}
-
-.logo {
-  height: 50px;
-  width: auto;
-  object-fit: contain;
-}
-
-.separator {
-  height: 30px;
-  width: 2px;
-  background-color: var(--border);
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.user-name {
-  font-size: 1rem;
-  color: var(--primary);
-  text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
-
-.logout-button {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: var(--space-sm);
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition-fast);
-}
-
-.logout-button:hover {
-  background: var(--bg-secondary);
-}
-
-.logout-icon {
-  color: var(--text-secondary);
-  font-size: 1.3rem;
-  transition: var(--transition-fast);
-}
-
-.logout-button:hover .logout-icon {
-  color: #dc2626;
-  transform: scale(1.1);
+  position: relative;
 }
 
 /* ===== FOOTER SYSTEM ===== */
@@ -208,4 +133,85 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: var(--space-xl);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* Tablets grandes */
+@media (max-width: 1024px) {
+  :root {
+    --header-height: 65px;
+    --footer-height: 55px;
+  }
+
+  .page-container {
+    padding: var(--space-lg);
+  }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+  :root {
+    --header-height: 60px;
+    --footer-height: 50px;
+  }
+
+  .page-container {
+    padding: var(--space-md);
+  }
+
+  .footer {
+    font-size: 13px;
+    padding: 0 var(--space-md);
+  }
+}
+
+/* Móviles grandes */
+@media (max-width: 640px) {
+  :root {
+    --header-height: 56px;
+  }
+
+  .page-container {
+    padding: var(--space-sm);
+  }
+
+  .footer {
+    font-size: 12px;
+    padding: 0 var(--space-sm);
+  }
+}
+
+/* Móviles */
+@media (max-width: 480px) {
+  :root {
+    --header-height: 52px;
+    --footer-height: 45px;
+  }
+
+  .page-container {
+    padding: var(--space-xs) var(--space-sm);
+  }
+
+  .footer {
+    font-size: 11px;
+    padding: 0 0.5rem;
+  }
+}
+
+/* Móviles pequeños */
+@media (max-width: 360px) {
+  :root {
+    --header-height: 48px;
+    --footer-height: 40px;
+  }
+
+  .page-container {
+    padding: 0.5rem;
+  }
+
+  .footer {
+    font-size: 10px;
+    padding: 0 0.375rem;
+  }
 }

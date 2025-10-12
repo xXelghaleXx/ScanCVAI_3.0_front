@@ -1,31 +1,64 @@
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import "../styles/Header.css";
 import Slidebar from "./Slidebar";
+import ThemeToggle from "./ThemeToggle";
 import logo from "../assets/logo.png";
 import { FaPowerOff, FaUserCircle, FaUserShield } from "react-icons/fa";
 import authService from "../services/authService";
 
 const Header = ({ onLogout }) => {
   const navigate = useNavigate();
-  
-  // Obtener usuario del authService
+  const [nombreCompleto, setNombreCompleto] = useState("");
+
+  // Función para obtener el nombre a mostrar
+  const getNombreCompleto = () => {
+    // Obtener usuario del authService
+    const user = authService.getUser();
+
+    // Prioridad 1: localStorage 'nombre' (actualizado desde perfil)
+    const nombreStorage = localStorage.getItem("nombre");
+    if (nombreStorage && nombreStorage.trim() && !nombreStorage.includes('@')) {
+      return nombreStorage.trim();
+    }
+
+    // Prioridad 2: user.nombre del objeto parseado
+    if (user?.nombre && !user.nombre.includes('@')) {
+      return user.nombre;
+    }
+
+    // Prioridad 3: email sin dominio
+    if (user?.email) {
+      return user.email.split('@')[0];
+    }
+
+    if (user?.correo) {
+      return user.correo.split('@')[0];
+    }
+
+    // Fallback
+    return "Usuario";
+  };
+
+  // Cargar nombre al montar y cuando cambie el localStorage
+  useEffect(() => {
+    setNombreCompleto(getNombreCompleto());
+
+    // Escuchar cambios en el perfil
+    const handleProfileUpdate = () => {
+      setNombreCompleto(getNombreCompleto());
+    };
+
+    window.addEventListener('profileUpdated', handleProfileUpdate);
+
+    return () => {
+      window.removeEventListener('profileUpdated', handleProfileUpdate);
+    };
+  }, []);
+
+  // Obtener usuario para verificar rol
   const user = authService.getUser();
-  
-  // Prioridad: user.nombre > localStorage.nombre > email sin @dominio > Usuario
-  let nombreCompleto = "Usuario";
-  
-  if (user?.nombre) {
-    nombreCompleto = user.nombre;
-  } else if (localStorage.getItem("nombre") && !localStorage.getItem("nombre").includes("@")) {
-    nombreCompleto = localStorage.getItem("nombre");
-  } else if (user?.email) {
-    nombreCompleto = user.email.split('@')[0];
-  } else if (user?.correo) {
-    nombreCompleto = user.correo.split('@')[0];
-  }
-  
-  const primerNombre = nombreCompleto.split(' ')[0];
 
   const handleLogout = () => {
     authService.logout(); // Usa el método de authService que ya limpia todo
@@ -58,7 +91,9 @@ const Header = ({ onLogout }) => {
         </div>
 
         <div className="user-info">
-          <span className="user-name">{primerNombre}</span>
+          <span className="user-name">{nombreCompleto}</span>
+
+          <ThemeToggle />
 
           {isAdmin && (
             <button

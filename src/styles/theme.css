@@ -1,0 +1,112 @@
+/* ===== VARIABLES DE TEMA - MODO CLARO Y OSCURO ===== */
+
+/* MODO CLARO (por defecto) */
+:root,
+[data-theme="light"] {
+  /* Colores primarios */
+  --primary: #667eea;
+  --primary-light: #818cf8;
+  --primary-dark: #4f46e5;
+  --primary-bg: #eef2ff;
+
+  /* Colores secundarios */
+  --secondary: #10b981;
+  --secondary-light: #34d399;
+  --secondary-dark: #059669;
+  --secondary-bg: #d1fae5;
+
+  /* Colores de acento */
+  --accent: #f59e0b;
+  --accent-light: #fbbf24;
+  --accent-dark: #d97706;
+  --accent-bg: #fef3c7;
+
+  /* Colores de error */
+  --error: #ef4444;
+  --error-light: #f87171;
+  --error-dark: #dc2626;
+  --error-bg: #fee2e2;
+
+  /* Fondos */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+
+  /* Textos */
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  --text-inverse: #ffffff;
+
+  /* Bordes */
+  --border: #e5e7eb;
+  --border-light: #f3f4f6;
+  --border-dark: #d1d5db;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* MODO OSCURO */
+[data-theme="dark"] {
+  /* Colores primarios */
+  --primary: #818cf8;
+  --primary-light: #a5b4fc;
+  --primary-dark: #6366f1;
+  --primary-bg: #312e81;
+
+  /* Colores secundarios */
+  --secondary: #34d399;
+  --secondary-light: #6ee7b7;
+  --secondary-dark: #10b981;
+  --secondary-bg: #064e3b;
+
+  /* Colores de acento */
+  --accent: #fbbf24;
+  --accent-light: #fcd34d;
+  --accent-dark: #f59e0b;
+  --accent-bg: #78350f;
+
+  /* Colores de error */
+  --error: #f87171;
+  --error-light: #fca5a5;
+  --error-dark: #ef4444;
+  --error-bg: #7f1d1d;
+
+  /* Fondos */
+  --bg-primary: #1f2937;
+  --bg-secondary: #111827;
+  --bg-tertiary: #374151;
+
+  /* Textos */
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-tertiary: #9ca3af;
+  --text-inverse: #111827;
+
+  /* Bordes */
+  --border: #374151;
+  --border-light: #4b5563;
+  --border-dark: #1f2937;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+}
+
+/* Transición suave al cambiar de tema */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Excepciones para animaciones específicas */
+.motion-div,
+[class*="animate"],
+[class*="transition"] {
+  transition: all 0.3s ease;
+}

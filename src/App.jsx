@@ -1,6 +1,7 @@
 // src/App.jsx
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Route, Routes, useLocation } from "react-router-dom";
+import { ThemeProvider } from "./context/ThemeContext";
 import Header from "./components/Header";
 import Login from "./components/Login";
 import Register from "./components/Register";
@@ -19,6 +20,7 @@ import authService from "./services/authService";
 import entrevistaService from "./services/entrevistaService";
 
 // IMPORTAR CSS EN EL ORDEN CORRECTO
+import "./styles/theme.css";
 import "./styles/layout-refactorizado.css";
 import "./styles/Welcome-refactorizado.css";
 import "./styles/Chat.css";
@@ -98,16 +100,17 @@ const App = () => {
   }
 
   return (
-    <GoogleOAuthProvider 
-      clientId={GOOGLE_CLIENT_ID}
-      onScriptLoadError={(error) => {
-        console.error('❌ Error cargando script de Google OAuth:', error);
-      }}
-      onScriptLoadSuccess={() => {
-        console.log('✅ Script de Google OAuth cargado correctamente');
-      }}
-    >
-      <div className="app-root">
+    <ThemeProvider>
+      <GoogleOAuthProvider
+        clientId={GOOGLE_CLIENT_ID}
+        onScriptLoadError={(error) => {
+          console.error('❌ Error cargando script de Google OAuth:', error);
+        }}
+        onScriptLoadSuccess={() => {
+          console.log('✅ Script de Google OAuth cargado correctamente');
+        }}
+      >
+        <div className="app-root">
         <div className="background-wrapper">
           <Background />
         </div>
@@ -203,8 +206,9 @@ const App = () => {
             <Footer />
           </div>
         )}
-      </div>
-    </GoogleOAuthProvider>
+        </div>
+      </GoogleOAuthProvider>
+    </ThemeProvider>
   );
 };
 

@@ -76,17 +76,24 @@
   font-weight: 800;
   color: var(--text-primary);
   margin-bottom: var(--space-sm);
-  line-height: 1.1;
+  line-height: 1.3;
   letter-spacing: -0.025em;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
 }
 
 .greeting-text .user-name {
-  font-size: 2.5rem; /* mismo tamaño que el saludo */
-  font-weight: 700; /* mismo peso que el saludo */
+  font-size: inherit;
+  font-weight: 800;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  display: inline-block;
+  position: relative;
+  line-height: inherit;
 }
 
 .user-name {
@@ -101,13 +108,13 @@
 .user-name::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: -2px;
   left: 0;
   width: 100%;
-  height: 2px;
+  height: 3px;
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   border-radius: var(--radius-xl);
-  opacity: 0.3;
+  opacity: 0.4;
 }
 
 .welcome-subtitle {

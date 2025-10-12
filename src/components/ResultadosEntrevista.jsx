@@ -1,14 +1,11 @@
 // src/components/ResultadosEntrevista.jsx
 import { motion } from 'framer-motion';
-import { 
-  CheckCircle, 
-  TrendingUp, 
-  BookOpen, 
-  Download, 
-  Share2, 
-  RefreshCw, 
-  Star, 
-  Award, 
+import Background from './Background';
+import {
+  CheckCircle,
+  TrendingUp,
+  RefreshCw,
+  Award,
   Target
 } from 'lucide-react';
 
@@ -17,12 +14,18 @@ const ResultadosEntrevista = ({ resultados, onNuevaEntrevista }) => {
     puntuacion_general = 0,
     fortalezas = [],
     areas_mejora = [],
-    resumen_ia = '',
-    habilidades = {},
+    comentario_final = '',
     carrera = '',
     fecha_entrevista = new Date().toLocaleDateString(),
-    tiempo_total = '0 min'
+    metricas_puntuacion = null
   } = resultados || {};
+
+  // Extraer métricas del nuevo sistema de scoring
+  const metricas = metricas_puntuacion?.metricas || {
+    cantidad_respuestas: 0,
+    palabras_promedio: 0,
+    completitud_porcentaje: 0
+  };
 
   const obtenerColorPuntuacion = (puntuacion) => {
     if (puntuacion >= 80) return '#10b981';
@@ -35,34 +38,67 @@ const ResultadosEntrevista = ({ resultados, onNuevaEntrevista }) => {
     return (
       <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
         {[...Array(5)].map((_, i) => (
-          <Star
+          <motion.div
             key={i}
-            size={24}
-            fill={i < estrellas ? '#fbbf24' : 'none'}
-            color={i < estrellas ? '#fbbf24' : '#d1d5db'}
-          />
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ delay: 0.5 + i * 0.1, type: 'spring' }}
+          >
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill={i < estrellas ? '#fbbf24' : 'none'}
+              stroke={i < estrellas ? '#fbbf24' : '#d1d5db'}
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
+          </motion.div>
         ))}
       </div>
     );
   };
 
-  const descargarPDF = () => {
-    alert('Generando PDF... Esta función estará disponible próximamente.');
+  const formatearAreaMejora = (area) => {
+    // Si es string simple, retornar como objeto
+    if (typeof area === 'string') {
+      return {
+        titulo: area,
+        descripcion: '',
+        recomendacion: ''
+      };
+    }
+    // Si ya es objeto, retornarlo
+    return area;
   };
 
-  const compartirResultados = () => {
-    alert('Compartir resultados... Esta función estará disponible próximamente.');
+  const formatearFortaleza = (fortaleza) => {
+    // Si es string simple, retornar como objeto
+    if (typeof fortaleza === 'string') {
+      return {
+        titulo: fortaleza,
+        descripcion: ''
+      };
+    }
+    // Si ya es objeto, retornarlo
+    return fortaleza;
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%)',
-      padding: '2rem 1rem',
-      overflowY: 'auto'
-    }}>
-      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        
+    <>
+      <Background />
+      <div style={{
+        minHeight: '100vh',
+        padding: '2rem 1rem',
+        overflowY: 'auto',
+        position: 'relative',
+        zIndex: 1
+      }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -96,7 +132,7 @@ const ResultadosEntrevista = ({ resultados, onNuevaEntrevista }) => {
             <strong style={{ color: '#667eea' }}>{carrera}</strong>
           </p>
           <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginTop: '0.5rem' }}>
-            {fecha_entrevista} • Duración: {tiempo_total}
+            {fecha_entrevista}
           </p>
         </motion.div>
 
@@ -167,18 +203,21 @@ const ResultadosEntrevista = ({ resultados, onNuevaEntrevista }) => {
           </div>
 
           <p style={{ color: '#6b7280', fontSize: '1rem', margin: 0 }}>
-            {puntuacion_general >= 80 && '¡Excelente desempeño! 🎉'}
-            {puntuacion_general >= 60 && puntuacion_general < 80 && 'Buen desempeño, con áreas de mejora 👍'}
-            {puntuacion_general < 60 && 'Hay mucho potencial por desarrollar 💪'}
+            {puntuacion_general >= 90 && '¡Excelente! Desempeño sobresaliente 🎉'}
+            {puntuacion_general >= 80 && puntuacion_general < 90 && '¡Muy bien! Excelente trabajo 🌟'}
+            {puntuacion_general >= 70 && puntuacion_general < 80 && 'Buen desempeño, sigue así 👍'}
+            {puntuacion_general >= 60 && puntuacion_general < 70 && 'Desempeño satisfactorio 📈'}
+            {puntuacion_general < 60 && 'Hay potencial por desarrollar 💪'}
           </p>
         </motion.div>
+
 
         {/* Fortalezas */}
         {fortalezas && fortalezas.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.3 }}
             style={{
               background: 'white',
               borderRadius: '24px',
@@ -199,47 +238,38 @@ const ResultadosEntrevista = ({ resultados, onNuevaEntrevista }) => {
               </h2>
             </div>
 
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: '1rem'
-            }}>
-              {fortalezas.map((fortaleza, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 + index * 0.1 }}
-                  style={{
-                    padding: '1.25rem',
-                    background: '#ecfdf5',
-                    border: '2px solid #d1fae5',
-                    borderRadius: '16px'
-                  }}
-                >
-                  <div style={{ display: 'flex', gap: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {fortalezas.slice(0, 3).map((fortaleza, index) => {
+                const fortalezaObj = formatearFortaleza(fortaleza);
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 + index * 0.1 }}
+                    style={{
+                      padding: '1rem',
+                      background: '#ecfdf5',
+                      border: '2px solid #d1fae5',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      gap: '0.75rem',
+                      alignItems: 'flex-start'
+                    }}
+                  >
                     <CheckCircle size={20} color="#10b981" style={{ flexShrink: 0, marginTop: '2px' }} />
-                    <div>
-                      <h3 style={{
-                        fontSize: '1rem',
-                        fontWeight: 600,
-                        color: '#111827',
-                        marginBottom: '0.5rem'
-                      }}>
-                        {fortaleza.titulo}
-                      </h3>
-                      <p style={{
-                        fontSize: '0.875rem',
-                        color: '#6b7280',
-                        margin: 0,
-                        lineHeight: 1.6
-                      }}>
-                        {fortaleza.descripcion}
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
+                    <p style={{
+                      fontSize: '0.95rem',
+                      fontWeight: 600,
+                      color: '#111827',
+                      margin: 0,
+                      lineHeight: 1.5
+                    }}>
+                      {fortalezaObj.titulo}
+                    </p>
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
         )}
@@ -249,7 +279,7 @@ const ResultadosEntrevista = ({ resultados, onNuevaEntrevista }) => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.4 }}
             style={{
               background: 'white',
               borderRadius: '24px',
@@ -270,161 +300,44 @@ const ResultadosEntrevista = ({ resultados, onNuevaEntrevista }) => {
               </h2>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {areas_mejora.map((area, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4 + index * 0.1 }}
-                  style={{
-                    padding: '1.25rem',
-                    background: '#fffbeb',
-                    border: '2px solid #fef3c7',
-                    borderRadius: '16px'
-                  }}
-                >
-                  <div style={{ display: 'flex', gap: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {areas_mejora.slice(0, 3).map((area, index) => {
+                const areaObj = formatearAreaMejora(area);
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4 + index * 0.1 }}
+                    style={{
+                      padding: '1rem',
+                      background: '#fffbeb',
+                      border: '2px solid #fef3c7',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      gap: '0.75rem',
+                      alignItems: 'flex-start'
+                    }}
+                  >
                     <TrendingUp size={20} color="#f59e0b" style={{ flexShrink: 0, marginTop: '2px' }} />
-                    <div style={{ flex: 1 }}>
-                      <h3 style={{
-                        fontSize: '1rem',
-                        fontWeight: 600,
-                        color: '#111827',
-                        marginBottom: '0.5rem'
-                      }}>
-                        {area.titulo}
-                      </h3>
-                      <p style={{
-                        fontSize: '0.875rem',
-                        color: '#6b7280',
-                        marginBottom: '0.75rem',
-                        lineHeight: 1.6
-                      }}>
-                        {area.descripcion}
-                      </p>
-                      {area.recomendacion && (
-                        <div style={{
-                          padding: '1rem',
-                          background: 'white',
-                          borderRadius: '12px',
-                          border: '1px solid #fef3c7'
-                        }}>
-                          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
-                            <BookOpen size={16} color="#667eea" style={{ flexShrink: 0, marginTop: '2px' }} />
-                            <div>
-                              <p style={{
-                                fontSize: '0.75rem',
-                                fontWeight: 600,
-                                color: '#667eea',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.05em',
-                                marginBottom: '0.25rem'
-                              }}>
-                                Recomendación
-                              </p>
-                              <p style={{
-                                fontSize: '0.875rem',
-                                color: '#374151',
-                                margin: 0,
-                                lineHeight: 1.5
-                              }}>
-                                {area.recomendacion}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Habilidades Evaluadas */}
-        {Object.keys(habilidades).length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            style={{
-              background: 'white',
-              borderRadius: '24px',
-              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-              padding: '2.5rem',
-              marginBottom: '1.5rem'
-            }}
-          >
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              marginBottom: '1.5rem'
-            }}>
-              <Star size={24} color="#667eea" />
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#111827', margin: 0 }}>
-                Habilidades Evaluadas
-              </h2>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              {Object.entries(habilidades).map(([habilidad, valor], index) => (
-                <motion.div
-                  key={habilidad}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
-                >
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '0.5rem'
-                  }}>
-                    <span style={{
+                    <p style={{
+                      fontSize: '0.95rem',
                       fontWeight: 600,
-                      color: '#374151',
-                      textTransform: 'capitalize',
-                      fontSize: '0.875rem'
+                      color: '#111827',
+                      margin: 0,
+                      lineHeight: 1.5
                     }}>
-                      {habilidad.replace(/_/g, ' ')}
-                    </span>
-                    <span style={{
-                      fontWeight: 700,
-                      color: obtenerColorPuntuacion(valor),
-                      fontSize: '1rem'
-                    }}>
-                      {valor}%
-                    </span>
-                  </div>
-                  <div style={{
-                    width: '100%',
-                    height: '10px',
-                    background: '#e5e7eb',
-                    borderRadius: '999px',
-                    overflow: 'hidden'
-                  }}>
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${valor}%` }}
-                      transition={{ duration: 0.8, delay: 0.6 + index * 0.1 }}
-                      style={{
-                        height: '100%',
-                        background: `linear-gradient(90deg, ${obtenerColorPuntuacion(valor)}, ${obtenerColorPuntuacion(valor)}dd)`,
-                        borderRadius: '999px'
-                      }}
-                    />
-                  </div>
-                </motion.div>
-              ))}
+                      {areaObj.titulo}
+                    </p>
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
         )}
 
         {/* Análisis de la IA */}
-        {resumen_ia && (
+        {comentario_final && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -457,7 +370,7 @@ const ResultadosEntrevista = ({ resultados, onNuevaEntrevista }) => {
                 🤖
               </div>
               <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'white', margin: 0 }}>
-                Análisis del Entrevistador IA
+                Análisis del Entrevistador
               </h2>
             </div>
 
@@ -473,121 +386,60 @@ const ResultadosEntrevista = ({ resultados, onNuevaEntrevista }) => {
                 lineHeight: 1.8,
                 margin: 0,
                 whiteSpace: 'pre-line',
-                fontSize: '0.875rem'
+                fontSize: '0.9375rem'
               }}>
-                {resumen_ia}
+                {comentario_final}
               </p>
             </div>
           </motion.div>
         )}
 
-        {/* Botones de Acción */}
+        {/* Botón de Acción */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '1rem'
+            display: 'flex',
+            justifyContent: 'center'
           }}
         >
           <button
-            onClick={descargarPDF}
-            style={{
-              padding: '1rem 1.5rem',
-              background: 'white',
-              color: '#374151',
-              border: '2px solid #e5e7eb',
-              borderRadius: '12px',
-              fontWeight: 600,
-              fontSize: '1rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem',
-              transition: 'all 0.2s',
-              fontFamily: 'inherit'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'translateY(-2px)';
-              e.target.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.1)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = 'none';
-            }}
-          >
-            <Download size={20} />
-            Descargar PDF
-          </button>
-
-          <button
-            onClick={compartirResultados}
-            style={{
-              padding: '1rem 1.5rem',
-              background: 'white',
-              color: '#374151',
-              border: '2px solid #e5e7eb',
-              borderRadius: '12px',
-              fontWeight: 600,
-              fontSize: '1rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem',
-              transition: 'all 0.2s',
-              fontFamily: 'inherit'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'translateY(-2px)';
-              e.target.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.1)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = 'none';
-            }}
-          >
-            <Share2 size={20} />
-            Compartir
-          </button>
-
-          <button
             onClick={onNuevaEntrevista}
             style={{
-              padding: '1rem 1.5rem',
+              padding: '1rem 2.5rem',
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               color: 'white',
               border: 'none',
               borderRadius: '12px',
               fontWeight: 600,
-              fontSize: '1rem',
+              fontSize: '1.125rem',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '0.5rem',
+              gap: '0.75rem',
               transition: 'all 0.2s',
-              fontFamily: 'inherit'
+              fontFamily: 'inherit',
+              boxShadow: '0 10px 20px rgba(102, 126, 234, 0.3)'
             }}
             onMouseEnter={(e) => {
               e.target.style.transform = 'translateY(-2px)';
-              e.target.style.boxShadow = '0 10px 20px rgba(102, 126, 234, 0.4)';
+              e.target.style.boxShadow = '0 15px 30px rgba(102, 126, 234, 0.4)';
             }}
             onMouseLeave={(e) => {
               e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = 'none';
+              e.target.style.boxShadow = '0 10px 20px rgba(102, 126, 234, 0.3)';
             }}
           >
-            <RefreshCw size={20} />
+            <RefreshCw size={22} />
             Nueva Entrevista
           </button>
         </motion.div>
 
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

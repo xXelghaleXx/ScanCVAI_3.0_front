@@ -345,99 +345,43 @@ const Login = () => {
 
   return (
     <div className="tecsup-login-container">
-      <div className={`tecsup-unified-card ${isSignUp ? 'register-mode' : ''}`}>
-
-        {/* Contenedor del Formulario de Registro */}
-        <div className="tecsup-form-side sign-up-container">
-          <div className="tecsup-form-container">
-            <form onSubmit={handleRegisterSubmit} className="tecsup-form">
-              <div className="tecsup-header">
-                <h1 className="tecsup-logo-text">Crear Cuenta</h1>
-              </div>
-              <div className="tecsup-input-group">
-                <input 
-                  type="text" 
-                  placeholder="Nombre" 
-                  value={nombre} 
-                  onChange={(e) => setNombre(e.target.value)} 
-                  className="tecsup-input" 
-                  required 
-                  disabled={isLoading}
-                />
-              </div>
-              <div className="tecsup-input-group">
-                <input 
-                  type="text" 
-                  placeholder="Apellido" 
-                  value={apellido} 
-                  onChange={(e) => setApellido(e.target.value)} 
-                  className="tecsup-input" 
-                  required 
-                  disabled={isLoading}
-                />
-              </div>
-              <div className="tecsup-input-group">
-                <input 
-                  type="email" 
-                  placeholder="Correo Electrónico" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)} 
-                  className="tecsup-input" 
-                  required 
-                  disabled={isLoading}
-                />
-              </div>
-              <div className="tecsup-input-group">
-                <input 
-                  type="password" 
-                  placeholder="Contraseña" 
-                  value={password} 
-                  onChange={(e) => setPassword(e.target.value)} 
-                  className="tecsup-input" 
-                  required 
-                  disabled={isLoading}
-                />
-              </div>
-              <button type="submit" className="tecsup-login-btn" disabled={isLoading}>
-                {isLoading ? 'Registrando...' : 'Registrarse'}
-              </button>
-            </form>
-          </div>
-        </div>
+      <div className="tecsup-unified-card">
 
         {/* Contenedor del Formulario de Login */}
-        <div className="tecsup-form-side sign-in-container">
+        <div className="tecsup-form-side">
           <div className="tecsup-form-container">
             <form onSubmit={handleLogin} className="tecsup-form">
               <div className="tecsup-header">
-                <h1 className="tecsup-logo-text">Iniciar Sesión</h1>
+                <h1 className="tecsup-logo-text">Tecsup</h1>
+                <p className="tecsup-tagline">TECNOLOGÍA CON SENTIDO</p>
+                <h2 className="tecsup-system-title">Sistema de evaluación laboral con IA</h2>
               </div>
               <div className="tecsup-input-group">
-                <input 
-                  type="email" 
-                  placeholder="Correo Electrónico" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)} 
-                  className="tecsup-input" 
-                  required 
+                <input
+                  type="email"
+                  placeholder="Correo Electrónico"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="tecsup-input"
+                  required
                   disabled={isLoading}
                 />
               </div>
               <div className="tecsup-input-group">
-                <input 
-                  type="password" 
-                  placeholder="Contraseña" 
-                  value={password} 
-                  onChange={(e) => setPassword(e.target.value)} 
-                  className="tecsup-input" 
-                  required 
+                <input
+                  type="password"
+                  placeholder="Contraseña"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="tecsup-input"
+                  required
                   disabled={isLoading}
                 />
               </div>
               <div className="tecsup-forgot-password">
-                <a 
-                  href="#" 
-                  className="tecsup-forgot-link" 
+                <a
+                  href="#"
+                  className="tecsup-forgot-link"
                   onClick={(e) => { e.preventDefault(); handleForgotPassword(); }}
                 >
                   ¿Olvidó la contraseña?
@@ -449,7 +393,7 @@ const Login = () => {
               </button>
 
               <div className="tecsup-divider">
-                <span>o</span>
+                <span>O</span>
               </div>
 
               {/* GOOGLE LOGIN BUTTON */}
@@ -459,7 +403,7 @@ const Login = () => {
                     onSuccess={handleGoogleSuccess}
                     onError={handleGoogleError}
                     useOneTap={false}
-                    theme="filled_blue"
+                    theme="outline"
                     size="large"
                     text="signin_with"
                     shape="rectangular"
@@ -469,10 +413,10 @@ const Login = () => {
                     cancel_on_tap_outside={true}
                   />
                 ) : (
-                  <div style={{ 
-                    padding: '12px', 
-                    backgroundColor: '#f8f9fa', 
-                    border: '1px solid #dadce0', 
+                  <div style={{
+                    padding: '12px',
+                    backgroundColor: '#f8f9fa',
+                    border: '1px solid #dadce0',
                     borderRadius: '4px',
                     textAlign: 'center',
                     color: '#5f6368'
@@ -481,33 +425,21 @@ const Login = () => {
                   </div>
                 )}
               </div>
-
-              <div className="tecsup-register">
-                <span>¿No tienes una cuenta? </span>
-                <a 
-                  href="#" 
-                  className="tecsup-register-link" 
-                  onClick={(e) => { e.preventDefault(); handleRegister(); }}
-                >
-                  Crear una cuenta
-                </a>
-              </div>
             </form>
           </div>
         </div>
 
-        {/* Panel de Superposición (Overlay) */}
-        <div className="overlay-container">
-          <div className="overlay">
-            <div className="overlay-panel overlay-left">
-              <h1>¡Bienvenido de Nuevo!</h1>
-              <p>Para mantenerte conectado, por favor inicia sesión con tu información personal.</p>
-              <button className="ghost-btn" onClick={handleLoginClick}>Iniciar Sesión</button>
-            </div>
-            <div className="overlay-panel overlay-right">
-              <h1>¡Hola, Amigo!</h1>
-              <p>Ingresa tus datos personales y comienza tu viaje con nosotros.</p>
-              <button className="ghost-btn" onClick={handleRegister}>Regístrate</button>
+        {/* Lado Derecho - Imagen */}
+        <div className="tecsup-image-side">
+          <div className="tecsup-image-overlay">
+            <div className="tecsup-center-image">
+              <img
+                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                alt="Tecnología con sentido"
+                className="tecsup-main-image"
+              />
+              <p className="tecsup-image-caption">Tecnología con sentido</p>
+              <p className="tecsup-image-subcaption">Formando profesionales con futuro</p>
             </div>
           </div>
         </div>
