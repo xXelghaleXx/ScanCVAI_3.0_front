@@ -3,20 +3,20 @@
 /*
   1. Importar el sistema de diseño (variables, colores, fuentes, etc.).
 */
-@import './styles/variables.css';
+@import './styles/base/variables.css';
 
 /*
   2. Importar los estilos base (reset, estilos para body, h1, button, etc.).
 */
-@import './styles/base.css';
+@import './styles/base/base.css';
 
 /*
   3. Importar estilos responsive globales
 */
-@import './styles/responsive-global.css';
+@import './styles/responsive/responsive-global.css';
 
 /*
   4. Importar media queries para responsive design (DEBE IR AL FINAL)
 */
-@import './styles/responsive.css';
+@import './styles/responsive/responsive.css';
 

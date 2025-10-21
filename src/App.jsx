@@ -1,29 +1,29 @@
 // src/App.jsx
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Route, Routes, useLocation } from "react-router-dom";
-import { ThemeProvider } from "./context/ThemeContext";
-import Header from "./components/Header";
-import Login from "./components/Login";
-import Register from "./components/Register";
-import Welcome from "./components/Welcome";
-import LectorCV from "./components/LectorCV";
-import HistorialCV from "./components/HistorialCV";
-import ChatEntrevista from "./components/Entrevista";
-import Perfil from './components/Perfil';
-import AdminDashboard from './components/AdminDashboard';
-import UserList from './components/UserList';
-import UserMetrics from './components/UserMetrics';
-import Background from "./components/Background";
-import Footer from "./components/Footer";
-import ProtectedRoute from "./components/ProtectedRoute";
-import authService from "./services/authService";
-import entrevistaService from "./services/entrevistaService";
+import { ThemeProvider } from "./context/ThemeContext/ThemeContext";
+import Header from "./components/layout/Header/Header";
+import Login from "./pages/Auth/LoginPage";
+import Register from "./pages/Auth/RegisterPage";
+import Welcome from "./pages/Home/WelcomePage";
+import LectorCV from "./components/cv/LectorCV/LectorCV";
+import HistorialCV from "./components/cv/HistorialCV/HistorialCV";
+import ChatEntrevista from "./components/entrevista/Entrevista/Entrevista";
+import Perfil from './pages/Perfil/PerfilPage';
+import AdminDashboard from './pages/Admin/AdminDashboardPage';
+import UserList from './components/admin/UserList/UserList';
+import UserMetrics from './components/admin/UserMetrics/UserMetrics';
+import Background from "./components/layout/Background/Background";
+import Footer from "./components/layout/Footer/Footer";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import authService from "./services/auth.service";
+import entrevistaService from "./services/entrevista.service";
 
 // IMPORTAR CSS EN EL ORDEN CORRECTO
-import "./styles/theme.css";
-import "./styles/layout-refactorizado.css";
-import "./styles/Welcome-refactorizado.css";
-import "./styles/Chat.css";
+import "./styles/base/theme.css";
+import "./styles/layout/layout-refactorizado.css";
+import "./styles/pages/Welcome-refactorizado.css";
+import "./styles/components/chat/Chat.css";
 import "./index.css";
 
 const App = () => {
