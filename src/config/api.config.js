@@ -4,7 +4,7 @@
  */
 
 // URL base de la API - prioriza variable de entorno
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:10000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://scancvai-3-0-back.onrender.com/api';
 
 // Google OAuth Client ID
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
