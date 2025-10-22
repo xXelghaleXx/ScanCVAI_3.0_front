@@ -34,17 +34,28 @@ const Welcome = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const token = localStorage.getItem('access_token');
-      
+
       if (!token) {
         console.warn('⚠️ No hay token de autenticación');
-        setError('No estás autenticado');
+        // No mostrar error, solo valores por defecto
+        setDashboardData({
+          total_cvs: 0,
+          total_entrevistas: 0,
+          total_informes: 0,
+          cvs_procesados: 0,
+          cvs_pendientes: 0,
+          progreso_analisis: 0,
+          cvs_recientes: [],
+          informes_recientes: [],
+          entrevistas_recientes: []
+        });
         setLoading(false);
         return;
       }
 
-      console.log('📊 Cargando datos de CVs e informes...');
+      console.log('📊 Cargando datos de dashboard...');
 
       // 📄 Obtener lista de CVs del endpoint GET /api/cv
       const cvsResponse = await fetch(`${API_BASE_URL}/cv`, {
@@ -55,12 +66,13 @@ const Welcome = () => {
         }
       });
 
-      if (!cvsResponse.ok) {
-        throw new Error(`Error ${cvsResponse.status}: ${cvsResponse.statusText}`);
+      let cvsData = { cvs: [] };
+      if (cvsResponse.ok) {
+        cvsData = await cvsResponse.json();
+        console.log('✅ CVs obtenidos:', cvsData.cvs?.length || 0);
+      } else {
+        console.log('ℹ️ No hay CVs todavía');
       }
-
-      const cvsData = await cvsResponse.json();
-      console.log('✅ CVs obtenidos:', cvsData);
 
       // 📋 Obtener lista de informes del endpoint GET /api/informes
       const informesResponse = await fetch(`${API_BASE_URL}/informes`, {
@@ -71,8 +83,13 @@ const Welcome = () => {
         }
       });
 
-      const informesData = await informesResponse.json();
-      console.log('✅ Informes obtenidos:', informesData);
+      let informesData = { informes: [] };
+      if (informesResponse.ok) {
+        informesData = await informesResponse.json();
+        console.log('✅ Informes obtenidos:', informesData.informes?.length || 0);
+      } else {
+        console.log('ℹ️ No hay informes todavía');
+      }
 
       // 🎯 Obtener historial de entrevistas del endpoint GET /api/entrevistas
       const entrevistasResponse = await fetch(`${API_BASE_URL}/entrevistas`, {
@@ -83,52 +100,56 @@ const Welcome = () => {
         }
       });
 
-      const entrevistasData = await entrevistasResponse.json();
-      console.log('✅ Entrevistas obtenidas:', entrevistasData);
+      let entrevistasData = { entrevistas: [] };
+      if (entrevistasResponse.ok) {
+        entrevistasData = await entrevistasResponse.json();
+        console.log('✅ Entrevistas obtenidas:', entrevistasData.entrevistas?.length || 0);
+      } else {
+        console.log('ℹ️ No hay entrevistas todavía');
+      }
 
       // Estructurar los datos para el dashboard
       const dashboardStats = {
         total_cvs: cvsData.cvs?.length || 0,
         total_informes: informesData.informes?.length || 0,
         total_entrevistas: entrevistasData.entrevistas?.length || 0,
-        
+
         // CVs procesados vs pendientes
         cvs_procesados: cvsData.cvs?.filter(cv => cv.contenido_extraido)?.length || 0,
         cvs_pendientes: cvsData.cvs?.filter(cv => !cv.contenido_extraido)?.length || 0,
-        
+
         // CVs recientes (últimos 3)
         cvs_recientes: cvsData.cvs?.slice(0, 3) || [],
-        
+
         // Informes recientes (últimos 3)
         informes_recientes: informesData.informes?.slice(0, 3) || [],
-        
+
         // Entrevistas recientes (últimas 3)
         entrevistas_recientes: entrevistasData.entrevistas?.slice(0, 3) || [],
-        
+
         // Calcular progreso (CVs procesados / total CVs)
-        progreso_analisis: cvsData.cvs?.length > 0 
+        progreso_analisis: cvsData.cvs?.length > 0
           ? Math.round((cvsData.cvs.filter(cv => cv.contenido_extraido).length / cvsData.cvs.length) * 100)
           : 0
       };
 
-      console.log('📊 Dashboard stats calculados:', dashboardStats);
+      console.log('📊 Dashboard stats:', dashboardStats);
       setDashboardData(dashboardStats);
-      
+
     } catch (error) {
       console.error('❌ Error cargando datos:', error);
-      
+
       // Manejar error 401 (token expirado)
-      if (error.message.includes('401')) {
-        setError('Sesión expirada. Recargando...');
-        // Dar tiempo para que el authService renueve el token
+      if (error.message?.includes('401')) {
+        console.log('🔄 Token expirado, recargando...');
         setTimeout(() => {
           window.location.reload();
         }, 2000);
       } else {
-        setError('Error al cargar los datos. Verifica tu conexión.');
+        console.log('ℹ️ Base de datos nueva, mostrando estado inicial');
       }
-      
-      // Valores por defecto en caso de error
+
+      // Valores por defecto (no mostrar error en UI)
       setDashboardData({
         total_cvs: 0,
         total_entrevistas: 0,
