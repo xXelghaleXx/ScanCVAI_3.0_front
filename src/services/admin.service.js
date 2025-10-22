@@ -1,6 +1,7 @@
 import axiosInstance from "./api/interceptors";
+import { API_BASE_URL } from '../config/api.config.js';
 
-const API_URL = "http://localhost:3000/api/admin";
+const API_URL = `${API_BASE_URL}/admin`.replace('/api/api', '/api');
 
 /**
  * Servicio para gestión de administración

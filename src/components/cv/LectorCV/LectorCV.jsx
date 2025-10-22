@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, X, Download, Search, FileText } from "lucide-react";
 import Background from "../../layout/Background/Background";
 import { toast } from 'react-toastify';
+import { API_BASE_URL } from '../../../config/api.config.js';
 import '../../../styles/components/cv/LectorCV.css';
 
 // Hook personalizado para el efecto de escritura tipo Gemini
@@ -286,7 +287,7 @@ const LectorCV = () => {
         throw new Error('No hay token de autenticación. Por favor, inicia sesión.');
       }
       
-      const response = await fetch('http://localhost:3000/api/cv/upload', {
+      const response = await fetch(`${API_BASE_URL}/cv/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -343,7 +344,7 @@ const LectorCV = () => {
         throw new Error('No hay token de autenticación. Por favor, inicia sesión.');
       }
       
-      const response = await fetch(`http://localhost:3000/api/cv/${cvId}/procesar`, {
+      const response = await fetch(`${API_BASE_URL}/cv/${cvId}/procesar`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -405,7 +406,7 @@ const LectorCV = () => {
         throw new Error('No hay token de autenticación. Por favor, inicia sesión.');
       }
       
-      const response = await fetch(`http://localhost:3000/api/cv/${cvId}/informe`, {
+      const response = await fetch(`${API_BASE_URL}/cv/${cvId}/informe`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -508,7 +509,7 @@ const LectorCV = () => {
       throw new Error('No hay token de autenticación. Por favor, inicia sesión.');
     }
     
-    const response = await fetch(`http://localhost:3000/api/informes/${reportId}/pdf`, {
+    const response = await fetch(`${API_BASE_URL}/informes/${reportId}/pdf`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -564,7 +565,7 @@ const LectorCV = () => {
         throw new Error('No hay token de autenticación. Por favor, inicia sesión.');
       }
       
-      const response = await fetch(`http://localhost:3000/api/cv/${cvId}`, {
+      const response = await fetch(`${API_BASE_URL}/cv/${cvId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

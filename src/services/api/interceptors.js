@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../../config/api.config.js';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:3000/api/'
+  baseURL: API_BASE_URL.endsWith('/') ? API_BASE_URL : `${API_BASE_URL}/`
 });
 
 // Interceptor de solicitud
@@ -30,7 +31,7 @@ axiosInstance.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem('refresh_token');
-        const response = await axios.post('http://localhost:3000/api/auth/token/refresh/', {
+        const response = await axios.post(`${API_BASE_URL}/auth/token/refresh/`, {
           refresh: refreshToken
         });
 

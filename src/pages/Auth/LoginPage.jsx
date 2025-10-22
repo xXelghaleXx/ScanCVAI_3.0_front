@@ -3,6 +3,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import authService from '../../services/auth.service';
+import { API_BASE_URL } from '../../config/api.config.js';
 import '../../styles/pages/Login.css';
 
 const Login = () => {
@@ -43,10 +44,9 @@ const Login = () => {
     }
     
     // URLs que se van a usar
-    const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-    console.log('🌐 Base URL calculada:', baseURL);
-    console.log('🌐 Login URL será:', `${baseURL}/auth/login`);
-    console.log('🌐 Google callback URL será:', `${baseURL}/auth/google/callback`);
+    console.log('🌐 Base URL calculada:', API_BASE_URL);
+    console.log('🌐 Login URL será:', `${API_BASE_URL}/auth/login`);
+    console.log('🌐 Google callback URL será:', `${API_BASE_URL}/auth/google/callback`);
     
     // Verificar origen actual
     console.log('🌍 Origen actual:', window.location.origin);
@@ -72,8 +72,7 @@ const Login = () => {
   // ========== TEST DE CONECTIVIDAD ==========
   const testConnectivity = async () => {
     try {
-      const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-      const healthURL = baseURL.replace('/api', '/api/health');
+      const healthURL = API_BASE_URL.replace('/api', '/api/health');
       
       console.log('🏥 Probando health check:', healthURL);
       

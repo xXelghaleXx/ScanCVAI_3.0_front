@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { FileText, MessageCircle, TrendingUp, Clock, Award, Brain } from "lucide-react";
 import Background from "../../components/layout/Background/Background";
 import authService from '../../services/auth.service';
+import { API_BASE_URL } from '../../config/api.config.js';
 
 const Welcome = () => {
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ const Welcome = () => {
       console.log('📊 Cargando datos de CVs e informes...');
 
       // 📄 Obtener lista de CVs del endpoint GET /api/cv
-      const cvsResponse = await fetch('http://localhost:3000/api/cv', {
+      const cvsResponse = await fetch(`${API_BASE_URL}/cv`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -62,7 +63,7 @@ const Welcome = () => {
       console.log('✅ CVs obtenidos:', cvsData);
 
       // 📋 Obtener lista de informes del endpoint GET /api/informes
-      const informesResponse = await fetch('http://localhost:3000/api/informes', {
+      const informesResponse = await fetch(`${API_BASE_URL}/informes`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -74,7 +75,7 @@ const Welcome = () => {
       console.log('✅ Informes obtenidos:', informesData);
 
       // 🎯 Obtener historial de entrevistas del endpoint GET /api/entrevistas
-      const entrevistasResponse = await fetch('http://localhost:3000/api/entrevistas', {
+      const entrevistasResponse = await fetch(`${API_BASE_URL}/entrevistas`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -12,9 +12,8 @@ import {
   XCircle
 } from 'lucide-react';
 import Background from '../../layout/Background/Background';
+import { API_BASE_URL } from '../../../config/api.config.js';
 import '../../../styles/components/cv/HistorialCV.css';
-
-const API_BASE_URL = 'http://localhost:3000/api';
 
 const HistorialCV = () => {
   const [cvs, setCvs] = useState([]);

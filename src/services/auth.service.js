@@ -1,12 +1,13 @@
 // src/services/authService.js - ARCHIVO PARA EL FRONTEND
+import { API_BASE_URL } from '../config/api.config.js';
 
 class AuthService {
   constructor() {
-    this.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+    this.baseURL = API_BASE_URL;
     this.tokenKey = 'access_token';
     this.refreshTokenKey = 'refresh_token';
     this.userKey = 'user';
-    
+
     console.log('🔧 AuthService inicializado correctamente en el FRONTEND');
     console.log('🔧 Base URL:', this.baseURL);
   }
