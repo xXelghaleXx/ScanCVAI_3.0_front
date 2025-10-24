@@ -17,7 +17,7 @@ export default defineConfig({
       '/api': {
         target: 'https://scancvai-3-0-back.onrender.com',
         changeOrigin: true,
-        secure: true,
+        secure: false,
         configure: (proxy, options) => {
           proxy.on('error', (err, req, res) => {
             console.log('proxy error', err);
