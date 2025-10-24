@@ -15,7 +15,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'https://scancvai-3-0-back.onrender.com:3000',
         changeOrigin: true,
         secure: false,
         configure: (proxy, options) => {
