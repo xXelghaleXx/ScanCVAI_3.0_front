@@ -35,14 +35,6 @@ export default defineConfig({
   // Configuración de build para producción
   build: {
     outDir: 'dist',
-    sourcemap: false,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'chart-vendor': ['chart.js', 'react-chartjs-2', 'recharts']
-        }
-      }
-    }
+    sourcemap: false
   }
 })
