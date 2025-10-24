@@ -38,7 +38,9 @@ env/
 
 # Ignorar archivos de configuración sensibles
 .env
-*.env
+.env.local
+# NO ignorar .env.production (necesario para Vercel)
+# .env.production
 
 # Ignorar archivos de sistema
 .DS_Store

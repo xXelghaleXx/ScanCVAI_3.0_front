@@ -1,4 +1,4 @@
-// vite.config.js en tu frontend
+// vite.config.js - Configuración para desarrollo y producción
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path';
@@ -10,10 +10,12 @@ export default defineConfig({
       '@services': path.resolve(__dirname, './src/services'),
     },
   },
+  // Configuración del servidor de desarrollo (solo se usa en local)
   server: {
+    port: 5173,
     proxy: {
       '/api': {
-        target: 'https://scancvai-3-0-back.onrender.com',
+        target: 'http://localhost:3000',
         changeOrigin: true,
         secure: false,
         configure: (proxy, options) => {
@@ -29,8 +31,18 @@ export default defineConfig({
         }
       }
     }
+  },
+  // Configuración de build para producción
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'chart-vendor': ['chart.js', 'react-chartjs-2', 'recharts']
+        }
+      }
+    }
   }
 })
-
-// Y cambia tu .env frontend a:
-// VITE_API_URL=/api  (sin localhost, usa proxy)
