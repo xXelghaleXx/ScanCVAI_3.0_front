@@ -15,9 +15,9 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://scancvai-3-0-back.onrender.com:3000',
+        target: 'https://scancvai-3-0-back.onrender.com',
         changeOrigin: true,
-        secure: false,
+        secure: true,
         configure: (proxy, options) => {
           proxy.on('error', (err, req, res) => {
             console.log('proxy error', err);
