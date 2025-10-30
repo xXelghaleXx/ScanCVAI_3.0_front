@@ -27,13 +27,13 @@
   height: 100vh;
   display: flex;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-  background: var(--tecsup-gris-muy-claro);
+  background: transparent;
   align-items: center;
   justify-content: center;
   padding: 20px;
   color-scheme: light;
   box-sizing: border-box;
-  z-index: 1000;
+  z-index: 1;
 }
 
 /* ===== GRAN CUADRO UNIFICADO ===== */

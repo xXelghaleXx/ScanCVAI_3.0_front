@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import authService from '../../services/auth.service';
 import { API_BASE_URL } from '../../config/api.config.js';
+import Background from '../../components/layout/Background/Background';
 import '../../styles/pages/Login.css';
 
 const Login = () => {
@@ -354,8 +355,10 @@ const Login = () => {
   };
 
   return (
-    <div className="tecsup-login-container">
-      <div className="tecsup-unified-card">
+    <>
+      <Background />
+      <div className="tecsup-login-container">
+        <div className="tecsup-unified-card">
 
         {/* Contenedor del Formulario de Login */}
         <div className="tecsup-form-side">
@@ -388,16 +391,6 @@ const Login = () => {
                   disabled={isLoading}
                 />
               </div>
-              <div className="tecsup-forgot-password">
-                <a
-                  href="#"
-                  className="tecsup-forgot-link"
-                  onClick={(e) => { e.preventDefault(); handleForgotPassword(); }}
-                >
-                  ¿Olvidó la contraseña?
-                </a>
-              </div>
-
               <button type="submit" className="tecsup-login-btn" disabled={isLoading}>
                 {isLoading ? 'Iniciando...' : 'Iniciar Sesión'}
               </button>
@@ -456,6 +449,7 @@ const Login = () => {
 
       </div>
     </div>
+    </>
   );
 };
 
