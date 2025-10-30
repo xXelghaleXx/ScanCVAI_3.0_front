@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, X, Download, Search, FileText } from "lucide-react";
 import Background from "../../layout/Background/Background";
+import CVScorePanel from "../CVScorePanel/CVScorePanel";
 import { toast } from 'react-toastify';
 import { API_BASE_URL } from '../../../config/api.config.js';
 import '../../../styles/components/cv/LectorCV.css';
@@ -254,6 +255,8 @@ const LectorCV = () => {
   const [analysisText, setAnalysisText] = useState("");
   const [loadingText, setLoadingText] = useState("Procesando...");
   const [analysisData, setAnalysisData] = useState(null);
+  const [scoringData, setScoringData] = useState(null);
+  const [showScoring, setShowScoring] = useState(false);
 
   // Usar nuestro hook personalizado de escritura
   const { displayedText, isTyping, typeText, resetText } = useGeminiTypewriter();
@@ -361,21 +364,40 @@ const LectorCV = () => {
       console.log('✅ Análisis completado:', data);
 
       // Extraer datos del análisis
-      const { analisis, validation, processing_time } = data;
-      
+      const { analisis, validation, processing_time, scoring, mostrar_scoring, informe } = data;
+
       setAnalysisData({
         ...analisis,
         validation,
         processing_time
       });
 
-      // Crear texto para mostrar en pantalla
-      const analysisDisplayText = formatAnalysisForDisplay(analisis, validation);
-      setAnalysisText(analysisDisplayText);
-      setReportReady(true);
+      // Guardar datos de scoring
+      if (scoring) {
+        setScoringData(scoring);
+      }
+
+      // Guardar el reportId si viene en el informe
+      if (informe && informe.id) {
+        setReportId(informe.id);
+      }
+
+      // Decidir qué mostrar basado en el scoring
+      if (mostrar_scoring && scoring && scoring.es_cv_ideal) {
+        // CV Ideal: Mostrar pantalla de scoring
+        setShowScoring(true);
+        setReportReady(false);
+        toast.success('¡Excelente! Tu CV cumple con los estándares ideales');
+      } else {
+        // CV necesita mejoras: Mostrar análisis con mejoras
+        setShowScoring(false);
+        const analysisDisplayText = formatAnalysisForDisplay(analisis, validation);
+        setAnalysisText(analysisDisplayText);
+        setReportReady(true);
+        toast.success('Análisis completado. Revisa las recomendaciones de mejora');
+      }
+
       setUploadError(null);
-      
-      toast.success('Análisis completado correctamente');
     } catch (error) {
       console.error('❌ Error analizando CV:', error);
       setUploadError(error.message);
@@ -587,6 +609,8 @@ const LectorCV = () => {
       setReportId(null);
       setAnalysisText("");
       setAnalysisData(null);
+      setScoringData(null);
+      setShowScoring(false);
       resetText();
       setUploadError(null);
       
@@ -775,9 +799,24 @@ const LectorCV = () => {
         )}
       </motion.div>
 
-      {/* Panel de Análisis (Derecha) */}
+      {/* Panel de Análisis o Scoring (Derecha) */}
       <AnimatePresence>
-        {reportReady && (
+        {showScoring && scoringData && (
+          <motion.div
+            className="scoring-panel-wrapper"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 50 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+          >
+            <CVScorePanel
+              scoringData={scoringData}
+              onDownloadReport={downloadReport}
+            />
+          </motion.div>
+        )}
+
+        {reportReady && !showScoring && (
           <motion.div
             className="analysis-panel"
             initial={{ opacity: 0, x: 50 }}
@@ -869,33 +908,8 @@ const LectorCV = () => {
                   cursor: 'pointer'
                 }}
               >
-                <Download size={18} /> Generar Informe PDF
+                <Download size={18} /> Descargar Informe PDF
               </motion.button>
-              
-              {!reportId && (
-                <motion.button
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.3, delay: 0.7 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={generateReport}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.75rem 1.5rem',
-                    backgroundColor: 'transparent',
-                    color: 'var(--primary)',
-                    border: '2px solid var(--primary)',
-                    borderRadius: 'var(--radius-lg)',
-                    fontWeight: '600',
-                    cursor: 'pointer'
-                  }}
-                >
-                  📊 Informe Completo
-                </motion.button>
-              )}
             </div>
           </motion.div>
         )}
