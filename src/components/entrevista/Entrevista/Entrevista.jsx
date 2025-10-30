@@ -1,8 +1,9 @@
 // src/components/Entrevista.jsx - VERSIÓN CORREGIDA
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  MessageCircle, 
+import {
+  MessageCircle,
   AlertCircle
 } from "lucide-react";
 import { toast } from 'react-toastify';
@@ -15,21 +16,23 @@ import entrevistaService from '../../../services/entrevista.service';
 import "../../../styles/components/chat/Chat.css";
 
 const EntrevistaChat = () => {
+  // ========== HOOKS ==========
+  const navigate = useNavigate();
+  const chatBoxRef = useRef(null);
+
   // ========== ESTADOS PRINCIPALES ==========
   const [entrevistaId, setEntrevistaId] = useState(null);
   const [chat, setChat] = useState([]);
   const [mensaje, setMensaje] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   // Estados del flujo
   const [mostrarSelectorCarrera, setMostrarSelectorCarrera] = useState(true);
   const [carreraSeleccionada, setCarreraSeleccionada] = useState(null);
   const [dificultadSeleccionada, setDificultadSeleccionada] = useState(null);
   const [entrevistaFinalizada, setEntrevistaFinalizada] = useState(false);
   const [resultados, setResultados] = useState(null);
-  
-  const chatBoxRef = useRef(null);
 
   // ========== VERIFICAR ENTREVISTA EXISTENTE AL CARGAR ==========
   useEffect(() => {
@@ -405,11 +408,11 @@ const EntrevistaChat = () => {
   if (mostrarSelectorCarrera) {
     return (
       <AnimatePresence>
-        <CarreraSelector 
+        <CarreraSelector
           onEntrevistaIniciada={handleEntrevistaIniciada}
           onCancel={() => {
             // Si cancelan, volver al welcome
-            window.location.href = '/welcome';
+            navigate('/welcome');
           }}
         />
       </AnimatePresence>

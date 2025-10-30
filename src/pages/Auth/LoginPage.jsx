@@ -189,7 +189,17 @@ const Login = () => {
             picture: payload.picture,
             aud: payload.aud // Esto debe coincidir con tu Client ID
           });
-          
+
+          // VALIDACIÓN DE DOMINIO TECSUP
+          const userEmail = payload.email;
+          if (!userEmail || !userEmail.toLowerCase().endsWith('@tecsup.edu.pe')) {
+            console.error('❌ DOMINIO NO AUTORIZADO:', userEmail);
+            toast.error('❌ Solo se permite el acceso con correos institucionales @tecsup.edu.pe');
+            setIsLoading(false);
+            return;
+          }
+          console.log('✅ Dominio Tecsup verificado:', userEmail);
+
           // Verificar que el audience coincide con nuestro Client ID
           const ourClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
           if (payload.aud !== ourClientId) {
@@ -198,6 +208,7 @@ const Login = () => {
               received: payload.aud
             });
             toast.error('❌ Error de configuración de Google OAuth');
+            setIsLoading(false);
             return;
           }
         }
