@@ -9,7 +9,7 @@ import {
 import { toast } from 'react-toastify';
 import ChatBox from "../../chat/ChatBox/ChatBox";
 import ChatInput from "../../chat/ChatInput/ChatInput";
-import VoiceInterview from "../VoiceInterview/VoiceInterview";
+import VoiceInputSection from "../VoiceInputSection/VoiceInputSection";
 import CarreraSelector from "../../forms/CarreraSelector/CarreraSelector";
 import ResultadosEntrevista from "../ResultadosEntrevista/ResultadosEntrevista";
 import Background from "../../layout/Background/Background";
@@ -541,41 +541,34 @@ const EntrevistaChat = () => {
 
       {/* Chat Container - Renderizado condicional según modalidad */}
       <div className="chat-main-container">
+        <ChatBox
+          chat={chat}
+          loading={loading}
+          preguntaInicial={chat.length === 0 ?
+            (modalidadSeleccionada?.id === 'voz'
+              ? "¡Hola! Estoy aquí para ayudarte a practicar tu entrevista por voz."
+              : "¡Hola! Estoy aquí para ayudarte a practicar tu entrevista."
+            ) : ""}
+          ref={chatBoxRef}
+        />
+
         {modalidadSeleccionada?.id === 'voz' ? (
           // Modo Voz
-          <>
-            <ChatBox
-              chat={chat}
-              loading={loading}
-              preguntaInicial={chat.length === 0 ? "¡Hola! Estoy aquí para ayudarte a practicar tu entrevista por voz." : ""}
-              ref={chatBoxRef}
-            />
-
-            <VoiceInterview
-              onSendMessage={handleEnviarMensaje}
-              loading={loading}
-              lastAIMessage={chat.length > 0 ? chat[chat.length - 1]?.texto : null}
-              disabled={entrevistaFinalizada || !entrevistaId}
-            />
-          </>
+          <VoiceInputSection
+            onSendMessage={handleEnviarMensaje}
+            loading={loading}
+            lastAIMessage={chat.length > 0 ? chat[chat.length - 1]?.texto : null}
+            disabled={entrevistaFinalizada || !entrevistaId}
+          />
         ) : (
           // Modo Chat (por defecto)
-          <>
-            <ChatBox
-              chat={chat}
-              loading={loading}
-              preguntaInicial={chat.length === 0 ? "¡Hola! Estoy aquí para ayudarte a practicar tu entrevista." : ""}
-              ref={chatBoxRef}
-            />
-
-            <ChatInput
-              mensaje={mensaje}
-              setMensaje={setMensaje}
-              onEnviar={handleEnviarMensaje}
-              disabled={loading || entrevistaFinalizada || !entrevistaId}
-              loading={loading}
-            />
-          </>
+          <ChatInput
+            mensaje={mensaje}
+            setMensaje={setMensaje}
+            onEnviar={handleEnviarMensaje}
+            disabled={loading || entrevistaFinalizada || !entrevistaId}
+            loading={loading}
+          />
         )}
       </div>
     </div>
