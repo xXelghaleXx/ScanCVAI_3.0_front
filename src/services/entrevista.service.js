@@ -6,7 +6,7 @@ import { API_BASE_URL } from '../config/api.config.js';
 class EntrevistaService {
   
   // ========== INICIAR NUEVA ENTREVISTA ==========
-  async iniciarEntrevista(carreraId, dificultad) {
+  async iniciarEntrevista(carreraId, dificultad, modalidad = 'chat') {
     try {
       const token = authService.getToken();
       if (!token) {
@@ -16,11 +16,13 @@ class EntrevistaService {
       console.log('🎯 Iniciando entrevista con:');
       console.log('  📚 Carrera ID:', carreraId);
       console.log('  📊 Dificultad:', dificultad);
+      console.log('  🎤 Modalidad:', modalidad);
 
       // IMPORTANTE: El backend espera 'carreraId' (camelCase), no 'carreraid'
       const payload = {
         carreraId: carreraId,
-        dificultad: dificultad
+        dificultad: dificultad,
+        modalidad: modalidad
       };
 
       console.log('📤 Payload:', payload);
@@ -388,24 +390,28 @@ class EntrevistaService {
   }
 
   // ========== GUARDAR ENTREVISTA EN LOCALSTORAGE ==========
-  guardarEntrevistaLocal(entrevistaId, chatHistory, carrera = null, dificultad = null) {
+  guardarEntrevistaLocal(entrevistaId, chatHistory, carrera = null, dificultad = null, modalidad = null) {
     try {
       const datos = {
         id: entrevistaId,
         chatHistory: chatHistory || [],
         carrera: carrera || null,
         dificultad: dificultad || null,
+        modalidad: modalidad || null,
         timestamp: Date.now()
       };
 
       localStorage.setItem('entrevistaActual', JSON.stringify(datos));
-      
-      // Guardar también carrera y dificultad por separado (redundancia útil)
+
+      // Guardar también carrera, dificultad y modalidad por separado (redundancia útil)
       if (carrera) {
         localStorage.setItem('carreraSeleccionada', JSON.stringify(carrera));
       }
       if (dificultad) {
         localStorage.setItem('dificultadSeleccionada', JSON.stringify(dificultad));
+      }
+      if (modalidad) {
+        localStorage.setItem('modalidadSeleccionada', JSON.stringify(modalidad));
       }
       
       console.log('💾 Entrevista guardada en localStorage:', {
@@ -443,16 +449,21 @@ class EntrevistaService {
         return { success: false, error: 'La entrevista guardada ha expirado' };
       }
 
-      // Recuperar también carrera y dificultad si existen por separado
+      // Recuperar también carrera, dificultad y modalidad si existen por separado
       const carreraStr = localStorage.getItem('carreraSeleccionada');
       const dificultadStr = localStorage.getItem('dificultadSeleccionada');
-      
+      const modalidadStr = localStorage.getItem('modalidadSeleccionada');
+
       if (carreraStr && !data.carrera) {
         data.carrera = JSON.parse(carreraStr);
       }
-      
+
       if (dificultadStr && !data.dificultad) {
         data.dificultad = JSON.parse(dificultadStr);
+      }
+
+      if (modalidadStr && !data.modalidad) {
+        data.modalidad = JSON.parse(modalidadStr);
       }
 
       console.log('✅ Entrevista recuperada:', {
@@ -477,6 +488,7 @@ class EntrevistaService {
       localStorage.removeItem('entrevistaActual');
       localStorage.removeItem('carreraSeleccionada');
       localStorage.removeItem('dificultadSeleccionada');
+      localStorage.removeItem('modalidadSeleccionada');
       console.log('🧹 LocalStorage limpiado');
       return { success: true };
     } catch (error) {

@@ -1,7 +1,7 @@
 // src/components/CarreraSelector.jsx - VERSIÓN OPTIMIZADA
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Briefcase, ChevronRight, CheckCircle, Zap, Award, Flame } from 'lucide-react';
+import { Search, Briefcase, ChevronRight, CheckCircle, Zap, Award, Flame, MessageCircle, Mic } from 'lucide-react';
 import authService from '../../../services/auth.service';
 import entrevistaService from '../../../services/entrevista.service';
 import { toast } from 'react-toastify';
@@ -13,6 +13,7 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
   const [loading, setLoading] = useState(true);
   const [selectedCarrera, setSelectedCarrera] = useState(null);
   const [selectedDificultad, setSelectedDificultad] = useState(null);
+  const [selectedModalidad, setSelectedModalidad] = useState(null);
   const [iniciandoEntrevista, setIniciandoEntrevista] = useState(false);
   const [error, setError] = useState(null);
 
@@ -40,6 +41,25 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
       icon: Flame,
       color: '#ef4444',
       gradient: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
+    }
+  ];
+
+  const modalidades = [
+    {
+      id: 'chat',
+      nombre: 'Chat',
+      descripcion: 'Entrevista mediante texto escrito',
+      icon: MessageCircle,
+      color: '#3b82f6',
+      gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+    },
+    {
+      id: 'voz',
+      nombre: 'Voz',
+      descripcion: 'Entrevista hablada con IA de voz',
+      icon: Mic,
+      color: '#8b5cf6',
+      gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
     }
   ];
 
@@ -87,6 +107,12 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
     setError(null);
   };
 
+  const handleSelectModalidad = (modalidad) => {
+    console.log('[Selector] Modalidad seleccionada:', modalidad.nombre);
+    setSelectedModalidad(modalidad);
+    setError(null);
+  };
+
   const handleContinuarADificultad = () => {
     if (selectedCarrera) {
       console.log('[Selector] Avanzando a selección de dificultad');
@@ -95,16 +121,32 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
     }
   };
 
+  const handleContinuarAModalidad = () => {
+    if (selectedDificultad) {
+      console.log('[Selector] Avanzando a selección de modalidad');
+      setPaso(3);
+      setError(null);
+    }
+  };
+
   const handleVolverACarreras = () => {
     console.log('[Selector] Volviendo a selección de carreras');
     setPaso(1);
     setSelectedDificultad(null);
+    setSelectedModalidad(null);
+    setError(null);
+  };
+
+  const handleVolverADificultad = () => {
+    console.log('[Selector] Volviendo a selección de dificultad');
+    setPaso(2);
+    setSelectedModalidad(null);
     setError(null);
   };
 
   const iniciarEntrevista = async () => {
-    if (!selectedCarrera || !selectedDificultad) {
-      toast.error('Selecciona una carrera y dificultad');
+    if (!selectedCarrera || !selectedDificultad || !selectedModalidad) {
+      toast.error('Selecciona una carrera, dificultad y modalidad');
       return;
     }
 
@@ -115,10 +157,12 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
       console.log('[Entrevista] Iniciando entrevista...');
       console.log('[Entrevista] Carrera:', selectedCarrera.nombre, `(ID: ${selectedCarrera.id})`);
       console.log('[Entrevista] Dificultad:', selectedDificultad.nombre, `(${selectedDificultad.id})`);
+      console.log('[Entrevista] Modalidad:', selectedModalidad.nombre, `(${selectedModalidad.id})`);
 
       const result = await entrevistaService.iniciarEntrevista(
         selectedCarrera.id,
-        selectedDificultad.id
+        selectedDificultad.id,
+        selectedModalidad.id
       );
 
       if (result.success) {
@@ -132,6 +176,7 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
           entrevistaId: result.data.entrevistaId,
           carrera: selectedCarrera,
           dificultad: selectedDificultad,
+          modalidad: selectedModalidad,
           mensajeInicial: result.data.mensajeInicial,
           aiDisponible: result.data.aiDisponible
         });
@@ -217,22 +262,28 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
           borderBottom: '1px solid #e5e7eb',
           background: paso === 1
             ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-            : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+            : paso === 2
+            ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+            : 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
             {paso === 1 ? (
               <Briefcase size={32} color="white" />
-            ) : (
+            ) : paso === 2 ? (
               <Flame size={32} color="white" />
+            ) : (
+              <Mic size={32} color="white" />
             )}
             <h2 style={{ margin: 0, color: 'white', fontSize: '1.75rem', fontWeight: 700 }}>
-              {paso === 1 ? 'Selecciona una Carrera' : 'Selecciona la Dificultad'}
+              {paso === 1 ? 'Selecciona una Carrera' : paso === 2 ? 'Selecciona la Dificultad' : 'Selecciona la Modalidad'}
             </h2>
           </div>
           <p style={{ margin: 0, color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.875rem' }}>
             {paso === 1
               ? 'Elige la carrera para la cual deseas practicar tu entrevista'
-              : `Carrera seleccionada: ${selectedCarrera?.nombre}`
+              : paso === 2
+              ? `Carrera seleccionada: ${selectedCarrera?.nombre}`
+              : `Dificultad: ${selectedDificultad?.nombre}`
             }
           </p>
 
@@ -254,7 +305,14 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
               flex: 1,
               height: '4px',
               borderRadius: '2px',
-              background: paso === 2 ? 'white' : 'rgba(255, 255, 255, 0.3)',
+              background: paso >= 2 ? 'white' : 'rgba(255, 255, 255, 0.3)',
+              transition: 'all 0.3s ease'
+            }} />
+            <div style={{
+              flex: 1,
+              height: '4px',
+              borderRadius: '2px',
+              background: paso === 3 ? 'white' : 'rgba(255, 255, 255, 0.3)',
               transition: 'all 0.3s ease'
             }} />
           </div>
@@ -391,7 +449,7 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
                 )}
               </div>
             </motion.div>
-          ) : (
+          ) : paso === 2 ? (
             <motion.div
               key="paso2"
               initial={{ opacity: 0 }}
@@ -492,6 +550,107 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
                 </div>
               )}
             </motion.div>
+          ) : (
+            <motion.div
+              key="paso3"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                padding: '2rem',
+                overflowY: 'auto'
+              }}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {modalidades.map((modalidad) => {
+                  const Icon = modalidad.icon;
+                  return (
+                    <div
+                      key={modalidad.id}
+                      onClick={() => handleSelectModalidad(modalidad)}
+                      style={{
+                        padding: '1.5rem',
+                        border: selectedModalidad?.id === modalidad.id
+                          ? `2px solid ${modalidad.color}`
+                          : '2px solid #e5e7eb',
+                        borderRadius: '16px',
+                        cursor: 'pointer',
+                        background: selectedModalidad?.id === modalidad.id
+                          ? `${modalidad.color}10`
+                          : 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '1.5rem',
+                        transition: 'all 0.2s ease',
+                        transform: 'scale(1)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'scale(1.01)';
+                        e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
+                    >
+                      <div style={{
+                        width: '60px',
+                        height: '60px',
+                        borderRadius: '14px',
+                        background: modalidad.gradient,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0
+                      }}>
+                        <Icon size={32} color="white" />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <h3 style={{
+                          margin: 0,
+                          fontSize: '1.25rem',
+                          fontWeight: 700,
+                          color: '#111827'
+                        }}>
+                          {modalidad.nombre}
+                        </h3>
+                        <p style={{
+                          margin: '0.25rem 0 0 0',
+                          fontSize: '0.875rem',
+                          color: '#6b7280'
+                        }}>
+                          {modalidad.descripcion}
+                        </p>
+                      </div>
+                      {selectedModalidad?.id === modalidad.id && (
+                        <CheckCircle size={28} color={modalidad.color} />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Mensaje de Error */}
+              {error && (
+                <div
+                  style={{
+                    marginTop: '1.5rem',
+                    padding: '1rem',
+                    background: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    borderRadius: '12px',
+                    color: '#dc2626',
+                    fontSize: '0.875rem'
+                  }}
+                >
+                  {error}
+                </div>
+              )}
+            </motion.div>
           )}
         </AnimatePresence>
 
@@ -504,7 +663,7 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
           background: '#f9fafb'
         }}>
           <button
-            onClick={paso === 1 ? onCancel : handleVolverACarreras}
+            onClick={paso === 1 ? onCancel : paso === 2 ? handleVolverACarreras : handleVolverADificultad}
             disabled={iniciandoEntrevista}
             style={{
               flex: 1,
@@ -557,21 +716,52 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
               Continuar
               <ChevronRight size={20} />
             </button>
-          ) : (
+          ) : paso === 2 ? (
             <button
-              onClick={iniciarEntrevista}
-              disabled={!selectedDificultad || iniciandoEntrevista}
+              onClick={handleContinuarAModalidad}
+              disabled={!selectedDificultad}
               style={{
                 flex: 2,
                 padding: '0.875rem 1.5rem',
                 border: 'none',
                 borderRadius: '12px',
-                background: selectedDificultad && !iniciandoEntrevista
+                background: selectedDificultad
+                  ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+                  : '#e5e7eb',
+                color: 'white',
+                fontWeight: 600,
+                cursor: selectedDificultad ? 'pointer' : 'not-allowed',
+                fontSize: '1rem',
+                opacity: selectedDificultad ? 1 : 0.5,
+                fontFamily: 'inherit',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                transition: 'all 0.2s',
+                transform: 'scale(1)'
+              }}
+              onMouseEnter={(e) => selectedDificultad && (e.target.style.transform = 'scale(1.02)')}
+              onMouseLeave={(e) => (e.target.style.transform = 'scale(1)')}
+            >
+              Continuar
+              <ChevronRight size={20} />
+            </button>
+          ) : (
+            <button
+              onClick={iniciarEntrevista}
+              disabled={!selectedModalidad || iniciandoEntrevista}
+              style={{
+                flex: 2,
+                padding: '0.875rem 1.5rem',
+                border: 'none',
+                borderRadius: '12px',
+                background: selectedModalidad && !iniciandoEntrevista
                   ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
                   : '#e5e7eb',
                 color: 'white',
                 fontWeight: 600,
-                cursor: (selectedDificultad && !iniciandoEntrevista) ? 'pointer' : 'not-allowed',
+                cursor: (selectedModalidad && !iniciandoEntrevista) ? 'pointer' : 'not-allowed',
                 fontSize: '1rem',
                 opacity: (selectedDificultad && !iniciandoEntrevista) ? 1 : 0.5,
                 fontFamily: 'inherit',

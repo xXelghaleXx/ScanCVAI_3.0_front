@@ -9,6 +9,7 @@ import {
 import { toast } from 'react-toastify';
 import ChatBox from "../../chat/ChatBox/ChatBox";
 import ChatInput from "../../chat/ChatInput/ChatInput";
+import VoiceInterview from "../VoiceInterview/VoiceInterview";
 import CarreraSelector from "../../forms/CarreraSelector/CarreraSelector";
 import ResultadosEntrevista from "../ResultadosEntrevista/ResultadosEntrevista";
 import Background from "../../layout/Background/Background";
@@ -31,6 +32,7 @@ const EntrevistaChat = () => {
   const [mostrarSelectorCarrera, setMostrarSelectorCarrera] = useState(true);
   const [carreraSeleccionada, setCarreraSeleccionada] = useState(null);
   const [dificultadSeleccionada, setDificultadSeleccionada] = useState(null);
+  const [modalidadSeleccionada, setModalidadSeleccionada] = useState(null);
   const [entrevistaFinalizada, setEntrevistaFinalizada] = useState(false);
   const [resultados, setResultados] = useState(null);
 
@@ -46,18 +48,20 @@ const EntrevistaChat = () => {
     const entrevistaGuardada = entrevistaService.recuperarEntrevistaLocal();
 
     if (entrevistaGuardada.success) {
-      const { id, chatHistory, carrera, dificultad } = entrevistaGuardada.data;
+      const { id, chatHistory, carrera, dificultad, modalidad } = entrevistaGuardada.data;
 
       console.log('✅ Entrevista recuperada de localStorage:');
       console.log('  🆔 ID:', id);
       console.log('  💬 Mensajes:', chatHistory?.length || 0);
       console.log('  📚 Carrera:', carrera?.nombre || 'N/A');
       console.log('  📊 Dificultad:', dificultad?.nombre || 'N/A');
+      console.log('  🎤 Modalidad:', modalidad?.nombre || 'N/A');
 
       setEntrevistaId(id);
       setChat(chatHistory || []);
       setCarreraSeleccionada(carrera);
       setDificultadSeleccionada(dificultad);
+      setModalidadSeleccionada(modalidad);
       setMostrarSelectorCarrera(false);
 
       toast.info('Continuando entrevista anterior');
@@ -112,13 +116,14 @@ const EntrevistaChat = () => {
   useEffect(() => {
     if (entrevistaId && chat.length > 0 && !entrevistaFinalizada) {
       entrevistaService.guardarEntrevistaLocal(
-        entrevistaId, 
-        chat, 
-        carreraSeleccionada, 
-        dificultadSeleccionada
+        entrevistaId,
+        chat,
+        carreraSeleccionada,
+        dificultadSeleccionada,
+        modalidadSeleccionada
       );
     }
-  }, [entrevistaId, chat, entrevistaFinalizada, carreraSeleccionada, dificultadSeleccionada]);
+  }, [entrevistaId, chat, entrevistaFinalizada, carreraSeleccionada, dificultadSeleccionada, modalidadSeleccionada]);
 
   // ========== SCROLL AUTOMÁTICO ==========
   useEffect(() => {
@@ -132,37 +137,40 @@ const EntrevistaChat = () => {
     try {
       setLoading(true);
       setError(null);
-      
-      const { entrevistaId, carrera, dificultad, mensajeInicial, aiDisponible } = data;
-      
+
+      const { entrevistaId, carrera, dificultad, modalidad, mensajeInicial, aiDisponible } = data;
+
       console.log('🎯 Procesando entrevista iniciada:');
       console.log('  🆔 ID:', entrevistaId);
       console.log('  📚 Carrera:', carrera.nombre);
       console.log('  📊 Dificultad:', dificultad.nombre);
+      console.log('  🎤 Modalidad:', modalidad.nombre);
       console.log('  💬 Mensaje inicial:', mensajeInicial?.substring(0, 50) + '...');
       console.log('  🤖 IA disponible:', aiDisponible);
-      
+
       // Guardar estados
       setCarreraSeleccionada(carrera);
       setDificultadSeleccionada(dificultad);
+      setModalidadSeleccionada(modalidad);
       setEntrevistaId(entrevistaId);
-      
+
       // Crear chat inicial con mensaje de la IA
-      const chatInicial = [{ 
-        tipo: "ia", 
+      const chatInicial = [{
+        tipo: "ia",
         texto: mensajeInicial || `¡Hola! Bienvenido a la entrevista de ${carrera.nombre}. Estoy aquí para ayudarte a practicar. ¿Listo para comenzar?`
       }];
-      
+
       setChat(chatInicial);
-      
+
       // Guardar en localStorage
       entrevistaService.guardarEntrevistaLocal(
-        entrevistaId, 
-        chatInicial, 
-        carrera, 
-        dificultad
+        entrevistaId,
+        chatInicial,
+        carrera,
+        dificultad,
+        modalidad
       );
-      
+
       // Ocultar selector
       setMostrarSelectorCarrera(false);
       setEntrevistaFinalizada(false);
@@ -531,22 +539,44 @@ const EntrevistaChat = () => {
         )}
       </AnimatePresence>
 
-      {/* Chat Container */}
+      {/* Chat Container - Renderizado condicional según modalidad */}
       <div className="chat-main-container">
-        <ChatBox 
-          chat={chat}
-          loading={loading}
-          preguntaInicial={chat.length === 0 ? "¡Hola! Estoy aquí para ayudarte a practicar tu entrevista." : ""}
-          ref={chatBoxRef}
-        />
+        {modalidadSeleccionada?.id === 'voz' ? (
+          // Modo Voz
+          <>
+            <ChatBox
+              chat={chat}
+              loading={loading}
+              preguntaInicial={chat.length === 0 ? "¡Hola! Estoy aquí para ayudarte a practicar tu entrevista por voz." : ""}
+              ref={chatBoxRef}
+            />
 
-        <ChatInput
-          mensaje={mensaje}
-          setMensaje={setMensaje}
-          onEnviar={handleEnviarMensaje}
-          disabled={loading || entrevistaFinalizada || !entrevistaId}
-          loading={loading}
-        />
+            <VoiceInterview
+              onSendMessage={handleEnviarMensaje}
+              loading={loading}
+              lastAIMessage={chat.length > 0 ? chat[chat.length - 1]?.texto : null}
+              disabled={entrevistaFinalizada || !entrevistaId}
+            />
+          </>
+        ) : (
+          // Modo Chat (por defecto)
+          <>
+            <ChatBox
+              chat={chat}
+              loading={loading}
+              preguntaInicial={chat.length === 0 ? "¡Hola! Estoy aquí para ayudarte a practicar tu entrevista." : ""}
+              ref={chatBoxRef}
+            />
+
+            <ChatInput
+              mensaje={mensaje}
+              setMensaje={setMensaje}
+              onEnviar={handleEnviarMensaje}
+              disabled={loading || entrevistaFinalizada || !entrevistaId}
+              loading={loading}
+            />
+          </>
+        )}
       </div>
     </div>
     </>
