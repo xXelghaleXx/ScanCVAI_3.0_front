@@ -1,7 +1,7 @@
 // src/components/entrevista/VoiceInterview/VoiceInterview.jsx
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, MicOff, Volume2, VolumeX, Loader, Settings } from 'lucide-react';
+import { Mic, MicOff, Volume2, VolumeX, Loader, Settings, ChevronDown, ChevronUp } from 'lucide-react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import { toast } from 'react-toastify';
 
@@ -23,7 +23,6 @@ const VoiceInterview = ({
   const [showVoiceSelector, setShowVoiceSelector] = useState(false);
 
   // Estados de detección de audio
-  const [audioLevel, setAudioLevel] = useState(0);
   const [isDetectingVoice, setIsDetectingVoice] = useState(false);
 
   // Referencias
@@ -34,8 +33,8 @@ const VoiceInterview = ({
   const analyserRef = useRef(null);
   const micStreamRef = useRef(null);
   const animationFrameRef = useRef(null);
-  const silenceTimeoutRef = useRef(null);
   const lastSpeechTimeRef = useRef(Date.now());
+  const sendTimeoutRef = useRef(null);
 
   // Hook de reconocimiento de voz
   const {
@@ -61,7 +60,7 @@ const VoiceInterview = ({
     const loadVoices = () => {
       const voices = synthRef.current.getVoices();
 
-      // Filtrar voces en español y femeninas
+      // Filtrar voces en español
       const spanishVoices = voices.filter(voice =>
         voice.lang.includes('es') || voice.lang.includes('ES')
       );
@@ -105,51 +104,59 @@ const VoiceInterview = ({
   // Inicializar detector de audio
   const initAudioDetection = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log('🎤 Iniciando detección de audio...');
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        }
+      });
       micStreamRef.current = stream;
 
       audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
       analyserRef.current = audioContextRef.current.createAnalyser();
+      analyserRef.current.fftSize = 256;
+      analyserRef.current.smoothingTimeConstant = 0.8;
 
       const source = audioContextRef.current.createMediaStreamSource(stream);
       source.connect(analyserRef.current);
 
-      analyserRef.current.fftSize = 256;
       const bufferLength = analyserRef.current.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
 
       const detectSound = () => {
-        if (!isListening) return;
+        if (!analyserRef.current) return;
 
         analyserRef.current.getByteFrequencyData(dataArray);
 
-        // Calcular nivel de audio
+        // Calcular nivel de audio promedio
         const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
-        setAudioLevel(average);
 
-        // Detectar si hay voz (umbral: 20)
-        const hasVoice = average > 20;
+        // Detectar si hay voz (umbral: 25)
+        const hasVoice = average > 25;
         setIsDetectingVoice(hasVoice);
 
         if (hasVoice) {
+          // Hay voz detectada
           lastSpeechTimeRef.current = Date.now();
 
-          // Limpiar timeout anterior
-          if (silenceTimeoutRef.current) {
-            clearTimeout(silenceTimeoutRef.current);
+          // Limpiar timeout si existía
+          if (sendTimeoutRef.current) {
+            clearTimeout(sendTimeoutRef.current);
+            sendTimeoutRef.current = null;
           }
         } else {
-          // Si no hay voz, iniciar countdown de silencio
+          // No hay voz, verificar si debe enviar
           const timeSinceLastSpeech = Date.now() - lastSpeechTimeRef.current;
 
-          if (timeSinceLastSpeech > 2000 && transcript.trim().length > 0) {
-            // 2 segundos de silencio después de haber hablado
-            if (!silenceTimeoutRef.current) {
-              silenceTimeoutRef.current = setTimeout(() => {
-                console.log('🔇 Silencio detectado, enviando...');
-                stopListeningAndSend();
-              }, 1000); // 1 segundo adicional de confirmación
-            }
+          // Si han pasado 2.5 segundos de silencio y hay texto
+          if (timeSinceLastSpeech > 2500 && transcript.trim().length > 0 && !sendTimeoutRef.current) {
+            console.log('🔇 Silencio detectado, programando envío...');
+            sendTimeoutRef.current = setTimeout(() => {
+              console.log('📤 Enviando mensaje automáticamente');
+              stopListeningAndSend();
+            }, 500); // 500ms adicionales de confirmación
           }
         }
 
@@ -157,30 +164,38 @@ const VoiceInterview = ({
       };
 
       detectSound();
+      console.log('✅ Detección de audio iniciada');
     } catch (error) {
-      console.error('Error al inicializar detección de audio:', error);
-      toast.error('No se pudo acceder al micrófono');
+      console.error('❌ Error al inicializar detección de audio:', error);
+      toast.error('No se pudo acceder al micrófono. Verifica los permisos.');
     }
-  }, [isListening, transcript]);
+  }, [transcript]);
 
   // Detener detector de audio
   const stopAudioDetection = useCallback(() => {
+    console.log('🛑 Deteniendo detección de audio...');
+
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
     }
-    if (audioContextRef.current) {
+
+    if (sendTimeoutRef.current) {
+      clearTimeout(sendTimeoutRef.current);
+      sendTimeoutRef.current = null;
+    }
+
+    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
       audioContextRef.current.close();
       audioContextRef.current = null;
     }
+
     if (micStreamRef.current) {
       micStreamRef.current.getTracks().forEach(track => track.stop());
       micStreamRef.current = null;
     }
-    if (silenceTimeoutRef.current) {
-      clearTimeout(silenceTimeoutRef.current);
-      silenceTimeoutRef.current = null;
-    }
-    setAudioLevel(0);
+
+    analyserRef.current = null;
     setIsDetectingVoice(false);
   }, []);
 
@@ -223,6 +238,7 @@ const VoiceInterview = ({
 
   // Función para detener grabación y enviar
   const stopListeningAndSend = () => {
+    console.log('⏹️ Deteniendo escucha y enviando...');
     SpeechRecognition.stopListening();
     stopAudioDetection();
 
@@ -318,193 +334,158 @@ const VoiceInterview = ({
 
   return (
     <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '1.5rem'
+      display: 'grid',
+      gridTemplateColumns: '1fr 320px',
+      gap: '1.5rem',
+      marginTop: '1.5rem'
     }}>
-      {/* Selector de Voz */}
+      {/* Columna Principal (Izquierda) */}
       <div style={{
-        background: 'white',
-        borderRadius: '12px',
-        padding: '1rem',
-        border: '1px solid #e5e7eb'
-      }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: showVoiceSelector ? '1rem' : 0
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Settings size={18} color="#667eea" />
-            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>
-              Voz de la IA: {selectedVoice?.name.substring(0, 25) || 'Predeterminada'}
-            </span>
-          </div>
-          <button
-            onClick={() => setShowVoiceSelector(!showVoiceSelector)}
-            style={{
-              padding: '0.5rem 1rem',
-              background: '#f3f4f6',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '0.875rem',
-              cursor: 'pointer',
-              fontWeight: 500,
-              color: '#667eea'
-            }}
-          >
-            {showVoiceSelector ? 'Cerrar' : 'Cambiar'}
-          </button>
-        </div>
-
-        <AnimatePresence>
-          {showVoiceSelector && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              style={{ overflow: 'hidden' }}
-            >
-              <div style={{
-                maxHeight: '200px',
-                overflowY: 'auto',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.5rem',
-                marginTop: '1rem',
-                paddingRight: '0.5rem'
-              }}>
-                {availableVoices.map((voice, index) => (
-                  <div
-                    key={index}
-                    onClick={() => {
-                      setSelectedVoice(voice);
-                      setShowVoiceSelector(false);
-                      toast.success(`Voz cambiada a: ${voice.name}`);
-                    }}
-                    style={{
-                      padding: '0.75rem',
-                      background: selectedVoice?.name === voice.name ? '#ede9fe' : '#f9fafb',
-                      border: selectedVoice?.name === voice.name ? '2px solid #8b5cf6' : '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (selectedVoice?.name !== voice.name) {
-                        e.currentTarget.style.background = '#f3f4f6';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (selectedVoice?.name !== voice.name) {
-                        e.currentTarget.style.background = '#f9fafb';
-                      }
-                    }}
-                  >
-                    <div style={{ fontSize: '0.875rem', fontWeight: 500, color: '#111827' }}>
-                      {voice.name}
-                    </div>
-                    <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
-                      {voice.lang} • {voice.localService ? 'Local' : 'Red'}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Área de Visualización Principal */}
-      <div style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        borderRadius: '16px',
-        padding: '2rem',
-        minHeight: '300px',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '1.5rem',
-        boxShadow: '0 10px 25px rgba(102, 126, 234, 0.3)'
+        gap: '1.5rem'
       }}>
-        {/* Estado y Animaciones */}
-        <AnimatePresence mode="wait">
+        {/* Sección: Texto de Entrevista */}
+        <div style={{
+          background: 'white',
+          borderRadius: '12px',
+          padding: '1.5rem',
+          border: '1px solid #e5e7eb',
+          minHeight: '200px',
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          <h3 style={{
+            margin: '0 0 1rem 0',
+            fontSize: '0.875rem',
+            fontWeight: 700,
+            color: '#667eea',
+            letterSpacing: '0.5px',
+            textTransform: 'uppercase'
+          }}>
+            Transcripción en Tiempo Real
+          </h3>
+
+          <div style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            {transcript ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                style={{
+                  width: '100%'
+                }}
+              >
+                <p style={{
+                  color: '#111827',
+                  margin: 0,
+                  fontSize: '1.1rem',
+                  lineHeight: '1.8',
+                  fontWeight: 500
+                }}>
+                  "{transcript}"
+                </p>
+              </motion.div>
+            ) : (
+              <p style={{
+                color: '#9ca3af',
+                fontSize: '0.95rem',
+                fontStyle: 'italic',
+                margin: 0
+              }}>
+                {isListening ? 'Esperando tu respuesta...' : 'Presiona el micrófono para comenzar'}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Sección: Opciones de Animación y Controles */}
+        <div style={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          borderRadius: '16px',
+          padding: '2.5rem',
+          minHeight: '300px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '2rem',
+          boxShadow: '0 10px 25px rgba(102, 126, 234, 0.3)',
+          position: 'relative'
+        }}>
+          {/* Visualización según estado */}
           {loading ? (
-            <motion.div
-              key="loading"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              style={{ textAlign: 'center', color: 'white' }}
-            >
-              <Loader size={56} className="animate-spin" />
-              <p style={{ marginTop: '1rem', fontSize: '1.2rem', fontWeight: 600 }}>
+            // Estado: Cargando
+            <div style={{ textAlign: 'center', color: 'white' }}>
+              <Loader size={56} className="animate-spin" style={{ margin: '0 auto' }} />
+              <p style={{ marginTop: '1.5rem', fontSize: '1.2rem', fontWeight: 600 }}>
                 Procesando respuesta...
               </p>
-            </motion.div>
+            </div>
           ) : isSpeaking ? (
-            <motion.div
-              key="speaking"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              style={{ textAlign: 'center', color: 'white' }}
-            >
-              {/* Barras de audio animadas */}
+            // Estado: IA hablando
+            <div style={{ textAlign: 'center', color: 'white' }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '6px',
-                height: '80px',
-                marginBottom: '1rem'
+                gap: '8px',
+                height: '100px',
+                marginBottom: '1.5rem'
               }}>
                 {[...Array(7)].map((_, i) => (
                   <motion.div
                     key={i}
                     animate={{
-                      scaleY: [1, 2.2, 0.8, 1.8, 1.2, 1],
+                      scaleY: [1, 2.5, 0.8, 2, 1.2, 1],
                       opacity: [0.6, 1, 0.7, 1, 0.8, 0.6]
                     }}
                     transition={{
-                      duration: 1.5,
+                      duration: 1.2,
                       repeat: Infinity,
-                      delay: i * 0.12,
+                      delay: i * 0.1,
                       ease: "easeInOut"
                     }}
                     style={{
-                      width: '8px',
-                      height: '40px',
+                      width: '10px',
+                      height: '50px',
                       background: 'white',
-                      borderRadius: '4px',
+                      borderRadius: '5px',
                       transformOrigin: 'center'
                     }}
                   />
                 ))}
               </div>
-              <p style={{ fontSize: '1.2rem', fontWeight: 600 }}>
+              <p style={{ fontSize: '1.3rem', fontWeight: 600 }}>
                 La IA está hablando...
               </p>
-            </motion.div>
+              <p style={{ fontSize: '0.9rem', opacity: 0.9, marginTop: '0.5rem' }}>
+                Escucha la respuesta
+              </p>
+            </div>
           ) : isListening ? (
-            <motion.div
-              key="listening"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              style={{ textAlign: 'center', color: 'white' }}
-            >
-              {/* Visualización de nivel de audio */}
-              <div style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto 1rem' }}>
-                {/* Ondas solo si hay voz */}
+            // Estado: Escuchando
+            <div style={{ textAlign: 'center', color: 'white' }}>
+              <div style={{
+                position: 'relative',
+                width: '150px',
+                height: '150px',
+                margin: '0 auto 1.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {/* Ondas concéntricas - solo si hay voz */}
                 {isDetectingVoice && (
                   <>
                     <motion.div
                       animate={{
-                        scale: [1, 2.5, 2.5],
-                        opacity: [0.6, 0.3, 0]
+                        scale: [1, 2.2],
+                        opacity: [0.7, 0]
                       }}
                       transition={{
                         duration: 1.5,
@@ -513,19 +494,16 @@ const VoiceInterview = ({
                       }}
                       style={{
                         position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: '120px',
-                        height: '120px',
+                        width: '150px',
+                        height: '150px',
                         border: '4px solid white',
                         borderRadius: '50%'
                       }}
                     />
                     <motion.div
                       animate={{
-                        scale: [1, 2.5, 2.5],
-                        opacity: [0.6, 0.3, 0]
+                        scale: [1, 2.2],
+                        opacity: [0.7, 0]
                       }}
                       transition={{
                         duration: 1.5,
@@ -535,11 +513,8 @@ const VoiceInterview = ({
                       }}
                       style={{
                         position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: '120px',
-                        height: '120px',
+                        width: '150px',
+                        height: '150px',
                         border: '4px solid white',
                         borderRadius: '50%'
                       }}
@@ -547,7 +522,7 @@ const VoiceInterview = ({
                   </>
                 )}
 
-                {/* Círculo central con pulso si hay voz */}
+                {/* Círculo central */}
                 <motion.div
                   animate={isDetectingVoice ? {
                     scale: [1, 1.1, 1],
@@ -557,154 +532,270 @@ const VoiceInterview = ({
                     repeat: Infinity,
                   }}
                   style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '100px',
-                    height: '100px',
-                    background: isDetectingVoice ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.2)',
+                    width: '120px',
+                    height: '120px',
+                    background: isDetectingVoice
+                      ? 'rgba(239, 68, 68, 0.4)'
+                      : 'rgba(255, 255, 255, 0.2)',
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: `4px solid ${isDetectingVoice ? '#ef4444' : 'white'}`
+                    border: `4px solid ${isDetectingVoice ? '#ef4444' : 'white'}`,
+                    transition: 'all 0.3s ease',
+                    position: 'relative',
+                    zIndex: 1
                   }}
                 >
-                  <Mic size={40} color="white" />
+                  <Mic size={48} color="white" />
                 </motion.div>
               </div>
 
-              <p style={{ fontSize: '1.2rem', fontWeight: 600 }}>
+              <p style={{ fontSize: '1.3rem', fontWeight: 600, margin: 0 }}>
                 {isDetectingVoice ? '¡Te estoy escuchando!' : 'Esperando tu voz...'}
               </p>
               <p style={{ fontSize: '0.9rem', opacity: 0.9, marginTop: '0.5rem' }}>
+                {isDetectingVoice
+                  ? 'Habla con claridad'
+                  : 'Empieza a hablar cuando estés listo'}
+              </p>
+              <p style={{ fontSize: '0.85rem', opacity: 0.8, marginTop: '0.5rem' }}>
                 (Se enviará automáticamente al terminar)
               </p>
-            </motion.div>
+            </div>
           ) : (
-            <motion.div
-              key="ready"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              style={{ textAlign: 'center', color: 'white' }}
-            >
-              <MicOff size={64} style={{ opacity: 0.7, marginBottom: '1rem' }} />
-              <p style={{ fontSize: '1.2rem', fontWeight: 600 }}>
+            // Estado: Listo para iniciar
+            <div style={{ textAlign: 'center', color: 'white' }}>
+              <MicOff size={72} style={{ opacity: 0.7, marginBottom: '1.5rem' }} />
+              <p style={{ fontSize: '1.3rem', fontWeight: 600, margin: 0 }}>
                 Presiona el micrófono para empezar
               </p>
-            </motion.div>
+              <p style={{ fontSize: '0.9rem', opacity: 0.9, marginTop: '0.5rem' }}>
+                Tu respuesta será grabada y enviada automáticamente
+              </p>
+            </div>
           )}
-        </AnimatePresence>
 
-        {/* Controles */}
-        <div style={{
-          display: 'flex',
-          gap: '1rem',
-          alignItems: 'center'
-        }}>
-          {/* Botón de micrófono */}
-          <motion.button
-            onClick={toggleListening}
-            disabled={disabled || loading || isSpeaking}
-            whileHover={!disabled && !loading && !isSpeaking ? { scale: 1.05 } : {}}
-            whileTap={!disabled && !loading && !isSpeaking ? { scale: 0.95 } : {}}
-            style={{
-              width: '90px',
-              height: '90px',
-              borderRadius: '50%',
-              border: 'none',
-              background: isListening
-                ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
-                : 'white',
-              color: isListening ? 'white' : '#667eea',
-              cursor: (disabled || loading || isSpeaking) ? 'not-allowed' : 'pointer',
-              opacity: (disabled || loading || isSpeaking) ? 0.5 : 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: isListening
-                ? '0 0 0 0 rgba(239, 68, 68, 0.7)'
-                : '0 8px 16px rgba(0,0,0,0.2)',
-              animation: isListening ? 'pulse 2s infinite' : 'none',
-              transition: 'all 0.3s ease'
-            }}
-          >
-            {isListening ? <Mic size={42} /> : <MicOff size={42} />}
-          </motion.button>
+          {/* Controles */}
+          <div style={{
+            display: 'flex',
+            gap: '1.5rem',
+            alignItems: 'center',
+            marginTop: '1rem'
+          }}>
+            {/* Botón de micrófono */}
+            <motion.button
+              onClick={toggleListening}
+              disabled={disabled || loading || isSpeaking}
+              whileHover={!disabled && !loading && !isSpeaking ? { scale: 1.05 } : {}}
+              whileTap={!disabled && !loading && !isSpeaking ? { scale: 0.95 } : {}}
+              style={{
+                width: '100px',
+                height: '100px',
+                borderRadius: '50%',
+                border: 'none',
+                background: isListening
+                  ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
+                  : 'white',
+                color: isListening ? 'white' : '#667eea',
+                cursor: (disabled || loading || isSpeaking) ? 'not-allowed' : 'pointer',
+                opacity: (disabled || loading || isSpeaking) ? 0.5 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: isListening
+                  ? '0 0 0 0 rgba(239, 68, 68, 0.7)'
+                  : '0 8px 16px rgba(0,0,0,0.2)',
+                animation: isListening ? 'pulse 2s infinite' : 'none',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              {isListening ? <Mic size={48} /> : <MicOff size={48} />}
+            </motion.button>
 
-          {/* Botón de control de voz */}
-          <motion.button
-            onClick={toggleVoiceOutput}
-            disabled={disabled}
-            whileHover={!disabled ? { scale: 1.05 } : {}}
-            whileTap={!disabled ? { scale: 0.95 } : {}}
-            style={{
-              width: '64px',
-              height: '64px',
-              borderRadius: '50%',
-              border: 'none',
-              background: voiceEnabled
-                ? 'rgba(255, 255, 255, 0.3)'
-                : 'rgba(255, 255, 255, 0.1)',
-              color: 'white',
-              cursor: disabled ? 'not-allowed' : 'pointer',
-              opacity: disabled ? 0.5 : 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backdropFilter: 'blur(10px)',
-              transition: 'all 0.3s ease'
-            }}
-          >
-            {voiceEnabled ? <Volume2 size={30} /> : <VolumeX size={30} />}
-          </motion.button>
+            {/* Botón de control de voz */}
+            <motion.button
+              onClick={toggleVoiceOutput}
+              disabled={disabled}
+              whileHover={!disabled ? { scale: 1.05 } : {}}
+              whileTap={!disabled ? { scale: 0.95 } : {}}
+              style={{
+                width: '70px',
+                height: '70px',
+                borderRadius: '50%',
+                border: 'none',
+                background: voiceEnabled
+                  ? 'rgba(255, 255, 255, 0.3)'
+                  : 'rgba(255, 255, 255, 0.15)',
+                color: 'white',
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                opacity: disabled ? 0.5 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backdropFilter: 'blur(10px)',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+              }}
+            >
+              {voiceEnabled ? <Volume2 size={32} /> : <VolumeX size={32} />}
+            </motion.button>
+          </div>
         </div>
       </div>
 
-      {/* Transcripción en tiempo real */}
-      <AnimatePresence>
-        {transcript && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+      {/* Columna Derecha: Selector de Voces */}
+      <div style={{
+        background: 'white',
+        borderRadius: '12px',
+        padding: '1.5rem',
+        border: '1px solid #e5e7eb',
+        height: 'fit-content',
+        position: 'sticky',
+        top: '1rem'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '1rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Settings size={20} color="#667eea" />
+            <h3 style={{
+              margin: 0,
+              fontSize: '0.875rem',
+              fontWeight: 700,
+              color: '#374151',
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase'
+            }}>
+              Selector de Voces
+            </h3>
+          </div>
+          <motion.button
+            onClick={() => setShowVoiceSelector(!showVoiceSelector)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             style={{
-              background: 'white',
-              padding: '1.25rem',
-              borderRadius: '12px',
-              border: '2px solid #e5e7eb',
-              boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
+              padding: '0.4rem',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#667eea',
+              display: 'flex',
+              alignItems: 'center'
             }}
           >
-            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#667eea', marginBottom: '0.5rem' }}>
-              TU RESPUESTA:
-            </div>
-            <p style={{
-              color: '#111827',
-              margin: 0,
-              fontSize: '1rem',
-              lineHeight: '1.6',
-              fontWeight: 500
-            }}>
-              "{transcript}"
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            {showVoiceSelector ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </motion.button>
+        </div>
 
-      {/* Estilos para la animación de pulso */}
+        {/* Voz actual seleccionada */}
+        <div style={{
+          padding: '1rem',
+          background: '#f3f4f6',
+          borderRadius: '8px',
+          marginBottom: showVoiceSelector ? '1rem' : 0
+        }}>
+          <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>
+            Voz Actual:
+          </div>
+          <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#111827' }}>
+            {selectedVoice?.name.substring(0, 35) || 'Predeterminada'}
+          </div>
+          <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.25rem' }}>
+            {selectedVoice?.lang}
+          </div>
+        </div>
+
+        {/* Lista de voces */}
+        <AnimatePresence>
+          {showVoiceSelector && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              style={{ overflow: 'hidden' }}
+            >
+              <div style={{
+                maxHeight: '400px',
+                overflowY: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.5rem',
+                paddingRight: '0.25rem'
+              }}>
+                {availableVoices.map((voice, index) => (
+                  <motion.div
+                    key={index}
+                    onClick={() => {
+                      setSelectedVoice(voice);
+                      toast.success(`Voz cambiada a: ${voice.name}`);
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    style={{
+                      padding: '0.75rem',
+                      background: selectedVoice?.name === voice.name ? '#ede9fe' : '#f9fafb',
+                      border: selectedVoice?.name === voice.name ? '2px solid #8b5cf6' : '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <div style={{
+                      fontSize: '0.875rem',
+                      fontWeight: selectedVoice?.name === voice.name ? 600 : 500,
+                      color: '#111827',
+                      marginBottom: '0.25rem'
+                    }}>
+                      {voice.name}
+                    </div>
+                    <div style={{
+                      fontSize: '0.75rem',
+                      color: '#6b7280',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}>
+                      <span>{voice.lang}</span>
+                      <span>•</span>
+                      <span>{voice.localService ? '📍 Local' : '🌐 Red'}</span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Estilos para animaciones */}
       <style>{`
         @keyframes pulse {
           0% {
             box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
           }
           70% {
-            box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
+            box-shadow: 0 0 0 25px rgba(239, 68, 68, 0);
           }
           100% {
             box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+          }
+        }
+
+        .animate-spin {
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
           }
         }
       `}</style>
