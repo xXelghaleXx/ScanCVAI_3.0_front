@@ -188,18 +188,21 @@ const EntrevistaChat = () => {
   };
 
   // ========== ENVIAR MENSAJE ==========
-  const handleEnviarMensaje = async () => {
-    if (mensaje.trim() === "") {
+  const handleEnviarMensaje = async (textoMensaje = null) => {
+    // Si se pasa un parámetro (desde VoiceInputSection), úsalo. Si no, usa el estado mensaje
+    const textoAEnviar = textoMensaje !== null ? textoMensaje : mensaje;
+
+    if (textoAEnviar.trim() === "") {
       toast.warning('Escribe un mensaje');
       return;
     }
-    
+
     if (!entrevistaId) {
       setError("No se ha iniciado una entrevista");
       toast.error("No se ha iniciado una entrevista");
       return;
     }
-    
+
     if (entrevistaFinalizada) {
       setError("La entrevista ya ha finalizado");
       toast.warning("La entrevista ya ha finalizado");
@@ -211,15 +214,19 @@ const EntrevistaChat = () => {
       setError(null);
 
       // Agregar mensaje del usuario al chat
-      const mensajeUsuario = { tipo: "usuario", texto: mensaje };
+      const mensajeUsuario = { tipo: "usuario", texto: textoAEnviar };
       const nuevoChat = [...chat, mensajeUsuario];
       setChat(nuevoChat);
-      setMensaje("");
 
-      console.log('📤 Enviando mensaje:', mensaje.substring(0, 50) + '...');
+      // Solo limpiar el estado mensaje si no se pasó un parámetro (modo chat)
+      if (textoMensaje === null) {
+        setMensaje("");
+      }
+
+      console.log('📤 Enviando mensaje:', textoAEnviar.substring(0, 50) + '...');
 
       // Enviar mensaje al backend
-      const result = await entrevistaService.enviarMensaje(entrevistaId, mensaje);
+      const result = await entrevistaService.enviarMensaje(entrevistaId, textoAEnviar);
 
       if (result.success) {
         const { respuesta, puedeFinalizar } = result.data;
@@ -285,7 +292,7 @@ const EntrevistaChat = () => {
       const result = await entrevistaService.finalizarEntrevista(entrevistaId);
 
       if (result.success) {
-        const { evaluacion, estadisticas, aiDisponible } = result.data;
+        const { evaluacion, aiDisponible } = result.data;
         
         console.log('✅ Entrevista finalizada:');
         console.log('  ⭐ Puntuación:', evaluacion.puntuacion_global);
@@ -557,7 +564,11 @@ const EntrevistaChat = () => {
           <VoiceInputSection
             onSendMessage={handleEnviarMensaje}
             loading={loading}
-            lastAIMessage={chat.length > 0 ? chat[chat.length - 1]?.texto : null}
+            lastAIMessage={
+              chat.length > 0 && chat[chat.length - 1]?.tipo === 'ia'
+                ? chat[chat.length - 1]?.texto
+                : null
+            }
             disabled={entrevistaFinalizada || !entrevistaId}
           />
         ) : (
