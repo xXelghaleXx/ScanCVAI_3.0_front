@@ -1,7 +1,8 @@
 // src/components/entrevista/VoiceInputSection/VoiceInputSection.jsx
-// VERSIÓN MINIMALISTA - SOLO FUNCIONALIDAD
+// VERSIÓN MINIMALISTA - SOLO FUNCIONALIDAD + FIX BUCLE
 import { useState, useEffect, useRef } from 'react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import '../../../styles/layout/VoiceInputSection.css';
 
 const VoiceInputSection = ({
   onSendMessage,
@@ -21,6 +22,7 @@ const VoiceInputSection = ({
   const lastMessageRef = useRef(null);
   const silenceTimerRef = useRef(null);
   const hasSpokenRef = useRef(false);
+  const shouldResumeListeningRef = useRef(false);
 
   // ========== SPEECH RECOGNITION ==========
   const {
@@ -71,7 +73,8 @@ const VoiceInputSection = ({
 
   // ========== DETECCIÓN AUTOMÁTICA DE PAUSA (2 segundos) ==========
   useEffect(() => {
-    if (!transcript || !isListening) return;
+    // NO DETECTAR SI ESTÁ HABLANDO LA IA
+    if (!transcript || !isListening || isSpeaking) return;
 
     if (transcript.trim().length > 0) {
       hasSpokenRef.current = true;
@@ -83,7 +86,7 @@ const VoiceInputSection = ({
 
     // Detectar pausa de 2 segundos
     silenceTimerRef.current = setTimeout(() => {
-      if (transcript.trim().length > 5 && hasSpokenRef.current) {
+      if (transcript.trim().length > 5 && hasSpokenRef.current && !isSpeaking) {
         console.log('⏸️ Pausa detectada, enviando mensaje:', transcript);
         enviarMensajeAutomatico();
       }
@@ -94,7 +97,7 @@ const VoiceInputSection = ({
         clearTimeout(silenceTimerRef.current);
       }
     };
-  }, [transcript, isListening]);
+  }, [transcript, isListening, isSpeaking]);
 
   // ========== REPRODUCIR VOZ DE IA AUTOMÁTICAMENTE ==========
   useEffect(() => {
@@ -105,6 +108,28 @@ const VoiceInputSection = ({
     }
   }, [lastAIMessage, voiceEnabled, loading]);
 
+  // ========== PAUSAR RECONOCIMIENTO MIENTRAS LOADING O SPEAKING ==========
+  useEffect(() => {
+    // Si está cargando o la IA está hablando, PAUSAR reconocimiento
+    if ((loading || isSpeaking) && listening) {
+      console.log('⏸️ PAUSANDO reconocimiento (IA procesando/hablando)');
+      SpeechRecognition.stopListening();
+      shouldResumeListeningRef.current = true;
+    }
+
+    // Si terminó de cargar y de hablar, y estaba escuchando antes, REANUDAR
+    if (!loading && !isSpeaking && shouldResumeListeningRef.current) {
+      console.log('▶️ REANUDANDO reconocimiento (IA terminó)');
+      setTimeout(() => {
+        SpeechRecognition.startListening({
+          continuous: true,
+          language: 'es-ES'
+        });
+        shouldResumeListeningRef.current = false;
+      }, 500);
+    }
+  }, [loading, isSpeaking, listening]);
+
   // ========== ENVIAR MENSAJE AUTOMÁTICO ==========
   const enviarMensajeAutomatico = () => {
     if (!transcript || transcript.trim().length === 0) return;
@@ -112,8 +137,9 @@ const VoiceInputSection = ({
     const textoAEnviar = transcript.trim();
     console.log('📤 Enviando:', textoAEnviar);
 
-    // Detener reconocimiento
+    // Detener reconocimiento INMEDIATAMENTE
     SpeechRecognition.stopListening();
+    console.log('🛑 Reconocimiento detenido (enviando mensaje)');
 
     // Resetear
     hasSpokenRef.current = false;
@@ -123,17 +149,6 @@ const VoiceInputSection = ({
 
     // Limpiar
     resetTranscript();
-
-    // Reiniciar después de 500ms
-    setTimeout(() => {
-      if (isListening) {
-        console.log('🔄 Reiniciando escucha...');
-        SpeechRecognition.startListening({
-          continuous: true,
-          language: 'es-ES'
-        });
-      }
-    }, 500);
   };
 
   // ========== INICIAR ESCUCHA ==========
@@ -146,6 +161,7 @@ const VoiceInputSection = ({
     console.log('🎤 Iniciando escucha...');
     resetTranscript();
     hasSpokenRef.current = false;
+    shouldResumeListeningRef.current = false;
 
     SpeechRecognition.startListening({
       continuous: true,
@@ -169,6 +185,7 @@ const VoiceInputSection = ({
     }
 
     hasSpokenRef.current = false;
+    shouldResumeListeningRef.current = false;
   };
 
   // ========== ALTERNAR ESCUCHA ==========
@@ -202,23 +219,12 @@ const VoiceInputSection = ({
 
     utterance.onstart = () => {
       setIsSpeaking(true);
-      console.log('▶️ IA hablando...');
+      console.log('▶️ IA hablando... (reconocimiento PAUSADO)');
     };
 
     utterance.onend = () => {
       setIsSpeaking(false);
-      console.log('⏹️ IA terminó de hablar');
-
-      // Reiniciar escucha automáticamente
-      if (isListening) {
-        setTimeout(() => {
-          console.log('🔄 Reiniciando escucha después de IA...');
-          SpeechRecognition.startListening({
-            continuous: true,
-            language: 'es-ES'
-          });
-        }, 500);
-      }
+      console.log('⏹️ IA terminó de hablar (reconocimiento se REANUDARÁ)');
     };
 
     utterance.onerror = (event) => {
@@ -258,46 +264,42 @@ const VoiceInputSection = ({
   // ========== VALIDACIÓN ==========
   if (!browserSupportsSpeechRecognition) {
     return (
-      <div>
+      <div className="voice-unsupported">
         <p>⚠️ Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge.</p>
       </div>
     );
   }
 
-  // ========== RENDER MINIMALISTA ==========
+  // ========== RENDER ==========
   return (
-    <div style={{ padding: '20px', border: '2px solid #ccc', margin: '10px' }}>
+    <div className="voice-input-container">
       {/* Estado actual */}
-      <div style={{ marginBottom: '20px', padding: '10px', background: '#f0f0f0' }}>
+      <div className="voice-status">
         <strong>Estado:</strong> {
           loading ? '⏳ Cargando...' :
-          isSpeaking ? '🔊 IA hablando...' :
+          isSpeaking ? '🔊 IA hablando... (mic PAUSADO)' :
           isListening ? '🎤 Escuchando...' :
           '💤 Inactivo'
         }
       </div>
 
       {/* Transcript */}
-      <div style={{ marginBottom: '20px', padding: '15px', background: '#fff', border: '1px solid #ddd', minHeight: '80px' }}>
+      <div className="voice-transcript">
         <strong>Tu voz (transcript):</strong>
         <p>{transcript || '(vacío)'}</p>
+        {isSpeaking && (
+          <p className="voice-transcript-paused">
+            🛑 Reconocimiento pausado - IA hablando
+          </p>
+        )}
       </div>
 
       {/* Controles */}
-      <div style={{ marginBottom: '20px' }}>
+      <div className="voice-controls">
         <button
           onClick={toggleListening}
           disabled={disabled || loading || isSpeaking}
-          style={{
-            padding: '15px 30px',
-            fontSize: '18px',
-            marginRight: '10px',
-            cursor: (disabled || loading || isSpeaking) ? 'not-allowed' : 'pointer',
-            background: isListening ? '#ef4444' : '#10b981',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px'
-          }}
+          className={`voice-btn ${isListening ? 'voice-btn-stop' : 'voice-btn-start'}`}
         >
           {isListening ? '🎤 DETENER' : '🎤 INICIAR'}
         </button>
@@ -305,23 +307,15 @@ const VoiceInputSection = ({
         <button
           onClick={toggleVoiceOutput}
           disabled={disabled}
-          style={{
-            padding: '15px 30px',
-            fontSize: '18px',
-            cursor: disabled ? 'not-allowed' : 'pointer',
-            background: voiceEnabled ? '#3b82f6' : '#6b7280',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px'
-          }}
+          className={`voice-btn ${voiceEnabled ? 'voice-btn-voice-on' : 'voice-btn-voice-off'}`}
         >
           {voiceEnabled ? '🔊 VOZ IA: ON' : '🔇 VOZ IA: OFF'}
         </button>
       </div>
 
       {/* Selector de voz */}
-      <div>
-        <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
+      <div className="voice-selector-container">
+        <label className="voice-selector-label">
           Seleccionar voz:
         </label>
         <select
@@ -331,12 +325,7 @@ const VoiceInputSection = ({
             setSelectedVoice(voice);
             console.log('🔄 Voz cambiada:', voice?.name);
           }}
-          style={{
-            padding: '10px',
-            fontSize: '14px',
-            width: '100%',
-            maxWidth: '400px'
-          }}
+          className="voice-selector"
         >
           {availableVoices.map((voice, index) => (
             <option key={index} value={voice.name}>
@@ -347,15 +336,16 @@ const VoiceInputSection = ({
       </div>
 
       {/* Info de debug */}
-      <div style={{ marginTop: '20px', padding: '10px', background: '#f9f9f9', fontSize: '12px', fontFamily: 'monospace' }}>
+      <div className="voice-debug">
         <strong>Debug:</strong><br />
         - Listening: {listening ? 'SÍ' : 'NO'}<br />
-        - Speaking: {isSpeaking ? 'SÍ' : 'NO'}<br />
+        - Speaking: {isSpeaking ? 'SÍ ⚠️' : 'NO'}<br />
         - Voice enabled: {voiceEnabled ? 'SÍ' : 'NO'}<br />
         - Transcript length: {transcript?.length || 0}<br />
         - Has spoken: {hasSpokenRef.current ? 'SÍ' : 'NO'}<br />
         - Disabled: {disabled ? 'SÍ' : 'NO'}<br />
-        - Loading: {loading ? 'SÍ' : 'NO'}
+        - Loading: {loading ? 'SÍ' : 'NO'}<br />
+        - Should resume: {shouldResumeListeningRef.current ? 'SÍ ⏸️' : 'NO'}
       </div>
     </div>
   );

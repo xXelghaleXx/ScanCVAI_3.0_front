@@ -1,0 +1,90 @@
+/* VoiceInputSection.css */
+
+.voice-input-container {
+  padding: 20px;
+  border: 2px solid #ccc;
+  margin: 10px;
+}
+
+.voice-status {
+  margin-bottom: 20px;
+  padding: 10px;
+  background: #f0f0f0;
+}
+
+.voice-transcript {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #fff;
+  border: 1px solid #ddd;
+  min-height: 80px;
+}
+
+.voice-transcript-paused {
+  color: red;
+  font-weight: bold;
+}
+
+.voice-controls {
+  margin-bottom: 20px;
+}
+
+.voice-btn {
+  padding: 15px 30px;
+  font-size: 18px;
+  margin-right: 10px;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.voice-btn:disabled {
+  cursor: not-allowed;
+}
+
+.voice-btn-start {
+  background: #10b981;
+}
+
+.voice-btn-stop {
+  background: #ef4444;
+}
+
+.voice-btn-voice-on {
+  background: #3b82f6;
+}
+
+.voice-btn-voice-off {
+  background: #6b7280;
+}
+
+.voice-selector-container {
+  margin-bottom: 20px;
+}
+
+.voice-selector-label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.voice-selector {
+  padding: 10px;
+  font-size: 14px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.voice-debug {
+  margin-top: 20px;
+  padding: 10px;
+  background: #f9f9f9;
+  font-size: 12px;
+  font-family: monospace;
+}
+
+.voice-unsupported {
+  padding: 20px;
+  text-align: center;
+}

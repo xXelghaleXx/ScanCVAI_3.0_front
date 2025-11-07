@@ -188,13 +188,15 @@ const getUserName = () => {
     return currentUser.nombre;
   }
 
-  // Prioridad 3: email sin dominio
-  if (currentUser?.email) {
-    return currentUser.email.split('@')[0];
-  }
-
-  if (currentUser?.correo) {
-    return currentUser.correo.split('@')[0];
+  // Prioridad 3: Extraer primer nombre del email (antes del punto o @)
+  const email = currentUser?.email || currentUser?.correo;
+  if (email) {
+    const emailPart = email.split('@')[0];
+    // Si hay punto, tomar solo el primer nombre (ej: juan.perez -> Juan)
+    const nombreParts = emailPart.split('.');
+    const primerNombre = nombreParts[0];
+    // Capitalizar primera letra
+    return primerNombre.charAt(0).toUpperCase() + primerNombre.slice(1).toLowerCase();
   }
 
   // Fallback
