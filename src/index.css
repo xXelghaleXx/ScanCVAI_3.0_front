@@ -6,17 +6,27 @@
 @import './styles/base/variables.css';
 
 /*
-  2. Importar los estilos base (reset, estilos para body, h1, button, etc.).
+  2. Importar sistema de temas (modo claro y oscuro)
+*/
+@import './styles/base/theme.css';
+
+/*
+  3. Importar modo oscuro global para todos los componentes
+*/
+@import './styles/base/dark-mode-global.css';
+
+/*
+  4. Importar los estilos base (reset, estilos para body, h1, button, etc.).
 */
 @import './styles/base/base.css';
 
 /*
-  3. Importar estilos responsive globales
+  5. Importar estilos responsive globales
 */
 @import './styles/responsive/responsive-global.css';
 
 /*
-  4. Importar media queries para responsive design (DEBE IR AL FINAL)
+  6. Importar media queries para responsive design (DEBE IR AL FINAL)
 */
 @import './styles/responsive/responsive.css';
 

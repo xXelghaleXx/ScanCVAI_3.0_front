@@ -2,61 +2,102 @@
 
 .voice-input-container {
   padding: 20px;
-  border: 2px solid #ccc;
+  border: 2px solid var(--border);
   margin: 10px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
 }
 
 .voice-status {
   margin-bottom: 20px;
   padding: 10px;
-  background: #f0f0f0;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
 }
 
 .voice-transcript {
   margin-bottom: 20px;
   padding: 15px;
-  background: #fff;
-  border: 1px solid #ddd;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   min-height: 80px;
 }
 
+.voice-transcript p {
+  color: var(--text-primary);
+  margin: 0;
+}
+
 .voice-transcript-paused {
-  color: red;
+  color: var(--error) !important;
   font-weight: bold;
 }
 
 .voice-controls {
   margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .voice-btn {
   padding: 15px 30px;
   font-size: 18px;
-  margin-right: 10px;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   cursor: pointer;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+.voice-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.voice-btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .voice-btn:disabled {
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .voice-btn-start {
-  background: #10b981;
+  background: var(--secondary);
+}
+
+.voice-btn-start:hover:not(:disabled) {
+  background: var(--secondary-dark);
 }
 
 .voice-btn-stop {
-  background: #ef4444;
+  background: var(--error);
+}
+
+.voice-btn-stop:hover:not(:disabled) {
+  background: var(--error-dark);
 }
 
 .voice-btn-voice-on {
-  background: #3b82f6;
+  background: var(--primary);
+}
+
+.voice-btn-voice-on:hover:not(:disabled) {
+  background: var(--primary-dark);
 }
 
 .voice-btn-voice-off {
-  background: #6b7280;
+  background: var(--text-secondary);
+}
+
+.voice-btn-voice-off:hover:not(:disabled) {
+  background: var(--text-primary);
 }
 
 .voice-selector-container {
@@ -67,6 +108,7 @@
   display: block;
   margin-bottom: 10px;
   font-weight: bold;
+  color: var(--text-primary);
 }
 
 .voice-selector {
@@ -74,17 +116,52 @@
   font-size: 14px;
   width: 100%;
   max-width: 400px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.voice-selector:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-bg);
 }
 
 .voice-debug {
   margin-top: 20px;
   padding: 10px;
-  background: #f9f9f9;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
   font-size: 12px;
-  font-family: monospace;
+  font-family: var(--font-family-mono);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
 }
 
 .voice-unsupported {
   padding: 20px;
   text-align: center;
+  background: var(--error-bg);
+  color: var(--error);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--error);
+}
+
+/* Modo oscuro - ajustes específicos */
+[data-theme="dark"] .voice-input-container {
+  box-shadow: var(--shadow-lg);
+}
+
+[data-theme="dark"] .voice-transcript {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .voice-selector {
+  background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .voice-selector option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
