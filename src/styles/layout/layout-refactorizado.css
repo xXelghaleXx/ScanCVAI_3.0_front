@@ -215,3 +215,26 @@
     padding: 0 0.375rem;
   }
 }
+
+/* ===== MODO OSCURO - FORZAR ESTILOS ===== */
+[data-theme="dark"] .background-wrapper {
+  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary)) !important;
+}
+
+[data-theme="dark"] .header-container {
+  background: rgba(31, 41, 55, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+  border-bottom-color: var(--border) !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .footer-container {
+  background: rgba(31, 41, 55, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+  border-top-color: var(--border) !important;
+  box-shadow: 0 -1px 3px 0 rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .footer {
+  color: var(--text-secondary) !important;
+}

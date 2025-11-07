@@ -387,3 +387,45 @@
     font-size: 1.4rem;
   }
 }
+
+/* ===== MODO OSCURO - FORZAR ESTILOS ===== */
+[data-theme="dark"] .header {
+  background: var(--bg-primary) !important;
+  border-bottom: 1px solid var(--border) !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .separator {
+  background-color: var(--border) !important;
+}
+
+[data-theme="dark"] .user-name {
+  color: var(--primary-light) !important;
+}
+
+[data-theme="dark"] .admin-icon {
+  color: var(--accent-light) !important;
+}
+
+[data-theme="dark"] .profile-icon,
+[data-theme="dark"] .theme-icon {
+  color: var(--primary-light) !important;
+}
+
+[data-theme="dark"] .logout-icon {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .admin-button:hover,
+[data-theme="dark"] .profile-button:hover,
+[data-theme="dark"] .theme-toggle-btn:hover {
+  background: var(--primary-bg) !important;
+}
+
+[data-theme="dark"] .logout-button:hover {
+  background: var(--error-bg) !important;
+}
+
+[data-theme="dark"] .logout-button:hover .logout-icon {
+  color: var(--error-light) !important;
+}

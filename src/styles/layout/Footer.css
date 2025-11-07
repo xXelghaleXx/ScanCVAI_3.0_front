@@ -6,3 +6,10 @@
   font-weight: 500;
 }
 
+
+/* ===== MODO OSCURO - FORZAR ESTILOS ===== */
+[data-theme="dark"] .footer {
+  background: var(--bg-primary) !important;
+  color: var(--text-secondary) !important;
+  border-top: 1px solid var(--border) !important;
+}

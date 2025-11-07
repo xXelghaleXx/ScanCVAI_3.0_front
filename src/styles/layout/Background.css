@@ -54,3 +54,22 @@
     opacity: 0.15;
   }
 }
+/* ===== MODO OSCURO - FORZAR ESTILOS ===== */
+[data-theme="dark"] .background-wrapper {
+  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary)) !important;
+}
+
+[data-theme="dark"] #light-blue line {
+  stroke: var(--primary-light) !important;
+  stroke-opacity: 0.08 !important;
+}
+
+[data-theme="dark"] #red line {
+  stroke: var(--primary) !important;
+  stroke-opacity: 0.06 !important;
+}
+
+[data-theme="dark"] #blue line {
+  stroke: var(--primary-dark) !important;
+  stroke-opacity: 0.05 !important;
+}
