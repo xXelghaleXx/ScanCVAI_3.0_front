@@ -1,6 +1,6 @@
 // src/components/entrevista/VoiceInputSection/VoiceInputSection.jsx
 // VERSIÓN REDISEÑADA - LAYOUT DOS COLUMNAS + DARK MODE
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import { useTheme } from '../../../context/ThemeContext/ThemeContext';
 import { motion } from 'framer-motion';
@@ -108,10 +108,12 @@ const VoiceInputSection = ({
   useEffect(() => {
     if (lastAIMessage && voiceEnabled && !loading && lastAIMessage !== lastMessageRef.current) {
       lastMessageRef.current = lastAIMessage;
-      console.log('🔊 Reproduciendo voz de IA...');
+      console.log('🔊 Reproduciendo voz de IA automáticamente...');
       speakText(lastAIMessage);
+    } else if (lastAIMessage && voiceEnabled && !loading && !selectedVoice) {
+      console.warn('⚠️ No hay voz seleccionada todavía, esperando...');
     }
-  }, [lastAIMessage, voiceEnabled, loading]);
+  }, [lastAIMessage, voiceEnabled, loading, selectedVoice, speakText]);
 
   // ========== PAUSAR RECONOCIMIENTO MIENTRAS LOADING O SPEAKING ==========
   useEffect(() => {
@@ -203,20 +205,37 @@ const VoiceInputSection = ({
   };
 
   // ========== SÍNTESIS DE VOZ ==========
-  const speakText = (text) => {
-    if (!window.speechSynthesis || !voiceEnabled || !selectedVoice) {
-      console.warn('⚠️ Síntesis de voz no disponible');
+  const speakText = useCallback((text) => {
+    if (!window.speechSynthesis || !voiceEnabled) {
+      console.warn('⚠️ speechSynthesis no disponible o voz deshabilitada');
       return;
+    }
+
+    // Si no hay voz seleccionada, intentar obtener una voz por defecto
+    let voiceToUse = selectedVoice;
+    if (!voiceToUse) {
+      const voices = synthRef.current.getVoices();
+      const spanishVoices = voices.filter(v => v.lang.includes('es') || v.lang.includes('ES'));
+      voiceToUse = spanishVoices[0] || voices[0];
+      console.warn('⚠️ No había voz seleccionada, usando voz por defecto:', voiceToUse?.name);
+
+      if (!voiceToUse) {
+        console.error('❌ No hay voces disponibles en el sistema');
+        return;
+      }
+
+      // Actualizar selectedVoice para futuros usos
+      setSelectedVoice(voiceToUse);
     }
 
     // Cancelar voz anterior
     synthRef.current.cancel();
 
     console.log('🔊 Reproduciendo:', text.substring(0, 100) + '...');
-    console.log('🎙️ Voz:', selectedVoice.name);
+    console.log('🎙️ Voz:', voiceToUse.name);
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.voice = selectedVoice;
+    utterance.voice = voiceToUse;
     utterance.lang = 'es-ES';
     utterance.rate = 0.95;
     utterance.pitch = 1.1;
@@ -237,8 +256,9 @@ const VoiceInputSection = ({
       setIsSpeaking(false);
     };
 
+    console.log('🎙️ Iniciando síntesis de voz...');
     synthRef.current.speak(utterance);
-  };
+  }, [voiceEnabled, selectedVoice]);
 
   // ========== ALTERNAR VOZ DE IA ==========
   const toggleVoiceOutput = () => {
@@ -378,111 +398,185 @@ const VoiceInputSection = ({
         >
           {/* Estado Visual */}
           <div>
-            <h3 style={{
-              margin: '0 0 1rem 0',
-              fontSize: '1.25rem',
-              fontWeight: '600',
-              color: colors.textPrimary
-            }}>
-              Estado Actual
-            </h3>
-            <div style={{
-              background: colors.bgTertiary,
-              padding: '1.5rem',
-              borderRadius: '12px',
-              border: `2px solid ${
-                loading ? colors.warning :
-                isSpeaking ? colors.accent :
-                isListening ? colors.success :
-                colors.border
-              }`,
-              textAlign: 'center',
-              transition: 'all 0.3s ease'
-            }}>
-              <div style={{
-                fontSize: '3rem',
-                marginBottom: '0.5rem'
-              }}>
-                {loading ? '⏳' : isSpeaking ? '🔊' : isListening ? '🎤' : '💤'}
-              </div>
-              <div style={{
-                fontSize: '1.1rem',
+            <motion.h3
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              style={{
+                margin: '0 0 1rem 0',
+                fontSize: '1.25rem',
                 fontWeight: '600',
                 color: colors.textPrimary
-              }}>
+              }}
+            >
+              Estado Actual
+            </motion.h3>
+            <motion.div
+              animate={{
+                borderColor: loading ? colors.warning :
+                            isSpeaking ? colors.accent :
+                            isListening ? colors.success :
+                            colors.border,
+                scale: isListening || isSpeaking ? [1, 1.02, 1] : 1
+              }}
+              transition={{
+                borderColor: { duration: 0.3 },
+                scale: { duration: 0.6, repeat: isListening || isSpeaking ? Infinity : 0 }
+              }}
+              style={{
+                background: colors.bgTertiary,
+                padding: '1.5rem',
+                borderRadius: '12px',
+                border: `2px solid ${
+                  loading ? colors.warning :
+                  isSpeaking ? colors.accent :
+                  isListening ? colors.success :
+                  colors.border
+                }`,
+                textAlign: 'center',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              <motion.div
+                animate={{
+                  scale: isListening || isSpeaking ? [1, 1.1, 1] : 1,
+                  rotate: loading ? 360 : 0
+                }}
+                transition={{
+                  scale: { duration: 1, repeat: isListening || isSpeaking ? Infinity : 0 },
+                  rotate: { duration: 2, repeat: loading ? Infinity : 0, ease: 'linear' }
+                }}
+                style={{
+                  fontSize: '3rem',
+                  marginBottom: '0.5rem',
+                  display: 'inline-block'
+                }}
+              >
+                {loading ? '⏳' : isSpeaking ? '🔊' : isListening ? '🎤' : '💤'}
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                style={{
+                  fontSize: '1.1rem',
+                  fontWeight: '600',
+                  color: colors.textPrimary
+                }}
+              >
                 {loading ? 'Procesando tu mensaje...' :
                  isSpeaking ? 'IA hablando (micrófono en pausa)' :
                  isListening ? 'Escuchando tu voz...' :
                  'Inactivo - Presiona INICIAR'}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
 
           {/* Transcript en tiempo real */}
           <div style={{ flex: 1 }}>
-            <h3 style={{
-              margin: '0 0 1rem 0',
-              fontSize: '1.25rem',
-              fontWeight: '600',
-              color: colors.textPrimary
-            }}>
+            <motion.h3
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+              style={{
+                margin: '0 0 1rem 0',
+                fontSize: '1.25rem',
+                fontWeight: '600',
+                color: colors.textPrimary
+              }}
+            >
               Lo que estás diciendo
-            </h3>
-            <div style={{
-              background: colors.bgTertiary,
-              padding: '1.5rem',
-              borderRadius: '12px',
-              border: `1px solid ${colors.border}`,
-              minHeight: '150px',
-              maxHeight: '300px',
-              overflowY: 'auto'
-            }}>
+            </motion.h3>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4 }}
+              style={{
+                background: colors.bgTertiary,
+                padding: '1.5rem',
+                borderRadius: '12px',
+                border: `1px solid ${colors.border}`,
+                minHeight: '150px',
+                maxHeight: '300px',
+                overflowY: 'auto'
+              }}
+            >
               {transcript && transcript.trim().length > 0 ? (
-                <p style={{
-                  margin: 0,
-                  fontSize: '1rem',
-                  lineHeight: '1.6',
-                  color: colors.textPrimary,
-                  whiteSpace: 'pre-wrap'
-                }}>
+                <motion.p
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  key={transcript}
+                  style={{
+                    margin: 0,
+                    fontSize: '1rem',
+                    lineHeight: '1.6',
+                    color: colors.textPrimary,
+                    whiteSpace: 'pre-wrap'
+                  }}
+                >
                   {transcript}
-                </p>
+                </motion.p>
               ) : (
-                <p style={{
-                  margin: 0,
-                  fontSize: '0.95rem',
-                  color: colors.textMuted,
-                  fontStyle: 'italic'
-                }}>
+                <motion.p
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  style={{
+                    margin: 0,
+                    fontSize: '0.95rem',
+                    color: colors.textMuted,
+                    fontStyle: 'italic'
+                  }}
+                >
                   {isListening ? 'Empieza a hablar...' : 'Aquí aparecerá tu texto en tiempo real'}
-                </p>
+                </motion.p>
               )}
               {isSpeaking && (
-                <div style={{
-                  marginTop: '1rem',
-                  padding: '0.75rem',
-                  background: colors.accent + '20',
-                  border: `1px solid ${colors.accent}`,
-                  borderRadius: '8px',
-                  fontSize: '0.9rem',
-                  color: colors.accent,
-                  textAlign: 'center'
-                }}>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  style={{
+                    marginTop: '1rem',
+                    padding: '0.75rem',
+                    background: colors.accent + '20',
+                    border: `1px solid ${colors.accent}`,
+                    borderRadius: '8px',
+                    fontSize: '0.9rem',
+                    color: colors.accent,
+                    textAlign: 'center'
+                  }}
+                >
                   🛑 Reconocimiento pausado - IA está respondiendo
-                </div>
+                </motion.div>
               )}
-            </div>
+            </motion.div>
           </div>
 
           {/* Controles principales */}
-          <div style={{
-            display: 'flex',
-            gap: '1rem',
-            flexWrap: 'wrap'
-          }}>
-            <button
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            style={{
+              display: 'flex',
+              gap: '1rem',
+              flexWrap: 'wrap'
+            }}
+          >
+            <motion.button
               onClick={toggleListening}
               disabled={disabled || loading || isSpeaking}
+              whileHover={!disabled && !loading && !isSpeaking ? { scale: 1.05, y: -2 } : {}}
+              whileTap={!disabled && !loading && !isSpeaking ? { scale: 0.95 } : {}}
+              animate={{
+                boxShadow: isListening
+                  ? ['0 4px 12px rgba(16, 185, 129, 0.3)', '0 8px 24px rgba(16, 185, 129, 0.5)', '0 4px 12px rgba(16, 185, 129, 0.3)']
+                  : '0 4px 12px rgba(0,0,0,0.2)'
+              }}
+              transition={{
+                boxShadow: { duration: 2, repeat: isListening ? Infinity : 0 }
+              }}
               style={{
                 flex: 1,
                 minWidth: '200px',
@@ -502,23 +596,15 @@ const VoiceInputSection = ({
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
               }}
-              onMouseEnter={(e) => {
-                if (!disabled && !loading && !isSpeaking) {
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.boxShadow = '0 6px 16px rgba(0,0,0,0.3)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
-              }}
             >
               {isListening ? '⏹️ DETENER MICRÓFONO' : '🎤 INICIAR MICRÓFONO'}
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
               onClick={toggleVoiceOutput}
               disabled={disabled}
+              whileHover={!disabled ? { scale: 1.05, y: -2 } : {}}
+              whileTap={!disabled ? { scale: 0.95 } : {}}
               style={{
                 flex: 1,
                 minWidth: '200px',
@@ -538,20 +624,10 @@ const VoiceInputSection = ({
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
               }}
-              onMouseEnter={(e) => {
-                if (!disabled) {
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.boxShadow = '0 6px 16px rgba(0,0,0,0.3)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
-              }}
             >
               {voiceEnabled ? '🔊 VOZ IA: ACTIVADA' : '🔇 VOZ IA: DESACTIVADA'}
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
         </motion.div>
 
         {/* COLUMNA DERECHA - SELECTOR DE VOZ Y DEBUG */}
@@ -572,20 +648,30 @@ const VoiceInputSection = ({
         >
           {/* Selector de voz */}
           <div>
-            <h3 style={{
-              margin: '0 0 1rem 0',
-              fontSize: '1.25rem',
-              fontWeight: '600',
-              color: colors.textPrimary
-            }}>
+            <motion.h3
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              style={{
+                margin: '0 0 1rem 0',
+                fontSize: '1.25rem',
+                fontWeight: '600',
+                color: colors.textPrimary
+              }}
+            >
               Configuración de Voz
-            </h3>
-            <div style={{
-              background: colors.bgTertiary,
-              padding: '1.5rem',
-              borderRadius: '12px',
-              border: `1px solid ${colors.border}`
-            }}>
+            </motion.h3>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.45 }}
+              style={{
+                background: colors.bgTertiary,
+                padding: '1.5rem',
+                borderRadius: '12px',
+                border: `1px solid ${colors.border}`
+              }}
+            >
               <label style={{
                 display: 'block',
                 marginBottom: '0.75rem',
@@ -595,13 +681,14 @@ const VoiceInputSection = ({
               }}>
                 Selecciona la voz de la IA:
               </label>
-              <select
+              <motion.select
                 value={selectedVoice?.name || ''}
                 onChange={(e) => {
                   const voice = availableVoices.find(v => v.name === e.target.value);
                   setSelectedVoice(voice);
                   console.log('🔄 Voz cambiada:', voice?.name);
                 }}
+                whileFocus={{ scale: 1.02 }}
                 style={{
                   width: '100%',
                   padding: '0.75rem',
@@ -611,7 +698,8 @@ const VoiceInputSection = ({
                   border: `1px solid ${colors.border}`,
                   borderRadius: '8px',
                   cursor: 'pointer',
-                  outline: 'none'
+                  outline: 'none',
+                  transition: 'all 0.2s ease'
                 }}
               >
                 {availableVoices.map((voice, index) => (
@@ -619,124 +707,245 @@ const VoiceInputSection = ({
                     {voice.name} ({voice.lang})
                   </option>
                 ))}
-              </select>
+              </motion.select>
               {selectedVoice && (
-                <div style={{
-                  marginTop: '1rem',
-                  padding: '0.75rem',
-                  background: colors.accent + '10',
-                  border: `1px solid ${colors.accent}`,
-                  borderRadius: '8px',
-                  fontSize: '0.85rem',
-                  color: colors.textSecondary
-                }}>
+                <motion.div
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  style={{
+                    marginTop: '1rem',
+                    padding: '0.75rem',
+                    background: colors.accent + '10',
+                    border: `1px solid ${colors.accent}`,
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    color: colors.textSecondary
+                  }}
+                >
                   ✓ Voz activa: <strong style={{ color: colors.accent }}>{selectedVoice.name}</strong>
-                </div>
+                </motion.div>
               )}
-            </div>
+            </motion.div>
           </div>
 
           {/* Información del sistema */}
           <div style={{ flex: 1 }}>
-            <h3 style={{
-              margin: '0 0 1rem 0',
-              fontSize: '1.25rem',
-              fontWeight: '600',
-              color: colors.textPrimary
-            }}>
+            <motion.h3
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+              style={{
+                margin: '0 0 1rem 0',
+                fontSize: '1.25rem',
+                fontWeight: '600',
+                color: colors.textPrimary
+              }}
+            >
               Información del Sistema
-            </h3>
-            <div style={{
-              background: colors.bgTertiary,
-              padding: '1.5rem',
-              borderRadius: '12px',
-              border: `1px solid ${colors.border}`,
-              fontSize: '0.9rem',
-              lineHeight: '2',
-              color: colors.textSecondary
-            }}>
+            </motion.h3>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5 }}
+              style={{
+                background: colors.bgTertiary,
+                padding: '1.5rem',
+                borderRadius: '12px',
+                border: `1px solid ${colors.border}`,
+                fontSize: '0.9rem',
+                lineHeight: '2',
+                color: colors.textSecondary
+              }}
+            >
               <div style={{ display: 'grid', gap: '0.5rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.55 }}
+                  style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
                   <span>Micrófono activo:</span>
-                  <strong style={{ color: listening ? colors.success : colors.textMuted }}>
+                  <motion.strong
+                    animate={{ color: listening ? colors.success : colors.textMuted }}
+                    transition={{ duration: 0.3 }}
+                    style={{ color: listening ? colors.success : colors.textMuted }}
+                  >
                     {listening ? '✓ SÍ' : '✗ NO'}
-                  </strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  </motion.strong>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.6 }}
+                  style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
                   <span>IA hablando:</span>
-                  <strong style={{ color: isSpeaking ? colors.warning : colors.textMuted }}>
+                  <motion.strong
+                    animate={{ color: isSpeaking ? colors.warning : colors.textMuted }}
+                    transition={{ duration: 0.3 }}
+                    style={{ color: isSpeaking ? colors.warning : colors.textMuted }}
+                  >
                     {isSpeaking ? '⚠️ SÍ' : '✗ NO'}
-                  </strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  </motion.strong>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.65 }}
+                  style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
                   <span>Voz habilitada:</span>
-                  <strong style={{ color: voiceEnabled ? colors.accent : colors.textMuted }}>
+                  <motion.strong
+                    animate={{ color: voiceEnabled ? colors.accent : colors.textMuted }}
+                    transition={{ duration: 0.3 }}
+                    style={{ color: voiceEnabled ? colors.accent : colors.textMuted }}
+                  >
                     {voiceEnabled ? '✓ SÍ' : '✗ NO'}
-                  </strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  </motion.strong>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.7 }}
+                  style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
                   <span>Longitud transcript:</span>
-                  <strong style={{ color: colors.textPrimary }}>
+                  <motion.strong
+                    key={transcript?.length}
+                    initial={{ scale: 1.2 }}
+                    animate={{ scale: 1 }}
+                    style={{ color: colors.textPrimary }}
+                  >
                     {transcript?.length || 0} caracteres
-                  </strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  </motion.strong>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.75 }}
+                  style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
                   <span>Has hablado:</span>
                   <strong style={{ color: hasSpokenRef.current ? colors.success : colors.textMuted }}>
                     {hasSpokenRef.current ? '✓ SÍ' : '✗ NO'}
                   </strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.8 }}
+                  style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
                   <span>Estado carga:</span>
-                  <strong style={{ color: loading ? colors.warning : colors.textMuted }}>
+                  <motion.strong
+                    animate={{ color: loading ? colors.warning : colors.textMuted }}
+                    transition={{ duration: 0.3 }}
+                    style={{ color: loading ? colors.warning : colors.textMuted }}
+                  >
                     {loading ? '⏳ Cargando...' : '✓ Listo'}
-                  </strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  </motion.strong>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.85 }}
+                  style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
                   <span>Auto-reanudar:</span>
                   <strong style={{ color: shouldResumeListeningRef.current ? colors.warning : colors.textMuted }}>
                     {shouldResumeListeningRef.current ? '⏸️ SÍ' : '✗ NO'}
                   </strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.9 }}
+                  style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
                   <span>Voces disponibles:</span>
                   <strong style={{ color: colors.accent }}>
                     {availableVoices.length}
                   </strong>
-                </div>
+                </motion.div>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Instrucciones */}
-          <div style={{
-            background: `linear-gradient(135deg, ${colors.accent}15 0%, ${colors.accentHover}15 100%)`,
-            padding: '1.5rem',
-            borderRadius: '12px',
-            border: `1px solid ${colors.accent}40`
-          }}>
-            <h4 style={{
-              margin: '0 0 0.75rem 0',
-              fontSize: '1rem',
-              fontWeight: '600',
-              color: colors.accent
-            }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.95 }}
+            style={{
+              background: `linear-gradient(135deg, ${colors.accent}15 0%, ${colors.accentHover}15 100%)`,
+              padding: '1.5rem',
+              borderRadius: '12px',
+              border: `1px solid ${colors.accent}40`
+            }}
+          >
+            <motion.h4
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1 }}
+              style={{
+                margin: '0 0 0.75rem 0',
+                fontSize: '1rem',
+                fontWeight: '600',
+                color: colors.accent
+              }}
+            >
               💡 Instrucciones
-            </h4>
-            <ul style={{
-              margin: 0,
-              paddingLeft: '1.25rem',
-              fontSize: '0.85rem',
-              lineHeight: '1.8',
-              color: colors.textSecondary
-            }}>
-              <li>Presiona <strong>INICIAR MICRÓFONO</strong> para comenzar</li>
-              <li>Habla con naturalidad - El sistema detecta pausas automáticamente</li>
-              <li>Después de 2 segundos de silencio, tu mensaje se enviará</li>
-              <li>La IA responderá por voz (si está activada)</li>
-              <li>Puedes cambiar la voz de la IA en cualquier momento</li>
-            </ul>
-          </div>
+            </motion.h4>
+            <motion.ul
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.05 }}
+              style={{
+                margin: 0,
+                paddingLeft: '1.25rem',
+                fontSize: '0.85rem',
+                lineHeight: '1.8',
+                color: colors.textSecondary
+              }}
+            >
+              <motion.li
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.1 }}
+              >
+                Presiona <strong>INICIAR MICRÓFONO</strong> para comenzar
+              </motion.li>
+              <motion.li
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.15 }}
+              >
+                Habla con naturalidad - El sistema detecta pausas automáticamente
+              </motion.li>
+              <motion.li
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.2 }}
+              >
+                Después de 2 segundos de silencio, tu mensaje se enviará
+              </motion.li>
+              <motion.li
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.25 }}
+              >
+                La IA responderá por voz (si está activada)
+              </motion.li>
+              <motion.li
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.3 }}
+              >
+                Puedes cambiar la voz de la IA en cualquier momento
+              </motion.li>
+            </motion.ul>
+          </motion.div>
         </motion.div>
       </div>
 
