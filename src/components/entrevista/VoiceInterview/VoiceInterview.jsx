@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Volume2, VolumeX, Loader, ChevronDown, ChevronUp, Send } from 'lucide-react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import { toast } from 'react-toastify';
+import { useTheme } from '../../../context/ThemeContext/ThemeContext';
 
 const VoiceInterview = ({
   onSendMessage,
@@ -11,6 +12,10 @@ const VoiceInterview = ({
   lastAIMessage,
   disabled
 }) => {
+  // Theme
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   // Estados principales
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -121,6 +126,7 @@ const VoiceInterview = ({
       });
       micStreamRef.current = stream;
 
+      // @ts-ignore
       audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
       analyserRef.current = audioContextRef.current.createAnalyser();
       analyserRef.current.fftSize = 256;
@@ -345,6 +351,20 @@ const VoiceInterview = ({
     );
   }
 
+  // Colores dinámicos basados en el tema
+  const colors = {
+    bgPrimary: isDark ? '#0f172a' : '#f9fafb',
+    bgSecondary: isDark ? '#1e293b' : '#ffffff',
+    bgTertiary: isDark ? '#334155' : '#f3f4f6',
+    headerBg: isDark ? '#0f172a' : '#1f2937',
+    textPrimary: isDark ? '#f1f5f9' : '#1f2937',
+    textSecondary: isDark ? '#cbd5e1' : '#6b7280',
+    border: isDark ? '#475569' : '#e5e7eb',
+    accent: '#667eea',
+    accentHover: '#764ba2',
+    error: '#ef4444'
+  };
+
   return (
     <div style={{
       display: 'flex',
@@ -352,20 +372,21 @@ const VoiceInterview = ({
       height: '100vh',
       padding: '1.5rem',
       gap: '1.5rem',
-      background: '#f9fafb'
+      background: colors.bgPrimary
     }}>
       {/* HEADER */}
       <div style={{
-        background: '#1f2937',
+        background: colors.headerBg,
         borderRadius: '12px',
         padding: '1rem 1.5rem',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        border: `1px solid ${colors.border}`
       }}>
         <h2 style={{
           margin: 0,
-          color: 'white',
+          color: colors.textPrimary,
           fontSize: '1.25rem',
           fontWeight: 700
         }}>
@@ -375,7 +396,7 @@ const VoiceInterview = ({
           onClick={() => window.location.reload()}
           style={{
             padding: '0.75rem 1.5rem',
-            background: '#ef4444',
+            background: colors.error,
             color: 'white',
             border: 'none',
             borderRadius: '8px',
@@ -405,12 +426,13 @@ const VoiceInterview = ({
         }}>
           {/* SECCIÓN: TEXTO DE ENTREVISTA */}
           <div style={{
-            background: '#111827',
+            background: colors.bgSecondary,
             borderRadius: '12px',
             padding: '2rem',
             flex: '0 0 280px',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            border: `1px solid ${colors.border}`
           }}>
             <div style={{
               marginBottom: '1.5rem',
@@ -422,7 +444,7 @@ const VoiceInterview = ({
                 margin: 0,
                 fontSize: '1rem',
                 fontWeight: 700,
-                color: 'white',
+                color: colors.textPrimary,
                 letterSpacing: '1px',
                 textTransform: 'uppercase'
               }}>
@@ -460,9 +482,10 @@ const VoiceInterview = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: 'rgba(255, 255, 255, 0.05)',
+              background: colors.bgTertiary,
               borderRadius: '8px',
-              padding: '1.5rem'
+              padding: '1.5rem',
+              border: `1px solid ${colors.border}`
             }}>
               {transcript ? (
                 <motion.div
@@ -471,7 +494,7 @@ const VoiceInterview = ({
                   style={{ width: '100%' }}
                 >
                   <p style={{
-                    color: '#f3f4f6',
+                    color: colors.textPrimary,
                     margin: 0,
                     fontSize: '1.1rem',
                     lineHeight: '1.8',
@@ -482,7 +505,7 @@ const VoiceInterview = ({
                   <div style={{
                     marginTop: '1rem',
                     fontSize: '0.75rem',
-                    color: '#9ca3af'
+                    color: colors.textSecondary
                   }}>
                     Caracteres: {transcript.length} | Audio: {audioLevel.toFixed(0)}
                   </div>
@@ -729,11 +752,12 @@ const VoiceInterview = ({
 
         {/* COLUMNA DERECHA: SELECTOR DE VOCES */}
         <div style={{
-          background: '#374151',
+          background: colors.bgSecondary,
           borderRadius: '12px',
           padding: '2rem',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          border: `1px solid ${colors.border}`
         }}>
           <div style={{
             display: 'flex',
@@ -745,7 +769,7 @@ const VoiceInterview = ({
               margin: 0,
               fontSize: '1rem',
               fontWeight: 700,
-              color: 'white',
+              color: colors.textPrimary,
               letterSpacing: '1px',
               textTransform: 'uppercase'
             }}>
@@ -760,7 +784,7 @@ const VoiceInterview = ({
                 background: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
-                color: 'white',
+                color: colors.textPrimary,
                 display: 'flex',
                 alignItems: 'center'
               }}
@@ -772,18 +796,18 @@ const VoiceInterview = ({
           {/* Voz actual seleccionada */}
           <div style={{
             padding: '1.25rem',
-            background: 'rgba(255, 255, 255, 0.1)',
+            background: colors.bgTertiary,
             borderRadius: '8px',
             marginBottom: showVoiceSelector ? '1.5rem' : 0,
-            border: '1px solid rgba(255, 255, 255, 0.2)'
+            border: `1px solid ${colors.border}`
           }}>
-            <div style={{ fontSize: '0.75rem', color: '#d1d5db', marginBottom: '0.5rem' }}>
+            <div style={{ fontSize: '0.75rem', color: colors.textSecondary, marginBottom: '0.5rem' }}>
               Voz Actual:
             </div>
-            <div style={{ fontSize: '0.95rem', fontWeight: 600, color: 'white' }}>
+            <div style={{ fontSize: '0.95rem', fontWeight: 600, color: colors.textPrimary }}>
               {selectedVoice?.name.substring(0, 35) || 'Predeterminada'}
             </div>
-            <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.5rem' }}>
+            <div style={{ fontSize: '0.75rem', color: colors.textSecondary, marginTop: '0.5rem' }}>
               {selectedVoice?.lang}
             </div>
           </div>
@@ -821,11 +845,11 @@ const VoiceInterview = ({
                       style={{
                         padding: '1rem',
                         background: selectedVoice?.name === voice.name
-                          ? 'rgba(139, 92, 246, 0.3)'
-                          : 'rgba(255, 255, 255, 0.05)',
+                          ? isDark ? 'rgba(102, 126, 234, 0.2)' : 'rgba(102, 126, 234, 0.1)'
+                          : colors.bgTertiary,
                         border: selectedVoice?.name === voice.name
-                          ? '2px solid #8b5cf6'
-                          : '1px solid rgba(255, 255, 255, 0.1)',
+                          ? `2px solid ${colors.accent}`
+                          : `1px solid ${colors.border}`,
                         borderRadius: '8px',
                         cursor: 'pointer',
                         transition: 'all 0.2s'
@@ -834,14 +858,14 @@ const VoiceInterview = ({
                       <div style={{
                         fontSize: '0.875rem',
                         fontWeight: selectedVoice?.name === voice.name ? 600 : 500,
-                        color: 'white',
+                        color: colors.textPrimary,
                         marginBottom: '0.25rem'
                       }}>
                         {voice.name}
                       </div>
                       <div style={{
                         fontSize: '0.75rem',
-                        color: '#d1d5db',
+                        color: colors.textSecondary,
                         display: 'flex',
                         alignItems: 'center',
                         gap: '0.5rem'

@@ -147,32 +147,54 @@
 
 [data-theme="light"] #light-blue line {
   stroke: #06cefa !important;
+  stroke-width: 6 !important;
   stroke-opacity: 0.15 !important;
+  stroke-dasharray: 200 !important;
+  stroke-dashoffset: 800 !important;
+  animation: draw 4s infinite ease-in-out !important;
+  fill: none !important;
 }
 
 [data-theme="dark"] #light-blue line {
   stroke: #818cf8 !important;
+  stroke-width: 6 !important;
   stroke-opacity: 0.12 !important;
+  stroke-dasharray: 200 !important;
+  stroke-dashoffset: 800 !important;
+  animation: draw 4s infinite ease-in-out !important;
+  fill: none !important;
 }
 
 [data-theme="light"] #red line {
   stroke: #0942de !important;
+  stroke-width: 12 !important;
   stroke-opacity: 0.15 !important;
+  animation: fade 4s infinite ease-in-out !important;
+  fill: none !important;
 }
 
 [data-theme="dark"] #red line {
   stroke: #6366f1 !important;
+  stroke-width: 12 !important;
   stroke-opacity: 0.10 !important;
+  animation: fade 4s infinite ease-in-out !important;
+  fill: none !important;
 }
 
 [data-theme="light"] #blue line {
   stroke: #6bdff9 !important;
+  stroke-width: 12 !important;
   stroke-opacity: 0.15 !important;
+  animation: fade 4s infinite ease-in-out !important;
+  fill: none !important;
 }
 
 [data-theme="dark"] #blue line {
   stroke: #4f46e5 !important;
+  stroke-width: 12 !important;
   stroke-opacity: 0.08 !important;
+  animation: fade 4s infinite ease-in-out !important;
+  fill: none !important;
 }
 
 /* ========== ASEGURAR QUE LAS LÍNEAS NO TENGAN FILL ========== */

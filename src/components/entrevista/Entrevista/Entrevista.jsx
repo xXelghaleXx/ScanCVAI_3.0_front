@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import ChatBox from "../../chat/ChatBox/ChatBox";
 import ChatInput from "../../chat/ChatInput/ChatInput";
 import VoiceInputSection from "../VoiceInputSection/VoiceInputSection";
+import VoiceInterview from "../VoiceInterview/VoiceInterview";
 import CarreraSelector from "../../forms/CarreraSelector/CarreraSelector";
 import ResultadosEntrevista from "../ResultadosEntrevista/ResultadosEntrevista";
 import Background from "../../layout/Background/Background";
@@ -431,6 +432,22 @@ const EntrevistaChat = () => {
           }}
         />
       </AnimatePresence>
+    );
+  }
+
+  // Si es modalidad de voz, mostrar VoiceInterview
+  if (modalidadSeleccionada?.id === 'voz') {
+    return (
+      <VoiceInterview
+        onSendMessage={handleEnviarMensaje}
+        loading={loading}
+        lastAIMessage={
+          chat.length > 0 && chat[chat.length - 1]?.tipo === 'ia'
+            ? chat[chat.length - 1]?.texto
+            : null
+        }
+        disabled={entrevistaFinalizada || !entrevistaId}
+      />
     );
   }
 
