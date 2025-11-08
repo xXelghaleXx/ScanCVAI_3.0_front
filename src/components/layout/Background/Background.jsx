@@ -1,8 +1,11 @@
-import "../../../styles/layout/Background.css"; // Asegurar que los estilos están importados
+import { useTheme } from "../../../context/ThemeContext/ThemeContext";
+import "../../../styles/layout/Background.css";
 
 const Background = () => {
+  const { theme } = useTheme();
+
   return (
-    <div className="background-wrapper">
+    <div className="background-wrapper" data-theme={theme}>
       <svg
         version="1.1"
         id="home-anim"
