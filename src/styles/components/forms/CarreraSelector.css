@@ -1098,3 +1098,169 @@
     background: var(--bg-tertiary);
   }
 }
+/* ===== MODO OSCURO - TEMA OSCURO PARA CARRERA SELECTOR ===== */
+
+/* Overlay Background */
+[data-theme="dark"] .carrera-selector-container,
+[data-theme="dark"] .selector-carreras-overlay {
+  background: rgba(0, 0, 0, 0.75) !important;
+  backdrop-filter: blur(12px) !important;
+}
+
+/* Modal Content */
+[data-theme="dark"] .selector-content,
+[data-theme="dark"] .selector-carreras-modal {
+  background: var(--bg-secondary) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Header */
+[data-theme="dark"] .selector-header {
+  border-bottom-color: var(--border) !important;
+}
+
+/* Search Container */
+[data-theme="dark"] .search-container {
+  border-bottom-color: var(--border) !important;
+}
+
+[data-theme="dark"] .search-input {
+  background: var(--bg-tertiary) !important;
+  border-color: var(--border) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .search-input:focus {
+  border-color: var(--primary-light) !important;
+  background: var(--bg-secondary) !important;
+  box-shadow: 0 0 0 3px var(--primary-bg) !important;
+}
+
+[data-theme="dark"] .search-input::placeholder {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .search-icon {
+  color: var(--text-muted) !important;
+}
+
+/* Lista de Carreras */
+[data-theme="dark"] .carreras-list {
+  background: transparent !important;
+}
+
+[data-theme="dark"] .carreras-list::-webkit-scrollbar-track {
+  background: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .carreras-list::-webkit-scrollbar-thumb {
+  background: var(--border-dark) !important;
+}
+
+[data-theme="dark"] .carreras-list::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted) !important;
+}
+
+/* Carrera Item */
+[data-theme="dark"] .carrera-item {
+  background: var(--bg-tertiary) !important;
+  border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .carrera-item:hover {
+  border-color: var(--primary-light) !important;
+  background: var(--bg-secondary) !important;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2) !important;
+}
+
+[data-theme="dark"] .carrera-item.selected {
+  border-color: var(--primary-light) !important;
+  background: var(--primary-bg) !important;
+  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3) !important;
+}
+
+[data-theme="dark"] .carrera-item.selected::after {
+  background: var(--primary-light) !important;
+}
+
+[data-theme="dark"] .carrera-nombre {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .carrera-descripcion {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .carrera-icon {
+  color: var(--primary-light) !important;
+}
+
+/* Checkbox */
+[data-theme="dark"] .checkbox-icon {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .checkbox-icon.checked {
+  color: var(--primary-light) !important;
+}
+
+[data-theme="dark"] .carrera-item:hover .checkbox-icon {
+  color: var(--primary-light) !important;
+}
+
+/* Footer */
+[data-theme="dark"] .selector-footer {
+  background: var(--bg-tertiary) !important;
+  border-top-color: var(--border) !important;
+}
+
+[data-theme="dark"] .selection-info {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .selection-info.muted {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .selection-info strong {
+  color: var(--primary-light) !important;
+}
+
+/* Botones */
+[data-theme="dark"] .btn-secondary {
+  background: var(--bg-secondary) !important;
+  border-color: var(--border) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+  background: var(--primary-bg) !important;
+  border-color: var(--primary-light) !important;
+  color: var(--primary-light) !important;
+}
+
+/* Estados especiales */
+[data-theme="dark"] .loading-state {
+  color: var(--primary-light) !important;
+}
+
+[data-theme="dark"] .loading-text {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .error-state {
+  color: var(--error-light) !important;
+}
+
+[data-theme="dark"] .error-state h3 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .error-state p {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .empty-state {
+  color: var(--text-secondary) !important;
+}
+

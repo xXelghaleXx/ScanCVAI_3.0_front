@@ -356,3 +356,131 @@
     -webkit-overflow-scrolling: touch;
   }
 }
+/* ===== MODO OSCURO - FORZAR TEMA OSCURO ===== */
+[data-theme="dark"] .lector-cv-container {
+  background: var(--bg-primary) !important;
+}
+
+[data-theme="dark"] .cv-panel,
+[data-theme="dark"] .analysis-panel {
+  background: var(--bg-secondary) !important;
+  border-color: var(--border) !important;
+  box-shadow: var(--shadow-2xl) !important;
+}
+
+[data-theme="dark"] .cv-panel:hover,
+[data-theme="dark"] .analysis-panel:hover {
+  border-color: var(--primary-light) !important;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3) !important;
+}
+
+[data-theme="dark"] .upload-label {
+  border-color: var(--border-dark) !important;
+  background: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .upload-label:not(.file-uploaded):hover {
+  border-color: var(--primary-light) !important;
+  background: var(--primary-bg) !important;
+}
+
+[data-theme="dark"] .upload-text {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .upload-subtext {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .upload-icon {
+  color: var(--primary-light) !important;
+}
+
+[data-theme="dark"] .file-icon {
+  color: var(--success-light) !important;
+}
+
+[data-theme="dark"] .file-name {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .analysis-title {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .analysis-content {
+  color: var(--text-secondary) !important;
+  background: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .loading-text,
+[data-theme="dark"] .empty-state-title {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .empty-state-text {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .btn-analyze {
+  background: var(--primary) !important;
+  color: white !important;
+}
+
+[data-theme="dark"] .btn-analyze:hover {
+  background: var(--primary-light) !important;
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+}
+
+[data-theme="dark"] .btn-cancel {
+  background: transparent !important;
+  color: var(--error-light) !important;
+  border-color: var(--error-light) !important;
+}
+
+[data-theme="dark"] .btn-cancel:hover {
+  background: var(--error-bg) !important;
+  border-color: var(--error-light) !important;
+}
+
+[data-theme="dark"] .download-btn {
+  background: var(--secondary) !important;
+  color: white !important;
+}
+
+[data-theme="dark"] .download-btn:hover {
+  background: var(--secondary-light) !important;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
+}
+
+[data-theme="dark"] .error-message {
+  background: var(--error-bg) !important;
+  border-color: var(--error) !important;
+  color: var(--error-light) !important;
+}
+
+/* SVG Empty State en modo oscuro */
+[data-theme="dark"] .empty-state-svg rect {
+  fill: var(--bg-tertiary) !important;
+  stroke: var(--border) !important;
+}
+
+[data-theme="dark"] .empty-state-svg path,
+[data-theme="dark"] .empty-state-svg circle {
+  fill: var(--text-muted) !important;
+}
+
+/* Loading Spheres en modo oscuro */
+[data-theme="dark"] .loading-sphere {
+  background: var(--primary-light) !important;
+}
+
+[data-theme="dark"] .thinking-dot {
+  background: var(--primary-light) !important;
+}
+
+/* Typing Cursor en modo oscuro */
+[data-theme="dark"] .typing-cursor {
+  background: var(--primary-light) !important;
+}
+
