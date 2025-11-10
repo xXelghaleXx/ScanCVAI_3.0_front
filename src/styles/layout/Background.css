@@ -42,182 +42,57 @@
 
 /* ========== LÍNEAS ANIMADAS - MODO CLARO ========== */
 
-/* Grupo light-blue - MODO CLARO */
-.background-wrapper[data-theme="light"] #light-blue line,
-.background-wrapper:not([data-theme="dark"]) #light-blue line {
+/* Líneas con animación draw - MODO CLARO */
+.background-wrapper[data-theme="light"] .line-draw,
+.background-wrapper:not([data-theme="dark"]) .line-draw {
   stroke: #06cefa !important;
   stroke-width: 6 !important;
-  stroke-opacity: 0.15 !important;
-  stroke-dasharray: 200 !important;
-  stroke-dashoffset: 800 !important;
-  animation: draw 4s infinite ease-in-out !important;
+  stroke-opacity: 0.3 !important;
   fill: none !important;
+  transition: stroke-dashoffset 2s ease-in-out !important;
 }
 
-/* Grupo red - MODO CLARO */
-.background-wrapper[data-theme="light"] #red line,
-.background-wrapper:not([data-theme="dark"]) #red line {
+/* Líneas con animación fade - MODO CLARO */
+.background-wrapper[data-theme="light"] .line-fade,
+.background-wrapper:not([data-theme="dark"]) .line-fade {
   stroke: #0942de !important;
-  stroke-width: 12 !important;
-  stroke-opacity: 0.15 !important;
-  animation: fade 4s infinite ease-in-out, move 8s infinite ease-in-out !important;
-  fill: none !important;
-}
-
-/* Grupo blue - MODO CLARO */
-.background-wrapper[data-theme="light"] #blue line,
-.background-wrapper:not([data-theme="dark"]) #blue line {
-  stroke: #6bdff9 !important;
-  stroke-width: 12 !important;
-  stroke-opacity: 0.15 !important;
-  animation: fade 4s infinite ease-in-out, move 10s infinite ease-in-out !important;
+  stroke-width: 10 !important;
+  stroke-opacity: 0.2 !important;
+  animation: pulse 3s infinite ease-in-out !important;
   fill: none !important;
 }
 
 /* ========== LÍNEAS ANIMADAS - MODO OSCURO ========== */
 
-/* Grupo light-blue - MODO OSCURO */
-.background-wrapper[data-theme="dark"] #light-blue line {
+/* Líneas con animación draw - MODO OSCURO */
+.background-wrapper[data-theme="dark"] .line-draw {
   stroke: #818cf8 !important;
   stroke-width: 6 !important;
-  stroke-opacity: 0.12 !important;
-  stroke-dasharray: 200 !important;
-  stroke-dashoffset: 800 !important;
-  animation: draw 4s infinite ease-in-out !important;
+  stroke-opacity: 0.25 !important;
   fill: none !important;
+  transition: stroke-dashoffset 2s ease-in-out !important;
 }
 
-/* Grupo red - MODO OSCURO */
-.background-wrapper[data-theme="dark"] #red line {
+/* Líneas con animación fade - MODO OSCURO */
+.background-wrapper[data-theme="dark"] .line-fade {
   stroke: #6366f1 !important;
-  stroke-width: 12 !important;
-  stroke-opacity: 0.10 !important;
-  animation: fade 4s infinite ease-in-out, move 8s infinite ease-in-out !important;
-  fill: none !important;
-}
-
-/* Grupo blue - MODO OSCURO */
-.background-wrapper[data-theme="dark"] #blue line {
-  stroke: #4f46e5 !important;
-  stroke-width: 12 !important;
-  stroke-opacity: 0.08 !important;
-  animation: fade 4s infinite ease-in-out, move 10s infinite ease-in-out !important;
+  stroke-width: 10 !important;
+  stroke-opacity: 0.18 !important;
+  animation: pulse 3s infinite ease-in-out !important;
   fill: none !important;
 }
 
 /* ========== ANIMACIONES ========== */
-@keyframes draw {
-  0% {
-    stroke-dashoffset: 800;
-  }
-  100% {
-    stroke-dashoffset: -800;
-  }
-}
-
-@keyframes fade {
+@keyframes pulse {
   0%, 100% {
-    stroke-opacity: 0.08;
+    stroke-opacity: 0.1;
   }
   50% {
-    stroke-opacity: 0.25;
+    stroke-opacity: 0.3;
   }
 }
 
-@keyframes move {
-  0% {
-    transform: translate(0, 0);
-  }
-  25% {
-    transform: translate(10px, -10px);
-  }
-  50% {
-    transform: translate(20px, 0);
-  }
-  75% {
-    transform: translate(10px, 10px);
-  }
-  100% {
-    transform: translate(0, 0);
-  }
-}
-
-/* ========== REGLAS GLOBALES DE RESPALDO ========== */
-/* Estas reglas se aplican si data-theme está en document.documentElement */
-
-[data-theme="light"] .background-wrapper {
-  background: linear-gradient(
-    135deg,
-    #f8fafc 0%,
-    #e2e8f0 50%,
-    #f1f5f9 100%
-  ) !important;
-}
-
-[data-theme="dark"] .background-wrapper {
-  background: linear-gradient(
-    135deg,
-    #0f172a 0%,
-    #1e293b 50%,
-    #111827 100%
-  ) !important;
-}
-
-[data-theme="light"] #light-blue line {
-  stroke: #06cefa !important;
-  stroke-width: 6 !important;
-  stroke-opacity: 0.15 !important;
-  stroke-dasharray: 200 !important;
-  stroke-dashoffset: 800 !important;
-  animation: draw 4s infinite ease-in-out !important;
-  fill: none !important;
-}
-
-[data-theme="dark"] #light-blue line {
-  stroke: #818cf8 !important;
-  stroke-width: 6 !important;
-  stroke-opacity: 0.12 !important;
-  stroke-dasharray: 200 !important;
-  stroke-dashoffset: 800 !important;
-  animation: draw 4s infinite ease-in-out !important;
-  fill: none !important;
-}
-
-[data-theme="light"] #red line {
-  stroke: #0942de !important;
-  stroke-width: 12 !important;
-  stroke-opacity: 0.15 !important;
-  animation: fade 4s infinite ease-in-out, move 8s infinite ease-in-out !important;
-  fill: none !important;
-}
-
-[data-theme="dark"] #red line {
-  stroke: #6366f1 !important;
-  stroke-width: 12 !important;
-  stroke-opacity: 0.10 !important;
-  animation: fade 4s infinite ease-in-out, move 8s infinite ease-in-out !important;
-  fill: none !important;
-}
-
-[data-theme="light"] #blue line {
-  stroke: #6bdff9 !important;
-  stroke-width: 12 !important;
-  stroke-opacity: 0.15 !important;
-  animation: fade 4s infinite ease-in-out, move 10s infinite ease-in-out !important;
-  fill: none !important;
-}
-
-[data-theme="dark"] #blue line {
-  stroke: #4f46e5 !important;
-  stroke-width: 12 !important;
-  stroke-opacity: 0.08 !important;
-  animation: fade 4s infinite ease-in-out, move 10s infinite ease-in-out !important;
-  fill: none !important;
-}
-
-/* ========== ASEGURAR QUE LAS LÍNEAS NO TENGAN FILL ========== */
-#light-blue line,
-#red line,
-#blue line {
+/* ========== ASEGURAR QUE TODAS LAS LÍNEAS NO TENGAN FILL ========== */
+line {
   fill: none !important;
 }

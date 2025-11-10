@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FileText, MessageCircle, TrendingUp, Clock, Award, Brain } from "lucide-react";
+import { FileText, MessageCircle, Brain, History, FileCheck } from "lucide-react";
 import Background from "../../components/layout/Background/Background";
 import authService from '../../services/auth.service';
 import { API_BASE_URL } from '../../config/api.config.js';
@@ -228,19 +228,13 @@ const getUserName = () => {
 
   const quickActions = [
     {
-      icon: TrendingUp,
-      title: 'Ver mi progreso',
-      description: 'Estadísticas y analytics',
-      action: () => navigate('/dashboard')
-    },
-    {
-      icon: Clock,
+      icon: History,
       title: 'Historial de CVs',
       description: `${dashboardData?.total_cvs || 0} CVs procesados`,
       action: () => navigate('/historialCV')
     },
     {
-      icon: Award,
+      icon: FileCheck,
       title: 'Mis informes',
       description: `${dashboardData?.total_informes || 0} informes generados`,
       action: () => navigate('/historialCV')
