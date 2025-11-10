@@ -106,6 +106,63 @@ const VoiceInterview = ({
     console.log('🎤 Estado de escucha:', listening ? 'ACTIVO' : 'INACTIVO');
   }, [listening]);
 
+  // Función para sintetizar voz (se define antes del useEffect)
+  const speakText = useCallback((text) => {
+    if (!window.speechSynthesis || !voiceEnabled) {
+      console.warn('⚠️ speechSynthesis no disponible o voz deshabilitada');
+      return;
+    }
+
+    // Si no hay voz seleccionada, intentar obtener una voz por defecto
+    let voiceToUse = selectedVoice;
+    if (!voiceToUse) {
+      const voices = synthRef.current.getVoices();
+      const spanishVoices = voices.filter(v => v.lang.includes('es') || v.lang.includes('ES'));
+      voiceToUse = spanishVoices[0] || voices[0];
+      console.warn('⚠️ No había voz seleccionada, usando voz por defecto:', voiceToUse?.name);
+
+      if (!voiceToUse) {
+        console.error('❌ No hay voces disponibles en el sistema');
+        return;
+      }
+
+      // Actualizar selectedVoice para futuros usos
+      setSelectedVoice(voiceToUse);
+    }
+
+    // Cancelar cualquier voz anterior
+    synthRef.current.cancel();
+
+    // Crear nueva utterance
+    utteranceRef.current = new SpeechSynthesisUtterance(text);
+    utteranceRef.current.voice = voiceToUse;
+    utteranceRef.current.lang = 'es-ES';
+    utteranceRef.current.rate = 0.95;
+    utteranceRef.current.pitch = 1.1;
+    utteranceRef.current.volume = 1.0;
+
+    // Eventos
+    utteranceRef.current.onstart = () => {
+      setIsSpeaking(true);
+      console.log('🔊 Reproduciendo con voz:', voiceToUse.name);
+    };
+
+    utteranceRef.current.onend = () => {
+      setIsSpeaking(false);
+      console.log('🔇 Reproducción finalizada');
+    };
+
+    utteranceRef.current.onerror = (event) => {
+      console.error('❌ Error en síntesis de voz:', event);
+      setIsSpeaking(false);
+      toast.error('Error al reproducir la voz de la IA');
+    };
+
+    // Reproducir
+    console.log('🎙️ Iniciando síntesis de voz...');
+    synthRef.current.speak(utteranceRef.current);
+  }, [voiceEnabled, selectedVoice]);
+
   // Reproducir respuesta de IA cuando llega un nuevo mensaje
   useEffect(() => {
     if (lastAIMessage && voiceEnabled && !loading && lastAIMessage !== lastMessageRef.current) {
@@ -154,10 +211,6 @@ const VoiceInterview = ({
         // Detectar si hay voz (umbral: 25)
         const hasVoice = average > 25;
 
-        if (hasVoice !== isDetectingVoice) {
-          console.log('🔊 Nivel de audio:', average.toFixed(2), '- Voz detectada:', hasVoice);
-        }
-
         setIsDetectingVoice(hasVoice);
 
         if (hasVoice) {
@@ -174,7 +227,7 @@ const VoiceInterview = ({
       console.error('❌ Error al inicializar detección de audio:', error);
       toast.error('No se pudo acceder al micrófono. Verifica los permisos.');
     }
-  }, [isDetectingVoice]);
+  }, []);
 
   // Detener detector de audio
   const stopAudioDetection = useCallback(() => {
@@ -282,63 +335,6 @@ const VoiceInterview = ({
       toast.warn('No hay texto para enviar');
     }
   };
-
-  // Función para sintetizar voz
-  const speakText = useCallback((text) => {
-    if (!window.speechSynthesis || !voiceEnabled) {
-      console.warn('⚠️ speechSynthesis no disponible o voz deshabilitada');
-      return;
-    }
-
-    // Si no hay voz seleccionada, intentar obtener una voz por defecto
-    let voiceToUse = selectedVoice;
-    if (!voiceToUse) {
-      const voices = synthRef.current.getVoices();
-      const spanishVoices = voices.filter(v => v.lang.includes('es') || v.lang.includes('ES'));
-      voiceToUse = spanishVoices[0] || voices[0];
-      console.warn('⚠️ No había voz seleccionada, usando voz por defecto:', voiceToUse?.name);
-
-      if (!voiceToUse) {
-        console.error('❌ No hay voces disponibles en el sistema');
-        return;
-      }
-
-      // Actualizar selectedVoice para futuros usos
-      setSelectedVoice(voiceToUse);
-    }
-
-    // Cancelar cualquier voz anterior
-    synthRef.current.cancel();
-
-    // Crear nueva utterance
-    utteranceRef.current = new SpeechSynthesisUtterance(text);
-    utteranceRef.current.voice = voiceToUse;
-    utteranceRef.current.lang = 'es-ES';
-    utteranceRef.current.rate = 0.95;
-    utteranceRef.current.pitch = 1.1;
-    utteranceRef.current.volume = 1.0;
-
-    // Eventos
-    utteranceRef.current.onstart = () => {
-      setIsSpeaking(true);
-      console.log('🔊 Reproduciendo con voz:', voiceToUse.name);
-    };
-
-    utteranceRef.current.onend = () => {
-      setIsSpeaking(false);
-      console.log('🔇 Reproducción finalizada');
-    };
-
-    utteranceRef.current.onerror = (event) => {
-      console.error('❌ Error en síntesis de voz:', event);
-      setIsSpeaking(false);
-      toast.error('Error al reproducir la voz de la IA');
-    };
-
-    // Reproducir
-    console.log('🎙️ Iniciando síntesis de voz...');
-    synthRef.current.speak(utteranceRef.current);
-  }, [voiceEnabled, selectedVoice]);
 
   // Función para detener la voz
   const stopSpeaking = () => {
