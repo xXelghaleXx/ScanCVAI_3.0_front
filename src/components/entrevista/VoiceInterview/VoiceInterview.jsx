@@ -5,6 +5,7 @@ import { Mic, MicOff, Volume2, VolumeX, Loader, ChevronDown, ChevronUp, Send } f
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import { toast } from 'react-toastify';
 import { useTheme } from '../../../context/ThemeContext/ThemeContext';
+import Background from '../../layout/Background/Background';
 
 const VoiceInterview = ({
   onSendMessage,
@@ -378,10 +379,9 @@ const VoiceInterview = ({
 
   // Colores dinámicos basados en el tema
   const colors = {
-    bgPrimary: isDark ? '#0f172a' : '#f9fafb',
-    bgSecondary: isDark ? '#1e293b' : '#ffffff',
-    bgTertiary: isDark ? '#334155' : '#f3f4f6',
-    headerBg: isDark ? '#0f172a' : '#1f2937',
+    bgSecondary: isDark ? 'rgba(30, 41, 59, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+    bgTertiary: isDark ? 'rgba(51, 65, 85, 0.8)' : 'rgba(243, 244, 246, 0.8)',
+    headerBg: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(31, 41, 55, 0.95)',
     textPrimary: isDark ? '#f1f5f9' : '#1f2937',
     textSecondary: isDark ? '#cbd5e1' : '#6b7280',
     border: isDark ? '#475569' : '#e5e7eb',
@@ -391,17 +391,21 @@ const VoiceInterview = ({
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100vh',
-      padding: '1.5rem',
-      gap: '1.5rem',
-      background: colors.bgPrimary
-    }}>
+    <>
+      <Background />
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        padding: '1.5rem',
+        gap: '1.5rem',
+        position: 'relative',
+        zIndex: 1
+      }}>
       {/* HEADER */}
       <div style={{
         background: colors.headerBg,
+        backdropFilter: 'blur(10px)',
         borderRadius: '12px',
         padding: '1rem 1.5rem',
         display: 'flex',
@@ -452,6 +456,7 @@ const VoiceInterview = ({
           {/* SECCIÓN: TEXTO DE ENTREVISTA */}
           <div style={{
             background: colors.bgSecondary,
+            backdropFilter: 'blur(10px)',
             borderRadius: '12px',
             padding: '2rem',
             flex: '0 0 280px',
@@ -778,6 +783,7 @@ const VoiceInterview = ({
         {/* COLUMNA DERECHA: SELECTOR DE VOCES */}
         <div style={{
           background: colors.bgSecondary,
+          backdropFilter: 'blur(10px)',
           borderRadius: '12px',
           padding: '2rem',
           display: 'flex',
@@ -935,7 +941,8 @@ const VoiceInterview = ({
           }
         }
       `}</style>
-    </div>
+      </div>
+    </>
   );
 };
 
