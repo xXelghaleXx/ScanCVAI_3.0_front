@@ -27,17 +27,24 @@
   display: flex;
   align-items: center;
   gap: clamp(0.5rem, 1.5vw, 1rem);
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .logo {
-  height: clamp(32px, 6vw, 45px);
+  height: clamp(28px, 5.5vw, 45px);
   width: auto;
-  max-width: clamp(80px, 20vw, 150px);
+  max-width: clamp(70px, 18vw, 150px);
+  min-width: 60px;
   object-fit: contain;
   object-position: left center;
-  flex-shrink: 0;
+  flex-shrink: 1;
   display: block;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .separator {
@@ -134,8 +141,9 @@
   }
 
   .logo {
-    height: 42px;
-    max-width: 140px;
+    height: 40px;
+    max-width: 130px;
+    min-width: 55px;
   }
 
   .separator {
@@ -150,8 +158,9 @@
   }
 
   .logo {
-    height: 40px;
-    max-width: 130px;
+    height: 38px;
+    max-width: 120px;
+    min-width: 50px;
   }
 
   .separator {
@@ -178,8 +187,9 @@
   }
 
   .logo {
-    height: 38px;
-    max-width: 120px;
+    height: 36px;
+    max-width: 110px;
+    min-width: 48px;
   }
 
   .separator {
@@ -225,8 +235,9 @@
   }
 
   .logo {
-    height: 36px;
-    max-width: 105px;
+    height: 34px;
+    max-width: 95px;
+    min-width: 45px;
   }
 
   .logo-slidebar-container {
@@ -268,8 +279,9 @@
   }
 
   .logo {
-    height: 34px;
-    max-width: 90px;
+    height: 32px;
+    max-width: 80px;
+    min-width: 42px;
   }
 
   .logo-slidebar-container {
@@ -304,8 +316,9 @@
   }
 
   .logo {
-    height: 30px;
-    max-width: 75px;
+    height: 28px;
+    max-width: 65px;
+    min-width: 38px;
   }
 
   .logo-slidebar-container {
@@ -363,6 +376,7 @@
   .logo {
     height: 48px;
     max-width: 160px;
+    min-width: 65px;
   }
 
   .separator {
