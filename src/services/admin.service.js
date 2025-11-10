@@ -89,6 +89,21 @@ const adminService = {
       console.error("Error actualizando estado del usuario:", error);
       throw error;
     }
+  },
+
+  /**
+   * Eliminar usuario y todos sus datos relacionados
+   * @param {number} userId - ID del usuario
+   * @returns {Promise<Object>} Confirmación de eliminación
+   */
+  async deleteUser(userId) {
+    try {
+      const response = await axiosInstance.delete(`${API_URL}/usuarios/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error eliminando usuario:", error);
+      throw error;
+    }
   }
 };
 

@@ -47,6 +47,16 @@
   transform: translateZ(0);
 }
 
+/* Logo principal (desktop/tablets) - Visible por defecto */
+.logo-desktop {
+  display: block;
+}
+
+/* Logo móvil - Oculto por defecto */
+.logo-mobile {
+  display: none;
+}
+
 .separator {
   height: clamp(26px, 4.5vw, 35px);
   width: 1px;
@@ -195,6 +205,15 @@
 
 /* Móviles grandes (640px - 480px) */
 @media (max-width: 640px) {
+  /* Cambiar a logo móvil */
+  .logo-desktop {
+    display: none;
+  }
+
+  .logo-mobile {
+    display: block;
+  }
+
   .separator {
     display: none;
   }

@@ -183,6 +183,26 @@
   color: var(--accent);
 }
 
+.admin-card-icon.blue {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.admin-card-icon.red {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+.admin-card-icon.gray {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.admin-card-icon.teal {
+  background: #ccfbf1;
+  color: #0d9488;
+}
+
 .admin-card-label {
   font-size: var(--text-sm);
   color: var(--text-secondary);

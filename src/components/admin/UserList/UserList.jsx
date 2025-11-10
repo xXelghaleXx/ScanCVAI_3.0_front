@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FileText, MessageCircle, BarChart3, Star } from "lucide-react";
+import { FileText, MessageCircle, BarChart3, Star, Trash2 } from "lucide-react";
 import adminService from '../../../services/admin.service';
 import Background from "../../layout/Background/Background";
 import { toast } from "react-toastify";
@@ -17,6 +17,11 @@ function UserList() {
     search: "",
     rol: "",
     estado: "",
+  });
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    userId: null,
+    userName: "",
   });
 
   useEffect(() => {
@@ -67,6 +72,34 @@ function UserList() {
     } catch (error) {
       console.error("Error actualizando estado:", error);
       toast.error(error.response?.data?.message || "Error actualizando estado");
+    }
+  };
+
+  const openDeleteModal = (userId, userName) => {
+    setDeleteModal({
+      isOpen: true,
+      userId,
+      userName,
+    });
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({
+      isOpen: false,
+      userId: null,
+      userName: "",
+    });
+  };
+
+  const handleDeleteUser = async () => {
+    try {
+      await adminService.deleteUser(deleteModal.userId);
+      toast.success(`Usuario ${deleteModal.userName} eliminado correctamente`);
+      closeDeleteModal();
+      loadUsers();
+    } catch (error) {
+      console.error("Error eliminando usuario:", error);
+      toast.error(error.response?.data?.message || "Error eliminando usuario");
     }
   };
 
@@ -164,7 +197,7 @@ function UserList() {
                   <th>Estado</th>
                   <th className="center">Métricas</th>
                   <th>Último Acceso</th>
-                  <th className="center">Acciones</th>
+                  <th className="center" style={{ minWidth: "180px" }}>Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -229,12 +262,21 @@ function UserList() {
                         : "Nunca"}
                     </td>
                     <td className="center">
-                      <button
-                        onClick={() => navigate(`/admin/usuarios/${user.id}`)}
-                        className="user-details-btn"
-                      >
-                        Ver detalles
-                      </button>
+                      <div className="user-actions-cell">
+                        <button
+                          onClick={() => navigate(`/admin/usuarios/${user.id}`)}
+                          className="user-details-btn"
+                        >
+                          Ver detalles
+                        </button>
+                        <button
+                          onClick={() => openDeleteModal(user.id, user.nombre)}
+                          className="user-delete-btn"
+                          title="Eliminar usuario"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -273,6 +315,54 @@ function UserList() {
             </div>
           )}
         </div>
+
+        {/* Modal de confirmación de eliminación */}
+        {deleteModal.isOpen && (
+          <div className="delete-modal-overlay" onClick={closeDeleteModal}>
+            <div className="delete-modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="delete-modal-header">
+                <div className="delete-modal-icon">
+                  <Trash2 size={24} />
+                </div>
+                <h2 className="delete-modal-title">Eliminar Usuario</h2>
+              </div>
+
+              <div className="delete-modal-body">
+                <p className="delete-modal-text">
+                  ¿Estás seguro de que deseas eliminar al usuario <strong>{deleteModal.userName}</strong>?
+                </p>
+                <p className="delete-modal-warning">
+                  Esta acción eliminará permanentemente:
+                </p>
+                <ul className="delete-modal-list">
+                  <li>Todos los CVs subidos por el usuario</li>
+                  <li>Todas las entrevistas realizadas</li>
+                  <li>Todos los informes generados</li>
+                  <li>Toda la información asociada a su cuenta</li>
+                </ul>
+                <p className="delete-modal-alert">
+                  <strong>Esta acción no se puede deshacer.</strong>
+                </p>
+              </div>
+
+              <div className="delete-modal-footer">
+                <button
+                  onClick={closeDeleteModal}
+                  className="delete-modal-btn delete-modal-cancel"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeleteUser}
+                  className="delete-modal-btn delete-modal-confirm"
+                >
+                  <Trash2 size={16} />
+                  Eliminar Usuario
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
     </>
