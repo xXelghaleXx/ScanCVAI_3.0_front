@@ -33,10 +33,10 @@
 }
 
 .logo {
-  height: clamp(28px, 5.5vw, 45px);
+  height: clamp(26px, 4.5vh, 50px);
   width: auto;
-  max-width: clamp(70px, 18vw, 150px);
-  min-width: 60px;
+  max-width: clamp(60px, 15vw, 180px);
+  min-width: clamp(50px, 8vw, 70px);
   object-fit: contain;
   object-position: left center;
   flex-shrink: 1;
@@ -139,32 +139,12 @@
   .header-content {
     padding: 0 1.25rem;
   }
-
-  .logo {
-    height: 40px;
-    max-width: 130px;
-    min-width: 55px;
-  }
-
-  .separator {
-    height: 32px;
-  }
 }
 
 /* Tablets (1024px - 768px) */
 @media (max-width: 1024px) {
   .header-content {
     padding: 0 1rem;
-  }
-
-  .logo {
-    height: 38px;
-    max-width: 120px;
-    min-width: 50px;
-  }
-
-  .separator {
-    height: 30px;
   }
 
   .user-name {
@@ -184,16 +164,6 @@
 @media (max-width: 768px) {
   .header-content {
     padding: 0 0.875rem;
-  }
-
-  .logo {
-    height: 36px;
-    max-width: 110px;
-    min-width: 48px;
-  }
-
-  .separator {
-    height: 28px;
   }
 
   .logo-slidebar-container {
@@ -234,12 +204,6 @@
     gap: 0.75rem;
   }
 
-  .logo {
-    height: 34px;
-    max-width: 95px;
-    min-width: 45px;
-  }
-
   .logo-slidebar-container {
     gap: 0.5rem;
   }
@@ -269,7 +233,10 @@
 
 /* Móviles (480px - 360px) */
 @media (max-width: 480px) {
-  .user-name {
+  .user-name,
+  .admin-button,
+  .profile-button,
+  .logout-button {
     display: none;
   }
 
@@ -278,33 +245,12 @@
     gap: 0.5rem;
   }
 
-  .logo {
-    height: 32px;
-    max-width: 80px;
-    min-width: 42px;
-  }
-
   .logo-slidebar-container {
     gap: 0.4rem;
   }
 
   .user-info {
     gap: 0.375rem;
-  }
-
-  .admin-button,
-  .profile-button,
-  .logout-button {
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
-    min-height: 32px;
-  }
-
-  .admin-icon,
-  .profile-icon,
-  .logout-icon {
-    font-size: 1.1rem;
   }
 }
 
@@ -315,33 +261,12 @@
     gap: 0.375rem;
   }
 
-  .logo {
-    height: 28px;
-    max-width: 65px;
-    min-width: 38px;
-  }
-
   .logo-slidebar-container {
     gap: 0.325rem;
   }
 
   .user-info {
     gap: 0.3rem;
-  }
-
-  .admin-button,
-  .profile-button,
-  .logout-button {
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-    min-height: 30px;
-  }
-
-  .admin-icon,
-  .profile-icon,
-  .logout-icon {
-    font-size: 1rem;
   }
 }
 
@@ -371,16 +296,6 @@
 @media (min-width: 1400px) {
   .header-content {
     padding: 0 2rem;
-  }
-
-  .logo {
-    height: 48px;
-    max-width: 160px;
-    min-width: 65px;
-  }
-
-  .separator {
-    height: 38px;
   }
 
   .user-name {

@@ -6,26 +6,30 @@ import {
   TrendingUp,
   RefreshCw,
   Award,
-  Target
+  Target,
+  BarChart3
 } from 'lucide-react';
 
 const ResultadosEntrevista = ({ resultados, onNuevaEntrevista }) => {
-  const {
-    puntuacion_general = 0,
-    fortalezas = [],
-    areas_mejora = [],
-    comentario_final = '',
-    carrera = '',
-    fecha_entrevista = new Date().toLocaleDateString(),
-    metricas_puntuacion = null
-  } = resultados || {};
+  // Extraer datos del backend
+  const puntuacion_general = resultados?.evaluacion?.puntuacion_global || resultados?.puntuacion_general || 0;
+  const scoringData = resultados?.evaluacion?.metricas_puntuacion;
 
-  // Extraer métricas del nuevo sistema de scoring
-  const metricas = metricas_puntuacion?.metricas || {
-    cantidad_respuestas: 0,
-    palabras_promedio: 0,
-    completitud_porcentaje: 0
+  // Determinar nivel (del scoring del backend o fallback)
+  const nivel = scoringData?.nivel || {
+    nombre: 'Regular',
+    color: '#f59e0b',
+    descripcion: 'Desempeño satisfactorio'
   };
+
+  const fortalezas = resultados?.evaluacion?.fortalezas || resultados?.fortalezas || [];
+  const areas_mejora = resultados?.evaluacion?.areas_mejora || resultados?.areas_mejora || [];
+  const comentario_final = resultados?.evaluacion?.comentario_final || resultados?.comentario_final || '';
+  const carrera = resultados?.estadisticas?.carrera || resultados?.carrera || '';
+  const fecha_entrevista = resultados?.fecha_completada
+    ? new Date(resultados.fecha_completada).toLocaleDateString()
+    : new Date().toLocaleDateString();
+  const totalPreguntas = scoringData?.totalPreguntas || resultados?.estadisticas?.mensajes_usuario || 0;
 
   const obtenerColorPuntuacion = (puntuacion) => {
     if (puntuacion >= 80) return '#10b981';
@@ -274,6 +278,215 @@ const ResultadosEntrevista = ({ resultados, onNuevaEntrevista }) => {
           </motion.div>
         )}
 
+        {/* Detalles del Scoring */}
+        {scoringData?.completado && scoringData.detalles && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            style={{
+              background: 'white',
+              borderRadius: '24px',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+              padding: '2.5rem',
+              marginBottom: '1.5rem'
+            }}
+          >
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              marginBottom: '1.5rem'
+            }}>
+              <BarChart3 size={24} color="#667eea" />
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#111827', margin: 0 }}>
+                Detalles del Scoring
+              </h2>
+            </div>
+
+            {/* Métricas Individuales */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              {/* Comunicación */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#6b7280' }}>
+                    💬 Comunicación
+                  </span>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 700, color: obtenerColorPuntuacion(scoringData.detalles.comunicacion) }}>
+                    {scoringData.detalles.comunicacion}/100
+                  </span>
+                </div>
+                <div style={{
+                  width: '100%',
+                  height: '8px',
+                  background: '#e5e7eb',
+                  borderRadius: '999px',
+                  overflow: 'hidden'
+                }}>
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${scoringData.detalles.comunicacion}%` }}
+                    transition={{ duration: 0.8, delay: 0.4 }}
+                    style={{
+                      height: '100%',
+                      background: obtenerColorPuntuacion(scoringData.detalles.comunicacion),
+                      borderRadius: '999px'
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Conocimiento Técnico */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#6b7280' }}>
+                    🔧 Conocimiento Técnico
+                  </span>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 700, color: obtenerColorPuntuacion(scoringData.detalles.conocimientoTecnico) }}>
+                    {scoringData.detalles.conocimientoTecnico}/100
+                  </span>
+                </div>
+                <div style={{
+                  width: '100%',
+                  height: '8px',
+                  background: '#e5e7eb',
+                  borderRadius: '999px',
+                  overflow: 'hidden'
+                }}>
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${scoringData.detalles.conocimientoTecnico}%` }}
+                    transition={{ duration: 0.8, delay: 0.5 }}
+                    style={{
+                      height: '100%',
+                      background: obtenerColorPuntuacion(scoringData.detalles.conocimientoTecnico),
+                      borderRadius: '999px'
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Competencias */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#6b7280' }}>
+                    🎯 Competencias Blandas
+                  </span>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 700, color: obtenerColorPuntuacion(scoringData.detalles.competencias) }}>
+                    {scoringData.detalles.competencias}/100
+                  </span>
+                </div>
+                <div style={{
+                  width: '100%',
+                  height: '8px',
+                  background: '#e5e7eb',
+                  borderRadius: '999px',
+                  overflow: 'hidden'
+                }}>
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${scoringData.detalles.competencias}%` }}
+                    transition={{ duration: 0.8, delay: 0.6 }}
+                    style={{
+                      height: '100%',
+                      background: obtenerColorPuntuacion(scoringData.detalles.competencias),
+                      borderRadius: '999px'
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Completitud */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#6b7280' }}>
+                    ✅ Completitud
+                  </span>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 700, color: obtenerColorPuntuacion(scoringData.detalles.completitud) }}>
+                    {scoringData.detalles.completitud}/100
+                  </span>
+                </div>
+                <div style={{
+                  width: '100%',
+                  height: '8px',
+                  background: '#e5e7eb',
+                  borderRadius: '999px',
+                  overflow: 'hidden'
+                }}>
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${scoringData.detalles.completitud}%` }}
+                    transition={{ duration: 0.8, delay: 0.7 }}
+                    style={{
+                      height: '100%',
+                      background: obtenerColorPuntuacion(scoringData.detalles.completitud),
+                      borderRadius: '999px'
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Coherencia */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#6b7280' }}>
+                    🔗 Coherencia
+                  </span>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 700, color: obtenerColorPuntuacion(scoringData.detalles.coherencia) }}>
+                    {scoringData.detalles.coherencia}/100
+                  </span>
+                </div>
+                <div style={{
+                  width: '100%',
+                  height: '8px',
+                  background: '#e5e7eb',
+                  borderRadius: '999px',
+                  overflow: 'hidden'
+                }}>
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${scoringData.detalles.coherencia}%` }}
+                    transition={{ duration: 0.8, delay: 0.8 }}
+                    style={{
+                      height: '100%',
+                      background: obtenerColorPuntuacion(scoringData.detalles.coherencia),
+                      borderRadius: '999px'
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Nivel y Estadísticas */}
+            <div style={{
+              marginTop: '1.5rem',
+              padding: '1.25rem',
+              background: `linear-gradient(135deg, ${nivel.color}15, ${nivel.color}05)`,
+              border: `2px solid ${nivel.color}30`,
+              borderRadius: '12px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                  <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', margin: '0 0 0.25rem 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Nivel Alcanzado
+                  </p>
+                  <p style={{ fontSize: '1.25rem', fontWeight: 700, color: nivel.color, margin: 0 }}>
+                    {nivel.nombre}
+                  </p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', margin: '0 0 0.25rem 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Preguntas Respondidas
+                  </p>
+                  <p style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111827', margin: 0 }}>
+                    {totalPreguntas} preguntas
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Áreas de Mejora */}
         {areas_mejora && areas_mejora.length > 0 && (
           <motion.div
@@ -296,12 +509,12 @@ const ResultadosEntrevista = ({ resultados, onNuevaEntrevista }) => {
             }}>
               <TrendingUp size={24} color="#f59e0b" />
               <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#111827', margin: 0 }}>
-                Áreas de Mejora
+                Recomendaciones de Mejora
               </h2>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {areas_mejora.slice(0, 3).map((area, index) => {
+              {areas_mejora.slice(0, 5).map((area, index) => {
                 const areaObj = formatearAreaMejora(area);
                 return (
                   <motion.div

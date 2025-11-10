@@ -239,10 +239,44 @@ const EntrevistaChat = () => {
         // Agregar respuesta de la IA
         if (respuesta) {
           setTimeout(() => {
-            setChat(prevChat => [...prevChat, {
-              tipo: "ia",
-              texto: respuesta
-            }]);
+            setChat(prevChat => {
+              const chatActualizado = [...prevChat, {
+                tipo: "ia",
+                texto: respuesta
+              }];
+
+              // Verificar si la IA ha finalizado la entrevista
+              const frasesFin = [
+                'entrevista ha concluido',
+                'hemos terminado',
+                'finalizado la entrevista',
+                'muchas gracias por tu tiempo',
+                'fin de la entrevista',
+                'entrevista finalizada',
+                'eso es todo por hoy',
+                'ha sido un placer',
+                'termina aquí'
+              ];
+              const entrevistaFinalizadaPorIA = frasesFin.some(frase => respuesta.toLowerCase().includes(frase));
+
+              if (entrevistaFinalizadaPorIA) {
+                console.log('🏁 IA ha finalizado la entrevista automáticamente');
+
+                // Verificar que tenga al menos 10 preguntas
+                const preguntasUsuario = chatActualizado.filter(m => m.tipo === 'usuario');
+
+                if (preguntasUsuario.length >= 10) {
+                  toast.success('La entrevista ha finalizado. Generando resultados...');
+                  setTimeout(() => {
+                    finalizarEntrevista();
+                  }, 2000);
+                } else {
+                  toast.info(`Necesitas responder al menos ${10 - preguntasUsuario.length} preguntas más antes de finalizar.`);
+                }
+              }
+
+              return chatActualizado;
+            });
           }, 500);
         }
 
@@ -270,18 +304,23 @@ const EntrevistaChat = () => {
       return;
     }
 
-    // Verificar que haya al menos 1 mensaje del usuario
+    // Verificar que haya al menos 10 mensajes del usuario
     const mensajesUsuario = chat.filter(m => m.tipo === 'usuario');
-    if (mensajesUsuario.length === 0) {
-      toast.warning('Debes responder al menos una pregunta antes de finalizar');
+
+    if (mensajesUsuario.length < 10) {
+      toast.warning(
+        `Debes responder al menos 10 preguntas para finalizar la entrevista.\n` +
+        `Actualmente has respondido ${mensajesUsuario.length} pregunta${mensajesUsuario.length !== 1 ? 's' : ''}.`
+      );
       return;
     }
 
     const confirmar = window.confirm(
       '¿Estás seguro de que deseas finalizar la entrevista?\n\n' +
-      `Has respondido ${mensajesUsuario.length} pregunta${mensajesUsuario.length !== 1 ? 's' : ''}.`
+      `Has respondido ${mensajesUsuario.length} pregunta${mensajesUsuario.length !== 1 ? 's' : ''}.\n` +
+      'Se generará tu evaluación final.'
     );
-    
+
     if (!confirmar) return;
 
     try {
@@ -413,7 +452,7 @@ const EntrevistaChat = () => {
   // Si la entrevista está finalizada, mostrar resultados
   if (entrevistaFinalizada && resultados) {
     return (
-      <ResultadosEntrevista 
+      <ResultadosEntrevista
         resultados={resultados}
         onNuevaEntrevista={handleNuevaEntrevista}
       />
