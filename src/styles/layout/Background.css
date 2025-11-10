@@ -117,10 +117,10 @@
 
 @keyframes fade {
   0%, 100% {
-    opacity: 0.5;
+    stroke-opacity: 0.08;
   }
   50% {
-    opacity: 1;
+    stroke-opacity: 0.2;
   }
 }
 
