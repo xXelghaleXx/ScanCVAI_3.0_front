@@ -11,7 +11,9 @@ const VoiceInterview = ({
   onSendMessage,
   loading,
   lastAIMessage,
-  disabled
+  disabled,
+  onFinalizarEntrevista,
+  onAbandonarEntrevista
 }) => {
   // Theme
   const { theme } = useTheme();
@@ -27,6 +29,8 @@ const VoiceInterview = ({
   const [availableVoices, setAvailableVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState(null);
   const [showVoiceSelector, setShowVoiceSelector] = useState(false);
+  const [showInitialVoiceSelection, setShowInitialVoiceSelection] = useState(true);
+  const [presetVoices, setPresetVoices] = useState([]);
 
   // Estados de detección de audio
   const [isDetectingVoice, setIsDetectingVoice] = useState(false);
@@ -41,6 +45,7 @@ const VoiceInterview = ({
   const micStreamRef = useRef(null);
   const animationFrameRef = useRef(null);
   const lastSpeechTimeRef = useRef(Date.now());
+  const silenceTimerRef = useRef(null);
 
   // Hook de reconocimiento de voz
   const {
@@ -79,17 +84,75 @@ const VoiceInterview = ({
 
       setAvailableVoices(spanishVoices.length > 0 ? spanishVoices : voices);
 
-      // Seleccionar voz femenina por defecto
-      const defaultVoice = spanishVoices.find(voice =>
-        voice.name.toLowerCase().includes('female') ||
-        voice.name.toLowerCase().includes('mujer') ||
-        voice.name.toLowerCase().includes('helena') ||
-        voice.name.toLowerCase().includes('monica') ||
-        voice.name.toLowerCase().includes('sabina')
-      ) || spanishVoices[0] || voices[0];
+      // Filtrar solo voces chilenas naturales
+      const chileanVoices = voices.filter(voice => {
+        const nameLower = voice.name.toLowerCase();
+        const langLower = voice.lang.toLowerCase();
 
-      setSelectedVoice(defaultVoice);
-      console.log('🔊 Voz seleccionada:', defaultVoice?.name);
+        // Buscar voces que contengan "chile" o "chilean" o "es-cl"
+        return (
+          nameLower.includes('chile') ||
+          nameLower.includes('chilean') ||
+          langLower.includes('es-cl') ||
+          langLower.includes('chile')
+        );
+      });
+
+      console.log('🇨🇱 Voces chilenas encontradas:', chileanVoices.map(v => v.name));
+
+      // Si no hay voces chilenas específicas, buscar voces españolas de Chile
+      let voicesChile = chileanVoices;
+
+      if (voicesChile.length === 0) {
+        // Buscar voces naturales en español (Google, Microsoft Natural)
+        voicesChile = spanishVoices.filter(voice => {
+          const nameLower = voice.name.toLowerCase();
+          return (
+            nameLower.includes('natural') ||
+            nameLower.includes('neural') ||
+            nameLower.includes('google')
+          );
+        });
+        console.log('🔊 Voces naturales en español encontradas:', voicesChile.map(v => v.name));
+      }
+
+      // Si aún no hay voces, usar las primeras 3 voces en español
+      if (voicesChile.length === 0) {
+        voicesChile = spanishVoices.slice(0, 3);
+        console.log('📢 Usando voces en español por defecto:', voicesChile.map(v => v.name));
+      }
+
+      // Limitar a máximo 3 voces
+      const selectedVoices = voicesChile.slice(0, 3);
+
+      // Formatear las voces seleccionadas
+      const foundPresets = selectedVoices.map((voice, index) => {
+        // Determinar si es femenina o masculina basándose en el nombre
+        const nameLower = voice.name.toLowerCase();
+        let gender = 'Neutral';
+
+        if (nameLower.includes('female') || nameLower.includes('mujer') ||
+            nameLower.includes('helena') || nameLower.includes('monica') ||
+            nameLower.includes('sabina') || nameLower.includes('paulina')) {
+          gender = 'Femenina';
+        } else if (nameLower.includes('male') || nameLower.includes('hombre') ||
+                   nameLower.includes('pablo') || nameLower.includes('jorge') ||
+                   nameLower.includes('raul') || nameLower.includes('diego')) {
+          gender = 'Masculina';
+        }
+
+        return {
+          voice: voice,
+          label: `Voz ${index + 1} (${gender})`
+        };
+      });
+
+      setPresetVoices(foundPresets);
+      console.log('🔊 Voces predefinidas cargadas:', foundPresets.map(p => ({
+        label: p.label,
+        name: p.voice.name,
+        lang: p.voice.lang
+      })));
     };
 
     loadVoices();
@@ -169,10 +232,37 @@ const VoiceInterview = ({
       lastMessageRef.current = lastAIMessage;
       console.log('🔊 Intentando reproducir voz de IA...');
       speakText(lastAIMessage);
+
+      // Detectar si la IA ha finalizado la entrevista
+      const frasesFin = [
+        'entrevista ha concluido',
+        'hemos terminado',
+        'finalizado la entrevista',
+        'muchas gracias por tu tiempo',
+        'fin de la entrevista',
+        'entrevista finalizada',
+        'eso es todo por hoy',
+        'ha sido un placer',
+        'termina aquí'
+      ];
+
+      const entrevistaFinalizadaPorIA = frasesFin.some(frase =>
+        lastAIMessage.toLowerCase().includes(frase)
+      );
+
+      if (entrevistaFinalizadaPorIA && onFinalizarEntrevista) {
+        console.log('🏁 IA ha finalizado la entrevista automáticamente en modo voz');
+        toast.success('La entrevista ha finalizado. Generando resultados...');
+
+        // Ejecutar finalización después de que termine de hablar
+        setTimeout(() => {
+          onFinalizarEntrevista();
+        }, 2000);
+      }
     } else if (lastAIMessage && voiceEnabled && !loading && !selectedVoice) {
       console.warn('⚠️ No hay voz seleccionada todavía, esperando...');
     }
-  }, [lastAIMessage, voiceEnabled, loading, selectedVoice, speakText]);
+  }, [lastAIMessage, voiceEnabled, loading, selectedVoice, speakText, onFinalizarEntrevista]);
 
   // Inicializar detector de audio
   const initAudioDetection = useCallback(async () => {
@@ -214,8 +304,28 @@ const VoiceInterview = ({
         setIsDetectingVoice(hasVoice);
 
         if (hasVoice) {
-          // Hay voz detectada
+          // Hay voz detectada - reiniciar timer de silencio
           lastSpeechTimeRef.current = Date.now();
+
+          // Cancelar timer anterior si existe
+          if (silenceTimerRef.current) {
+            clearTimeout(silenceTimerRef.current);
+            silenceTimerRef.current = null;
+          }
+        } else {
+          // No hay voz - verificar si han pasado 3.5 segundos de silencio
+          const silenceDuration = Date.now() - lastSpeechTimeRef.current;
+
+          if (silenceDuration >= 3500 && !silenceTimerRef.current) {
+            // Iniciar timer para auto-enviar
+            silenceTimerRef.current = setTimeout(() => {
+              console.log('⏱️ Auto-enviando por 3.5 segundos de silencio');
+              if (transcript.trim()) {
+                stopListeningAndSend();
+              }
+              silenceTimerRef.current = null;
+            }, 100); // Small delay to ensure state is updated
+          }
         }
 
         animationFrameRef.current = requestAnimationFrame(detectSound);
@@ -236,6 +346,11 @@ const VoiceInterview = ({
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
       animationFrameRef.current = null;
+    }
+
+    if (silenceTimerRef.current) {
+      clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = null;
     }
 
     if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
@@ -389,12 +504,104 @@ const VoiceInterview = ({
   return (
     <>
       <Background />
+
+      {/* MODAL DE SELECCIÓN INICIAL DE VOZ */}
+      {showInitialVoiceSelection && presetVoices.length > 0 && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.85)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '1rem'
+        }}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            style={{
+              background: colors.bgSecondary,
+              borderRadius: '20px',
+              padding: 'clamp(1.5rem, 4vw, 3rem)',
+              maxWidth: '600px',
+              width: '100%',
+              border: `2px solid ${colors.border}`,
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+            }}
+          >
+            <h2 style={{
+              margin: '0 0 1rem 0',
+              color: colors.textPrimary,
+              fontSize: 'clamp(1.25rem, 3vw, 1.75rem)',
+              fontWeight: 700,
+              textAlign: 'center'
+            }}>
+              Selecciona una Voz para la Entrevista
+            </h2>
+            <p style={{
+              margin: '0 0 2rem 0',
+              color: colors.textSecondary,
+              fontSize: 'clamp(0.875rem, 2vw, 1rem)',
+              textAlign: 'center'
+            }}>
+              Elige la voz que prefieras para las respuestas de la IA
+            </p>
+
+            <div style={{
+              display: 'grid',
+              gap: '1rem',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))'
+            }}>
+              {presetVoices.map((preset, index) => (
+                <motion.button
+                  key={index}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    setSelectedVoice(preset.voice);
+                    setShowInitialVoiceSelection(false);
+                    toast.success(`Voz seleccionada: ${preset.label}`);
+                    console.log('🔊 Voz elegida:', preset.voice.name);
+                  }}
+                  style={{
+                    padding: 'clamp(1rem, 3vw, 1.5rem)',
+                    background: `linear-gradient(135deg, ${colors.accent} 0%, ${colors.accentHover} 100%)`,
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    fontSize: 'clamp(0.875rem, 2vw, 1rem)',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    textAlign: 'center'
+                  }}
+                >
+                  <Volume2 size={28} style={{ marginBottom: '0.5rem' }} />
+                  <div>{preset.label}</div>
+                  <div style={{
+                    fontSize: 'clamp(0.7rem, 1.5vw, 0.8rem)',
+                    opacity: 0.8,
+                    marginTop: '0.25rem'
+                  }}>
+                    {preset.voice.name.substring(0, 30)}
+                  </div>
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      )}
+
       <div style={{
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
-        padding: '1.5rem',
-        gap: '1.5rem',
+        padding: 'clamp(0.75rem, 2vw, 1.5rem)',
+        gap: 'clamp(0.75rem, 2vw, 1.5rem)',
         position: 'relative',
         zIndex: 1
       }}>
@@ -402,44 +609,76 @@ const VoiceInterview = ({
       <div style={{
         background: colors.headerBg,
         backdropFilter: 'blur(10px)',
-        borderRadius: '12px',
-        padding: '1rem 1.5rem',
+        borderRadius: 'clamp(8px, 2vw, 12px)',
+        padding: 'clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        border: `1px solid ${colors.border}`
+        border: `1px solid ${colors.border}`,
+        flexWrap: 'wrap',
+        gap: '0.75rem'
       }}>
         <h2 style={{
           margin: 0,
           color: colors.textPrimary,
-          fontSize: '1.25rem',
+          fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
           fontWeight: 700
         }}>
           ENTREVISTA POR VOZ
         </h2>
-        <button
-          onClick={() => window.location.reload()}
-          style={{
-            padding: '0.75rem 1.5rem',
-            background: colors.error,
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            fontSize: '0.875rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.3s ease'
-          }}
-        >
-          FINALIZAR Y ABANDONAR
-        </button>
+
+        {/* Botones de Finalizar y Abandonar */}
+        <div style={{
+          display: 'flex',
+          gap: '0.75rem',
+          alignItems: 'center'
+        }}>
+          <button
+            onClick={onFinalizarEntrevista}
+            disabled={disabled || loading}
+            style={{
+              padding: 'clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2.5vw, 1.5rem)',
+              background: 'white',
+              color: '#6b7280',
+              border: '2px solid #e5e7eb',
+              borderRadius: '8px',
+              fontSize: 'clamp(0.75rem, 1.8vw, 0.875rem)',
+              fontWeight: 600,
+              cursor: disabled || loading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.3s ease',
+              whiteSpace: 'nowrap',
+              opacity: disabled || loading ? 0.5 : 1
+            }}
+          >
+            Finalizar
+          </button>
+          <button
+            onClick={onAbandonarEntrevista}
+            disabled={disabled || loading}
+            style={{
+              padding: 'clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2.5vw, 1.5rem)',
+              background: colors.error,
+              color: 'white',
+              border: `2px solid ${colors.error}`,
+              borderRadius: '8px',
+              fontSize: 'clamp(0.75rem, 1.8vw, 0.875rem)',
+              fontWeight: 600,
+              cursor: disabled || loading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.3s ease',
+              whiteSpace: 'nowrap',
+              opacity: disabled || loading ? 0.5 : 1
+            }}
+          >
+            Abandonar
+          </button>
+        </div>
       </div>
 
       {/* LAYOUT PRINCIPAL: 2 COLUMNAS */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '1fr 350px',
-        gap: '1.5rem',
+        gridTemplateColumns: window.innerWidth >= 1024 ? '1fr 350px' : '1fr',
+        gap: 'clamp(1rem, 2vw, 1.5rem)',
         flex: 1,
         overflow: 'hidden'
       }}>
@@ -447,15 +686,16 @@ const VoiceInterview = ({
         <div style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: '1.5rem'
+          gap: 'clamp(1rem, 2vw, 1.5rem)'
         }}>
           {/* SECCIÓN: TEXTO DE ENTREVISTA */}
           <div style={{
             background: colors.bgSecondary,
             backdropFilter: 'blur(10px)',
-            borderRadius: '12px',
-            padding: '2rem',
-            flex: '0 0 280px',
+            borderRadius: 'clamp(8px, 2vw, 12px)',
+            padding: 'clamp(1rem, 3vw, 2rem)',
+            flex: '0 0 auto',
+            minHeight: 'clamp(200px, 30vh, 280px)',
             display: 'flex',
             flexDirection: 'column',
             border: `1px solid ${colors.border}`
@@ -468,7 +708,7 @@ const VoiceInterview = ({
             }}>
               <h3 style={{
                 margin: 0,
-                fontSize: '1rem',
+                fontSize: 'clamp(0.875rem, 2vw, 1rem)',
                 fontWeight: 700,
                 color: colors.textPrimary,
                 letterSpacing: '1px',

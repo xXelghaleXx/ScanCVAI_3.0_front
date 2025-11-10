@@ -486,6 +486,8 @@ const EntrevistaChat = () => {
             : null
         }
         disabled={entrevistaFinalizada || !entrevistaId}
+        onFinalizarEntrevista={finalizarEntrevista}
+        onAbandonarEntrevista={abandonarEntrevista}
       />
     );
   }
