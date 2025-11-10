@@ -60,7 +60,7 @@
   stroke: #0942de !important;
   stroke-width: 12 !important;
   stroke-opacity: 0.15 !important;
-  animation: fade 4s infinite ease-in-out !important;
+  animation: fade 4s infinite ease-in-out, move 8s infinite ease-in-out !important;
   fill: none !important;
 }
 
@@ -70,7 +70,7 @@
   stroke: #6bdff9 !important;
   stroke-width: 12 !important;
   stroke-opacity: 0.15 !important;
-  animation: fade 4s infinite ease-in-out !important;
+  animation: fade 4s infinite ease-in-out, move 10s infinite ease-in-out !important;
   fill: none !important;
 }
 
@@ -92,7 +92,7 @@
   stroke: #6366f1 !important;
   stroke-width: 12 !important;
   stroke-opacity: 0.10 !important;
-  animation: fade 4s infinite ease-in-out !important;
+  animation: fade 4s infinite ease-in-out, move 8s infinite ease-in-out !important;
   fill: none !important;
 }
 
@@ -101,7 +101,7 @@
   stroke: #4f46e5 !important;
   stroke-width: 12 !important;
   stroke-opacity: 0.08 !important;
-  animation: fade 4s infinite ease-in-out !important;
+  animation: fade 4s infinite ease-in-out, move 10s infinite ease-in-out !important;
   fill: none !important;
 }
 
@@ -111,7 +111,7 @@
     stroke-dashoffset: 800;
   }
   100% {
-    stroke-dashoffset: 0;
+    stroke-dashoffset: -800;
   }
 }
 
@@ -120,7 +120,25 @@
     stroke-opacity: 0.08;
   }
   50% {
-    stroke-opacity: 0.2;
+    stroke-opacity: 0.25;
+  }
+}
+
+@keyframes move {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(10px, -10px);
+  }
+  50% {
+    transform: translate(20px, 0);
+  }
+  75% {
+    transform: translate(10px, 10px);
+  }
+  100% {
+    transform: translate(0, 0);
   }
 }
 
@@ -169,7 +187,7 @@
   stroke: #0942de !important;
   stroke-width: 12 !important;
   stroke-opacity: 0.15 !important;
-  animation: fade 4s infinite ease-in-out !important;
+  animation: fade 4s infinite ease-in-out, move 8s infinite ease-in-out !important;
   fill: none !important;
 }
 
@@ -177,7 +195,7 @@
   stroke: #6366f1 !important;
   stroke-width: 12 !important;
   stroke-opacity: 0.10 !important;
-  animation: fade 4s infinite ease-in-out !important;
+  animation: fade 4s infinite ease-in-out, move 8s infinite ease-in-out !important;
   fill: none !important;
 }
 
@@ -185,7 +203,7 @@
   stroke: #6bdff9 !important;
   stroke-width: 12 !important;
   stroke-opacity: 0.15 !important;
-  animation: fade 4s infinite ease-in-out !important;
+  animation: fade 4s infinite ease-in-out, move 10s infinite ease-in-out !important;
   fill: none !important;
 }
 
@@ -193,7 +211,7 @@
   stroke: #4f46e5 !important;
   stroke-width: 12 !important;
   stroke-opacity: 0.08 !important;
-  animation: fade 4s infinite ease-in-out !important;
+  animation: fade 4s infinite ease-in-out, move 10s infinite ease-in-out !important;
   fill: none !important;
 }
 

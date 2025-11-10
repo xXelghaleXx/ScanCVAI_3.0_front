@@ -10,7 +10,7 @@
 }
 
 [data-theme="dark"] body {
-  background: var(--bg-secondary);
+  background: transparent;
   color: var(--text-primary);
 }
 

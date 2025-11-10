@@ -2,6 +2,7 @@
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext/ThemeContext";
+import { LoaderProvider, useLoader } from "./context/LoaderContext/LoaderContext";
 import Header from "./components/layout/Header/Header";
 import Login from "./pages/Auth/LoginPage";
 import Register from "./pages/Auth/RegisterPage";
@@ -14,10 +15,12 @@ import AdminDashboard from './pages/Admin/AdminDashboardPage';
 import UserList from './components/admin/UserList/UserList';
 import UserMetrics from './components/admin/UserMetrics/UserMetrics';
 import Background from "./components/layout/Background/Background";
+import Loader from "./components/layout/Loader/Loader";
 import Footer from "./components/layout/Footer/Footer";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import authService from "./services/auth.service";
 import entrevistaService from "./services/entrevista.service";
+import { useEffect } from "react";
 
 // IMPORTAR CSS EN EL ORDEN CORRECTO
 import "./styles/base/theme.css";
@@ -26,9 +29,17 @@ import "./styles/pages/Welcome-refactorizado.css";
 import "./styles/components/chat/Chat.css";
 import "./index.css";
 
-const App = () => {
+const AppContent = () => {
   const location = useLocation();
+  const { isLoading, showLoader, hideLoader } = useLoader();
   const isLoginPage = location.pathname === "/" || location.pathname === "/register";
+
+  // Mostrar loader en cambios de ruta
+  useEffect(() => {
+    showLoader();
+    const timer = setTimeout(() => hideLoader(), 500);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
 
   const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -100,17 +111,18 @@ const App = () => {
   }
 
   return (
-    <ThemeProvider>
-      <GoogleOAuthProvider
-        clientId={GOOGLE_CLIENT_ID}
-        onScriptLoadError={(error) => {
-          console.error('❌ Error cargando script de Google OAuth:', error);
-        }}
-        onScriptLoadSuccess={() => {
-          console.log('✅ Script de Google OAuth cargado correctamente');
-        }}
-      >
-        <div className="app-root">
+    <GoogleOAuthProvider
+      clientId={GOOGLE_CLIENT_ID}
+      onScriptLoadError={(error) => {
+        console.error('❌ Error cargando script de Google OAuth:', error);
+      }}
+      onScriptLoadSuccess={() => {
+        console.log('✅ Script de Google OAuth cargado correctamente');
+      }}
+    >
+      <div className="app-root">
+        {isLoading && <Loader />}
+
         <div className="background-wrapper">
           <Background />
         </div>
@@ -126,7 +138,7 @@ const App = () => {
             {/* Páginas de autenticación */}
             <Route path="/" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            
+
             {/* Welcome */}
             <Route path="/welcome" element={
               <ProtectedRoute>
@@ -135,7 +147,7 @@ const App = () => {
                 </div>
               </ProtectedRoute>
             } />
-            
+
             {/* Lector CV */}
             <Route path="/lector-cv" element={
               <ProtectedRoute>
@@ -146,7 +158,7 @@ const App = () => {
                 </div>
               </ProtectedRoute>
             } />
-            
+
             {/* Entrevista */}
             <Route path="/entrevista" element={
               <ProtectedRoute>
@@ -157,7 +169,7 @@ const App = () => {
                 </div>
               </ProtectedRoute>
             } />
-            
+
             {/* Historial CV */}
             <Route path="/historialCV" element={
               <ProtectedRoute>
@@ -168,7 +180,7 @@ const App = () => {
                 </div>
               </ProtectedRoute>
             } />
-            
+
             {/* Perfil */}
             <Route path="/perfil" element={
               <ProtectedRoute>
@@ -206,8 +218,17 @@ const App = () => {
             <Footer />
           </div>
         )}
-        </div>
-      </GoogleOAuthProvider>
+      </div>
+    </GoogleOAuthProvider>
+  );
+};
+
+const App = () => {
+  return (
+    <ThemeProvider>
+      <LoaderProvider>
+        <AppContent />
+      </LoaderProvider>
     </ThemeProvider>
   );
 };
