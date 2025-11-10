@@ -368,17 +368,22 @@
 }
 
 .delete-btn {
-  background: var(--bg-secondary);
-  color: var(--error);
-  border: 1px solid var(--border);
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
 }
 
 .delete-btn:hover:not(:disabled) {
-  background: var(--error);
-  color: var(--text-inverse);
-  border-color: var(--error);
+  background: #dc2626;
+  color: white;
+  border-color: #b91c1c;
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.4), 0 4px 6px -2px rgba(220, 38, 38, 0.3);
+}
+
+.delete-btn:active:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.3);
 }
 
 .delete-btn:disabled {
@@ -710,17 +715,22 @@
 }
 
 .delete-btn {
-  background: var(--bg-secondary);
-  color: var(--error);
-  border: 1px solid var(--border);
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
 }
 
 .delete-btn:hover:not(:disabled) {
-  background: var(--error);
-  color: var(--text-inverse);
-  border-color: var(--error);
+  background: #dc2626;
+  color: white;
+  border-color: #b91c1c;
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.4), 0 4px 6px -2px rgba(220, 38, 38, 0.3);
+}
+
+.delete-btn:active:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.3);
 }
 
 .delete-btn:disabled {

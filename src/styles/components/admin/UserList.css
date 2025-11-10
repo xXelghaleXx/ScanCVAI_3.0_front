@@ -339,18 +339,25 @@
   width: 32px;
   height: 32px;
   padding: 0;
-  background: var(--error-bg);
-  color: var(--error);
-  border: none;
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid transparent;
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 0.2s ease;
 }
 
 .user-delete-btn:hover {
-  background: var(--error);
+  background: #dc2626;
   color: white;
+  border-color: #b91c1c;
   transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.3), 0 2px 4px -1px rgba(220, 38, 38, 0.2);
+}
+
+.user-delete-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px -1px rgba(220, 38, 38, 0.2);
 }
 
 /* Paginación */
@@ -671,14 +678,21 @@
 }
 
 .delete-modal-confirm {
-  background: var(--error);
+  background: #dc2626;
   color: white;
+  border: 1px solid #b91c1c;
 }
 
 .delete-modal-confirm:hover {
-  background: var(--error-dark);
+  background: #b91c1c;
+  border-color: #991b1b;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.4), 0 4px 6px -2px rgba(220, 38, 38, 0.3);
+}
+
+.delete-modal-confirm:active {
   transform: translateY(-1px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.3);
 }
 
 @keyframes fadeIn {

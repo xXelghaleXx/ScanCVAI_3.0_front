@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom";
 import "../../../styles/layout/Header.css";
 import Slidebar from "../Sidebar/Slidebar";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
-import logo from "../../../assets/logo.png";
-import logo2 from "../../../assets/logo2.png";
 import { FaPowerOff, FaUserCircle, FaUserShield } from "react-icons/fa";
 import authService from '../../../services/auth.service';
 
@@ -86,8 +84,7 @@ const Header = ({ onLogout }) => {
     <header className="header">
       <div className="header-content">
         <div className="logo-slidebar-container">
-          <img src={logo} alt="Tecsup logo" className="logo logo-desktop" />
-          <img src={logo2} alt="Tecsup logo" className="logo logo-mobile" />
+          <h1 className="logo-text">Tecsup</h1>
           <div className="separator"></div>
           <Slidebar />
         </div>

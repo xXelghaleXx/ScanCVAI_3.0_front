@@ -76,6 +76,7 @@ function UserList() {
   };
 
   const openDeleteModal = (userId, userName) => {
+    console.log('🗑️ Abriendo modal de eliminación:', { userId, userName });
     setDeleteModal({
       isOpen: true,
       userId,
@@ -84,6 +85,7 @@ function UserList() {
   };
 
   const closeDeleteModal = () => {
+    console.log('❌ Cerrando modal de eliminación');
     setDeleteModal({
       isOpen: false,
       userId: null,
@@ -92,14 +94,17 @@ function UserList() {
   };
 
   const handleDeleteUser = async () => {
+    console.log('⚠️ Intentando eliminar usuario:', deleteModal);
     try {
-      await adminService.deleteUser(deleteModal.userId);
+      const response = await adminService.deleteUser(deleteModal.userId);
+      console.log('✅ Usuario eliminado exitosamente:', response);
       toast.success(`Usuario ${deleteModal.userName} eliminado correctamente`);
       closeDeleteModal();
       loadUsers();
     } catch (error) {
-      console.error("Error eliminando usuario:", error);
-      toast.error(error.response?.data?.message || "Error eliminando usuario");
+      console.error("❌ Error eliminando usuario:", error);
+      console.error("Detalles del error:", error.response?.data);
+      toast.error(error.response?.data?.message || error.response?.data?.error || "Error eliminando usuario");
     }
   };
 
