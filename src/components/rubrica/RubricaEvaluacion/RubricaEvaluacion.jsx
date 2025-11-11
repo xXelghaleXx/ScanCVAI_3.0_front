@@ -12,7 +12,7 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
   const { theme } = useTheme();
   const [selectedCriterio, setSelectedCriterio] = useState(null);
 
-  // Datos de la rúbrica
+  // Datos de la rúbrica (versión minimalista)
   const rubrica = {
     titulo: 'Rubrica de Evaluacion de CV y Certificados',
     criterios: [
@@ -21,22 +21,10 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
         nombre: 'Perfil Profesional',
         peso: 15,
         niveles: {
-          excelente: {
-            rango: '13-15 pts',
-            descripcion: '4-5 líneas perfectas con marca personal y valor añadido'
-          },
-          bueno: {
-            rango: '10-12 pts',
-            descripcion: 'Estructura correcta, falta refinamiento menor'
-          },
-          regular: {
-            rango: '7-9 pts',
-            descripcion: 'Muy extenso/corto, información irrelevante'
-          },
-          deficiente: {
-            rango: '0-6 pts',
-            descripcion: 'No existe o errores graves'
-          }
+          excelente: { rango: '13-15' },
+          bueno: { rango: '10-12' },
+          regular: { rango: '7-9' },
+          deficiente: { rango: '0-6' }
         }
       },
       {
@@ -44,22 +32,10 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
         nombre: 'Formato TECSUP',
         peso: 20,
         niveles: {
-          excelente: {
-            rango: '18-20 pts',
-            descripcion: 'Formato perfecto, tipografía correcta, bien organizado'
-          },
-          bueno: {
-            rango: '14-17 pts',
-            descripcion: 'Sigue formato con errores menores'
-          },
-          regular: {
-            rango: '10-13 pts',
-            descripcion: 'Faltan secciones importantes'
-          },
-          deficiente: {
-            rango: '0-9 pts',
-            descripcion: 'No sigue formato institucional'
-          }
+          excelente: { rango: '18-20' },
+          bueno: { rango: '14-17' },
+          regular: { rango: '10-13' },
+          deficiente: { rango: '0-9' }
         }
       },
       {
@@ -67,22 +43,10 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
         nombre: 'Experiencia Académica',
         peso: 20,
         niveles: {
-          excelente: {
-            rango: '18-20 pts',
-            descripcion: '3+ proyectos detallados con resultados cuantificables'
-          },
-          bueno: {
-            rango: '14-17 pts',
-            descripcion: '2 proyectos bien documentados'
-          },
-          regular: {
-            rango: '10-13 pts',
-            descripcion: '1-2 proyectos sin suficiente detalle'
-          },
-          deficiente: {
-            rango: '0-9 pts',
-            descripcion: 'No presenta proyectos académicos'
-          }
+          excelente: { rango: '18-20' },
+          bueno: { rango: '14-17' },
+          regular: { rango: '10-13' },
+          deficiente: { rango: '0-9' }
         }
       },
       {
@@ -90,22 +54,10 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
         nombre: 'Experiencia Laboral',
         peso: 20,
         niveles: {
-          excelente: {
-            rango: '13-15 pts',
-            descripcion: 'Experiencia relevante con logros cuantificables'
-          },
-          bueno: {
-            rango: '10-12 pts',
-            descripcion: 'Prácticas o trabajos de medio tiempo'
-          },
-          regular: {
-            rango: '7-9 pts',
-            descripcion: 'Experiencia no relacionada a la carrera'
-          },
-          deficiente: {
-            rango: '0-6 pts',
-            descripcion: 'Sin experiencia laboral relevante'
-          }
+          excelente: { rango: '18-20' },
+          bueno: { rango: '14-17' },
+          regular: { rango: '10-13' },
+          deficiente: { rango: '0-9' }
         }
       },
       {
@@ -113,45 +65,21 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
         nombre: 'Certificaciones',
         peso: 15,
         niveles: {
-          excelente: {
-            rango: '13-15 pts',
-            descripcion: '3+ certificaciones validadas y relevantes'
-          },
-          bueno: {
-            rango: '10-12 pts',
-            descripcion: '2 certificaciones validadas'
-          },
-          regular: {
-            rango: '7-9 pts',
-            descripcion: '1 certificación validada'
-          },
-          deficiente: {
-            rango: '0-6 pts',
-            descripcion: 'Sin certificaciones validadas'
-          }
+          excelente: { rango: '13-15' },
+          bueno: { rango: '10-12' },
+          regular: { rango: '7-9' },
+          deficiente: { rango: '0-6' }
         }
       },
       {
         id: 6,
         nombre: 'Informacion Adicional',
-        peso: 15,
+        peso: 10,
         niveles: {
-          excelente: {
-            rango: '13-15 pts',
-            descripcion: 'Idiomas, voluntariado, liderazgo, desarrollo continuo'
-          },
-          bueno: {
-            rango: '10-12 pts',
-            descripcion: '2+ elementos adicionales relevantes'
-          },
-          regular: {
-            rango: '7-9 pts',
-            descripcion: '1 elemento adicional básico'
-          },
-          deficiente: {
-            rango: '0-6 pts',
-            descripcion: 'Sección vacía o irrelevante'
-          }
+          excelente: { rango: '9-10' },
+          bueno: { rango: '7-8' },
+          regular: { rango: '5-6' },
+          deficiente: { rango: '0-4' }
         }
       }
     ],
@@ -208,23 +136,19 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
                 <tr key={criterio.id} className="criterio-row">
                   <td className="criterio-cell">
                     <div className="criterio-nombre">{criterio.nombre}</div>
-                    <div className="criterio-peso">{criterio.peso}</div>
+                    <div className="criterio-peso">{criterio.peso} pts</div>
                   </td>
                   <td className="nivel-cell excelente">
-                    <div className="nivel-rango">{criterio.niveles.excelente.rango}</div>
-                    <div className="nivel-descripcion">{criterio.niveles.excelente.descripcion}</div>
+                    {criterio.niveles.excelente.rango}
                   </td>
                   <td className="nivel-cell bueno">
-                    <div className="nivel-rango">{criterio.niveles.bueno.rango}</div>
-                    <div className="nivel-descripcion">{criterio.niveles.bueno.descripcion}</div>
+                    {criterio.niveles.bueno.rango}
                   </td>
                   <td className="nivel-cell regular">
-                    <div className="nivel-rango">{criterio.niveles.regular.rango}</div>
-                    <div className="nivel-descripcion">{criterio.niveles.regular.descripcion}</div>
+                    {criterio.niveles.regular.rango}
                   </td>
                   <td className="nivel-cell deficiente">
-                    <div className="nivel-rango">{criterio.niveles.deficiente.rango}</div>
-                    <div className="nivel-descripcion">{criterio.niveles.deficiente.descripcion}</div>
+                    {criterio.niveles.deficiente.rango}
                   </td>
                 </tr>
               ))}
@@ -302,30 +226,25 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
                   {rubrica.criterios.map((criterio) => (
                     <motion.tr
                       key={criterio.id}
-                      className={`criterio-row ${selectedCriterio === criterio.id ? 'selected' : ''}`}
-                      onClick={() => setSelectedCriterio(selectedCriterio === criterio.id ? null : criterio.id)}
-                      whileHover={{ scale: 1.01 }}
+                      className="criterio-row"
+                      whileHover={{ scale: 1.005 }}
                       transition={{ duration: 0.2 }}
                     >
                       <td className="criterio-cell">
                         <div className="criterio-nombre">{criterio.nombre}</div>
-                        <div className="criterio-peso">{criterio.peso}</div>
+                        <div className="criterio-peso">{criterio.peso} pts</div>
                       </td>
                       <td className="nivel-cell excelente">
-                        <div className="nivel-rango">{criterio.niveles.excelente.rango}</div>
-                        <div className="nivel-descripcion">{criterio.niveles.excelente.descripcion}</div>
+                        {criterio.niveles.excelente.rango}
                       </td>
                       <td className="nivel-cell bueno">
-                        <div className="nivel-rango">{criterio.niveles.bueno.rango}</div>
-                        <div className="nivel-descripcion">{criterio.niveles.bueno.descripcion}</div>
+                        {criterio.niveles.bueno.rango}
                       </td>
                       <td className="nivel-cell regular">
-                        <div className="nivel-rango">{criterio.niveles.regular.rango}</div>
-                        <div className="nivel-descripcion">{criterio.niveles.regular.descripcion}</div>
+                        {criterio.niveles.regular.rango}
                       </td>
                       <td className="nivel-cell deficiente">
-                        <div className="nivel-rango">{criterio.niveles.deficiente.rango}</div>
-                        <div className="nivel-descripcion">{criterio.niveles.deficiente.descripcion}</div>
+                        {criterio.niveles.deficiente.rango}
                       </td>
                     </motion.tr>
                   ))}

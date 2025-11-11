@@ -193,12 +193,15 @@
   font-size: clamp(0.75rem, 1.5vw, 0.875rem);
 }
 
-/* ==================== NIVEL CELLS ==================== */
+/* ==================== NIVEL CELLS (MINIMALISTA) ==================== */
 .nivel-cell {
-  padding: 1.25rem 1rem;
+  padding: 1.5rem 1rem;
   text-align: center;
   border-right: 1px solid var(--border-color);
-  vertical-align: top;
+  vertical-align: middle;
+  font-weight: 600;
+  font-size: clamp(0.85rem, 1.8vw, 1rem);
+  color: var(--text-primary);
 }
 
 .nivel-cell:last-child {
@@ -206,57 +209,23 @@
 }
 
 .nivel-cell.excelente {
-  background: linear-gradient(to bottom, rgba(16, 185, 129, 0.05), transparent);
-}
-
-.nivel-cell.bueno {
-  background: linear-gradient(to bottom, rgba(59, 130, 246, 0.05), transparent);
-}
-
-.nivel-cell.regular {
-  background: linear-gradient(to bottom, rgba(245, 158, 11, 0.05), transparent);
-}
-
-.nivel-cell.deficiente {
-  background: linear-gradient(to bottom, rgba(239, 68, 68, 0.05), transparent);
-}
-
-.nivel-rango {
-  font-weight: 700;
-  font-size: clamp(0.75rem, 1.6vw, 0.875rem);
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
-  padding: 0.35rem 0.75rem;
-  border-radius: 6px;
-  display: inline-block;
-}
-
-.nivel-cell.excelente .nivel-rango {
-  background: rgba(16, 185, 129, 0.2);
+  background: rgba(16, 185, 129, 0.08);
   color: #059669;
 }
 
-.nivel-cell.bueno .nivel-rango {
-  background: rgba(59, 130, 246, 0.2);
+.nivel-cell.bueno {
+  background: rgba(59, 130, 246, 0.08);
   color: #2563eb;
 }
 
-.nivel-cell.regular .nivel-rango {
-  background: rgba(245, 158, 11, 0.2);
+.nivel-cell.regular {
+  background: rgba(245, 158, 11, 0.08);
   color: #d97706;
 }
 
-.nivel-cell.deficiente .nivel-rango {
-  background: rgba(239, 68, 68, 0.2);
+.nivel-cell.deficiente {
+  background: rgba(239, 68, 68, 0.08);
   color: #dc2626;
-}
-
-.nivel-descripcion {
-  font-size: clamp(0.7rem, 1.4vw, 0.8rem);
-  color: var(--text-secondary);
-  line-height: 1.5;
-  text-align: left;
-  margin-top: 0.5rem;
 }
 
 /* ==================== NIVELES DE DESEMPEÑO ==================== */
