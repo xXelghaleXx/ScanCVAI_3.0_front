@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Lock, Eye, EyeOff, CheckCircle, AlertCircle, Loader } from 'lucide-react';
 import { toast } from 'react-toastify';
 import authService from '../../services/auth.service';
-import '../../styles/pages/Auth.css';
+import '../../styles/pages/Login.css';
 
 const ResetPasswordPage = () => {
   const navigate = useNavigate();

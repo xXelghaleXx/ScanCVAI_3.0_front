@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Mail, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import authService from '../../services/auth.service';
-import '../../styles/pages/Auth.css';
+import '../../styles/pages/Login.css';
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
