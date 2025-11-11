@@ -14,6 +14,7 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
   const [selectedCarrera, setSelectedCarrera] = useState(null);
   const [selectedDificultad, setSelectedDificultad] = useState(null);
   const [selectedModalidad, setSelectedModalidad] = useState(null);
+  const [selectedVoz, setSelectedVoz] = useState('alloy'); // Voz por defecto
   const [iniciandoEntrevista, setIniciandoEntrevista] = useState(false);
   const [error, setError] = useState(null);
 
@@ -61,6 +62,15 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
       color: '#8b5cf6',
       gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
     }
+  ];
+
+  const voces = [
+    { id: 'alloy', nombre: 'Alloy', descripcion: 'Voz neutral y profesional' },
+    { id: 'echo', nombre: 'Echo', descripcion: 'Voz masculina clara' },
+    { id: 'fable', nombre: 'Fable', descripcion: 'Voz masculina expresiva' },
+    { id: 'onyx', nombre: 'Onyx', descripcion: 'Voz masculina profunda' },
+    { id: 'nova', nombre: 'Nova', descripcion: 'Voz femenina amigable' },
+    { id: 'shimmer', nombre: 'Shimmer', descripcion: 'Voz femenina suave' }
   ];
 
   useEffect(() => {
@@ -158,6 +168,9 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
       console.log('[Entrevista] Carrera:', selectedCarrera.nombre, `(ID: ${selectedCarrera.id})`);
       console.log('[Entrevista] Dificultad:', selectedDificultad.nombre, `(${selectedDificultad.id})`);
       console.log('[Entrevista] Modalidad:', selectedModalidad.nombre, `(${selectedModalidad.id})`);
+      if (selectedModalidad.id === 'voz') {
+        console.log('[Entrevista] Voz seleccionada:', selectedVoz);
+      }
 
       const result = await entrevistaService.iniciarEntrevista(
         selectedCarrera.id,
@@ -178,7 +191,8 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
           dificultad: selectedDificultad,
           modalidad: selectedModalidad,
           mensajeInicial: result.data.mensajeInicial,
-          aiDisponible: result.data.aiDisponible
+          aiDisponible: result.data.aiDisponible,
+          vozSeleccionada: selectedModalidad.id === 'voz' ? selectedVoz : null
         });
 
       } else {
@@ -633,6 +647,64 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
                   );
                 })}
               </div>
+
+              {/* Selector de Voz - Solo visible cuando modalidad es 'voz' */}
+              {selectedModalidad?.id === 'voz' && (
+                <div style={{ marginTop: '2rem' }}>
+                  <h3 style={{
+                    margin: '0 0 1rem 0',
+                    fontSize: '1.125rem',
+                    fontWeight: '700',
+                    color: '#1f2937'
+                  }}>
+                    Selecciona la Voz del Entrevistador
+                  </h3>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gap: '1rem'
+                  }}>
+                    {voces.map((voz) => (
+                      <div
+                        key={voz.id}
+                        onClick={() => setSelectedVoz(voz.id)}
+                        style={{
+                          padding: '1rem',
+                          background: selectedVoz === voz.id ? '#eff6ff' : 'white',
+                          border: `2px solid ${selectedVoz === voz.id ? '#2b7de9' : '#e5e7eb'}`,
+                          borderRadius: '12px',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between'
+                        }}
+                      >
+                        <div>
+                          <h4 style={{
+                            margin: '0 0 0.25rem 0',
+                            fontSize: '1rem',
+                            fontWeight: '600',
+                            color: selectedVoz === voz.id ? '#2b7de9' : '#1f2937'
+                          }}>
+                            {voz.nombre}
+                          </h4>
+                          <p style={{
+                            margin: '0',
+                            fontSize: '0.875rem',
+                            color: '#6b7280'
+                          }}>
+                            {voz.descripcion}
+                          </p>
+                        </div>
+                        {selectedVoz === voz.id && (
+                          <CheckCircle size={24} color="#2b7de9" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Mensaje de Error */}
               {error && (

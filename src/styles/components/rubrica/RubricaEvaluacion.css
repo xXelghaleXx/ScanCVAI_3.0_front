@@ -87,10 +87,10 @@
   align-items: center;
   gap: 1rem;
   padding: 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #2b7de9;
   border-radius: 12px;
   color: white;
-  box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .info-card svg {
@@ -131,7 +131,7 @@
 }
 
 .rubrica-table thead {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #2b7de9;
   color: white;
 }
 
@@ -186,7 +186,7 @@
 .criterio-peso {
   display: inline-block;
   padding: 0.25rem 0.75rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #2b7de9;
   color: white;
   border-radius: 20px;
   font-weight: 700;
@@ -295,7 +295,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #2b7de9;
   color: white;
   border-radius: 12px;
   font-size: 1.1rem;

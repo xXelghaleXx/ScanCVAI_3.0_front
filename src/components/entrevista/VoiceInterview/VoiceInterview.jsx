@@ -13,7 +13,8 @@ const VoiceInterview = ({
   lastAIMessage,
   disabled,
   onFinalizarEntrevista,
-  onAbandonarEntrevista
+  onAbandonarEntrevista,
+  vozSeleccionada = 'alloy' // Voz de OpenAI TTS por defecto
 }) => {
   // Theme
   const { theme } = useTheme();
@@ -54,6 +55,11 @@ const VoiceInterview = ({
     resetTranscript,
     browserSupportsSpeechRecognition
   } = useSpeechRecognition();
+
+  // Log de la voz seleccionada
+  useEffect(() => {
+    console.log('🔊 Voz de OpenAI TTS seleccionada:', vozSeleccionada);
+  }, [vozSeleccionada]);
 
   // Log del transcript cada vez que cambia
   useEffect(() => {

@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import authService from '../../services/auth.service';
 import { API_BASE_URL } from '../../config/api.config.js';
 import Background from '../../components/layout/Background/Background';
+import InstitutionalEmailModal from '../../components/modals/InstitutionalEmailModal/InstitutionalEmailModal';
 import '../../styles/pages/Login.css';
 
 const Login = () => {
@@ -14,6 +15,8 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [attemptedEmail, setAttemptedEmail] = useState('');
   const navigate = useNavigate();
 
   // ========== DEBUGGING Y VERIFICACIONES ==========
@@ -195,7 +198,8 @@ const Login = () => {
           const userEmail = payload.email;
           if (!userEmail || !userEmail.toLowerCase().endsWith('@tecsup.edu.pe')) {
             console.error('❌ DOMINIO NO AUTORIZADO:', userEmail);
-            toast.error('❌ Solo se permite el acceso con correos institucionales @tecsup.edu.pe');
+            setAttemptedEmail(userEmail);
+            setShowEmailModal(true);
             setIsLoading(false);
             return;
           }
@@ -235,8 +239,21 @@ const Login = () => {
         }
       } else {
         console.error('❌ Login con Google fallido:', result);
-        const errorMessage = result?.error || 'Error al iniciar sesión con Google';
-        toast.error(errorMessage);
+
+        // Si es error de dominio no autorizado, mostrar modal
+        if (result?.code === 'UNAUTHORIZED_DOMAIN' || result?.error?.includes('correos institucionales')) {
+          // Intentar obtener el email del token
+          try {
+            const payload = JSON.parse(atob(credentialResponse.credential.split('.')[1]));
+            setAttemptedEmail(payload.email);
+          } catch (e) {
+            setAttemptedEmail('');
+          }
+          setShowEmailModal(true);
+        } else {
+          const errorMessage = result?.error || 'Error al iniciar sesión con Google';
+          toast.error(errorMessage);
+        }
       }
       
     } catch (error) {
@@ -395,6 +412,25 @@ const Login = () => {
                 {isLoading ? 'Iniciando...' : 'Iniciar Sesión'}
               </button>
 
+              {/* Enlace de recuperación de contraseña */}
+              <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                <button
+                  type="button"
+                  onClick={() => navigate('/forgot-password')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#2b7de9',
+                    fontSize: '0.875rem',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    padding: '0.5rem'
+                  }}
+                >
+                  ¿Olvidaste tu contraseña?
+                </button>
+              </div>
+
               <div className="tecsup-divider">
                 <span>O</span>
               </div>
@@ -448,6 +484,13 @@ const Login = () => {
         </div>
 
       </div>
+
+      {/* Modal de validación de correo institucional */}
+      <InstitutionalEmailModal
+        isOpen={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        attemptedEmail={attemptedEmail}
+      />
     </div>
     </>
   );

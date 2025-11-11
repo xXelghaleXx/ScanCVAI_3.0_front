@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  FileText, 
-  Trash2, 
-  Eye, 
-  Clock, 
+import {
+  FileText,
+  Trash2,
+  Eye,
+  Clock,
   AlertCircle,
   Search,
   Calendar,
   CheckCircle,
-  XCircle
+  XCircle,
+  Download
 } from 'lucide-react';
 import Background from '../../layout/Background/Background';
 import { API_BASE_URL } from '../../../config/api.config.js';
@@ -121,6 +122,21 @@ const HistorialCV = () => {
       window.open(fileUrl, '_blank');
     } else {
       alert('No hay archivo disponible para visualizar');
+    }
+  };
+
+  const handleViewInforme = (cv) => {
+    // Buscar el informe más reciente con PDF
+    if (cv.informes && cv.informes.length > 0) {
+      const informeConPDF = cv.informes.find(informe => informe.pdf_url);
+
+      if (informeConPDF && informeConPDF.pdf_url) {
+        window.open(informeConPDF.pdf_url, '_blank');
+      } else {
+        alert('No hay informe PDF disponible para este CV');
+      }
+    } else {
+      alert('Este CV aún no tiene un informe generado');
     }
   };
 
@@ -321,14 +337,27 @@ const HistorialCV = () => {
 
                 {/* Actions */}
                 <div className="cv-actions">
-                  <button 
-                    onClick={() => handleViewCV(cv)} 
+                  <button
+                    onClick={() => handleViewCV(cv)}
                     className="action-btn view-btn"
                     title="Ver CV"
                   >
                     <Eye size={16} />
-                    Ver
+                    Ver CV
                   </button>
+
+                  {/* Botón para ver informe si existe */}
+                  {cv.informes && cv.informes.length > 0 && cv.informes.some(inf => inf.pdf_url) && (
+                    <button
+                      onClick={() => handleViewInforme(cv)}
+                      className="action-btn informe-btn"
+                      title="Ver Informe PDF"
+                    >
+                      <Download size={16} />
+                      Ver Informe
+                    </button>
+                  )}
+
                   <button
                     onClick={() => handleDeleteCV(cv.id)}
                     disabled={deletingId === cv.id}

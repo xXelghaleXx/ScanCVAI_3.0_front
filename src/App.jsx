@@ -6,6 +6,8 @@ import { LoaderProvider, useLoader } from "./context/LoaderContext/LoaderContext
 import Header from "./components/layout/Header/Header";
 import Login from "./pages/Auth/LoginPage";
 import Register from "./pages/Auth/RegisterPage";
+import ForgotPassword from "./pages/Auth/ForgotPasswordPage";
+import ResetPassword from "./pages/Auth/ResetPasswordPage";
 import Welcome from "./pages/Home/WelcomePage";
 import LectorCV from "./components/cv/LectorCV/LectorCV";
 import HistorialCV from "./components/cv/HistorialCV/HistorialCV";
@@ -33,7 +35,11 @@ import "./index.css";
 const AppContent = () => {
   const location = useLocation();
   const { isLoading, showLoader, hideLoader } = useLoader();
-  const isLoginPage = location.pathname === "/" || location.pathname === "/register";
+  const isLoginPage = location.pathname === "/" ||
+                      location.pathname === "/login" ||
+                      location.pathname === "/register" ||
+                      location.pathname === "/forgot-password" ||
+                      location.pathname === "/reset-password";
 
   // Mostrar loader en cambios de ruta
   useEffect(() => {
@@ -138,7 +144,10 @@ const AppContent = () => {
           <Routes>
             {/* Páginas de autenticación */}
             <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
             {/* Welcome */}
             <Route path="/welcome" element={

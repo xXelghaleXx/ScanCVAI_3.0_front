@@ -884,6 +884,26 @@
   outline-offset: 2px;
 }
 
+/* Informe Button Styles */
+.informe-btn {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border: 1px solid #93c5fd;
+}
+
+.informe-btn:hover {
+  background: #1d4ed8;
+  color: white;
+  border-color: #1e40af;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(29, 78, 216, 0.4), 0 4px 6px -2px rgba(29, 78, 216, 0.3);
+}
+
+.informe-btn:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(29, 78, 216, 0.3);
+}
+
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .search-input {

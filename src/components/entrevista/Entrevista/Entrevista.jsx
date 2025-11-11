@@ -34,6 +34,7 @@ const EntrevistaChat = () => {
   const [carreraSeleccionada, setCarreraSeleccionada] = useState(null);
   const [dificultadSeleccionada, setDificultadSeleccionada] = useState(null);
   const [modalidadSeleccionada, setModalidadSeleccionada] = useState(null);
+  const [vozSeleccionada, setVozSeleccionada] = useState('alloy'); // Voz por defecto
   const [entrevistaFinalizada, setEntrevistaFinalizada] = useState(false);
   const [resultados, setResultados] = useState(null);
 
@@ -139,13 +140,16 @@ const EntrevistaChat = () => {
       setLoading(true);
       setError(null);
 
-      const { entrevistaId, carrera, dificultad, modalidad, mensajeInicial, aiDisponible } = data;
+      const { entrevistaId, carrera, dificultad, modalidad, mensajeInicial, aiDisponible, vozSeleccionada } = data;
 
       console.log('🎯 Procesando entrevista iniciada:');
       console.log('  🆔 ID:', entrevistaId);
       console.log('  📚 Carrera:', carrera.nombre);
       console.log('  📊 Dificultad:', dificultad.nombre);
       console.log('  🎤 Modalidad:', modalidad.nombre);
+      if (vozSeleccionada) {
+        console.log('  🔊 Voz seleccionada:', vozSeleccionada);
+      }
       console.log('  💬 Mensaje inicial:', mensajeInicial?.substring(0, 50) + '...');
       console.log('  🤖 IA disponible:', aiDisponible);
 
@@ -153,6 +157,7 @@ const EntrevistaChat = () => {
       setCarreraSeleccionada(carrera);
       setDificultadSeleccionada(dificultad);
       setModalidadSeleccionada(modalidad);
+      setVozSeleccionada(vozSeleccionada || 'alloy');
       setEntrevistaId(entrevistaId);
 
       // Crear chat inicial con mensaje de la IA
@@ -488,6 +493,7 @@ const EntrevistaChat = () => {
         disabled={entrevistaFinalizada || !entrevistaId}
         onFinalizarEntrevista={finalizarEntrevista}
         onAbandonarEntrevista={abandonarEntrevista}
+        vozSeleccionada={vozSeleccionada}
       />
     );
   }

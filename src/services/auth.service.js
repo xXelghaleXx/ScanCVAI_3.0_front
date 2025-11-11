@@ -337,6 +337,92 @@ class AuthService {
     }
   }
 
+  // ========== RECUPERACIÓN DE CONTRASEÑA ==========
+
+  async forgotPassword(correo) {
+    try {
+      console.log('📧 Solicitando recuperación de contraseña para:', correo);
+
+      const response = await fetch(`${this.baseURL}/auth/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ correo })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('✅ Solicitud de recuperación enviada');
+        return {
+          success: true,
+          message: data.message
+        };
+      } else {
+        throw new Error(data.error || 'Error al solicitar recuperación');
+      }
+    } catch (error) {
+      console.error('❌ Error en forgotPassword:', error);
+      throw error;
+    }
+  }
+
+  async verifyResetToken(token) {
+    try {
+      console.log('🔍 Verificando token de recuperación');
+
+      const response = await fetch(`${this.baseURL}/auth/verify-reset-token?token=${token}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.valid) {
+        console.log('✅ Token válido');
+        return data;
+      } else {
+        console.error('❌ Token inválido o expirado');
+        return { valid: false };
+      }
+    } catch (error) {
+      console.error('❌ Error verificando token:', error);
+      return { valid: false };
+    }
+  }
+
+  async resetPassword(token, nueva_contrasena) {
+    try {
+      console.log('🔐 Restableciendo contraseña');
+
+      const response = await fetch(`${this.baseURL}/auth/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ token, nueva_contrasena })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('✅ Contraseña restablecida correctamente');
+        return {
+          success: true,
+          message: data.message
+        };
+      } else {
+        throw new Error(data.error || 'Error al restablecer contraseña');
+      }
+    } catch (error) {
+      console.error('❌ Error en resetPassword:', error);
+      throw error;
+    }
+  }
+
   // ========== OBTENER CARRERAS ==========
 
   async getCarreras() {
