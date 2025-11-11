@@ -11,6 +11,7 @@ import LectorCV from "./components/cv/LectorCV/LectorCV";
 import HistorialCV from "./components/cv/HistorialCV/HistorialCV";
 import ChatEntrevista from "./components/entrevista/Entrevista/Entrevista";
 import Perfil from './pages/Perfil/PerfilPage';
+import RubricaPage from './pages/Rubrica/RubricaPage';
 import AdminDashboard from './pages/Admin/AdminDashboardPage';
 import UserList from './components/admin/UserList/UserList';
 import UserMetrics from './components/admin/UserMetrics/UserMetrics';
@@ -187,6 +188,17 @@ const AppContent = () => {
                 <div className="content-with-header">
                   <div className="page-container">
                     <Perfil />
+                  </div>
+                </div>
+              </ProtectedRoute>
+            } />
+
+            {/* Rúbrica */}
+            <Route path="/rubrica" element={
+              <ProtectedRoute>
+                <div className="content-with-header">
+                  <div className="page-container">
+                    <RubricaPage />
                   </div>
                 </div>
               </ProtectedRoute>
