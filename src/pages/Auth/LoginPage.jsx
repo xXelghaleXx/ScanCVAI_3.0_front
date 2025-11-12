@@ -19,6 +19,16 @@ const Login = () => {
   const [attemptedEmail, setAttemptedEmail] = useState('');
   const navigate = useNavigate();
 
+  // Auto-cerrar modal después de 3 segundos
+  useEffect(() => {
+    if (showEmailModal) {
+      const timer = setTimeout(() => {
+        setShowEmailModal(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showEmailModal]);
+
   // ========== DEBUGGING Y VERIFICACIONES ==========
   useEffect(() => {
     console.log('🔍 INICIANDO DEBUGGING DE LOGIN');
@@ -411,25 +421,6 @@ const Login = () => {
               <button type="submit" className="tecsup-login-btn" disabled={isLoading}>
                 {isLoading ? 'Iniciando...' : 'Iniciar Sesión'}
               </button>
-
-              {/* Enlace de recuperación de contraseña */}
-              <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                <button
-                  type="button"
-                  onClick={() => navigate('/forgot-password')}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#2b7de9',
-                    fontSize: '0.875rem',
-                    cursor: 'pointer',
-                    textDecoration: 'underline',
-                    padding: '0.5rem'
-                  }}
-                >
-                  ¿Olvidaste tu contraseña?
-                </button>
-              </div>
 
               <div className="tecsup-divider">
                 <span>O</span>

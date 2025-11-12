@@ -1,7 +1,6 @@
 // src/components/rubrica/RubricaEvaluacion/RubricaEvaluacion.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Award, Info, ArrowLeft, FileText, MessageCircle } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext/ThemeContext';
 import Background from '../../layout/Background/Background';
@@ -19,6 +18,7 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
       {
         id: 1,
         nombre: 'Perfil Profesional',
+        descripcion: 'Se califica la claridad y concisión del resumen profesional, objetivos de carrera y propuesta de valor',
         peso: 15,
         niveles: {
           excelente: { rango: '13-15' },
@@ -29,7 +29,8 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
       },
       {
         id: 2,
-        nombre: 'Formato TECSUP',
+        nombre: 'Formato Tecsup',
+        descripcion: 'Se califica el cumplimiento del formato institucional, estructura, organización y presentación visual',
         peso: 20,
         niveles: {
           excelente: { rango: '18-20' },
@@ -41,6 +42,7 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
       {
         id: 3,
         nombre: 'Experiencia Académica',
+        descripcion: 'Se califica la educación formal, cursos, especializaciones y logros académicos relevantes',
         peso: 20,
         niveles: {
           excelente: { rango: '18-20' },
@@ -52,6 +54,7 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
       {
         id: 4,
         nombre: 'Experiencia Laboral',
+        descripcion: 'Se califica la relevancia, descripción de responsabilidades, logros cuantificables y progresión profesional',
         peso: 20,
         niveles: {
           excelente: { rango: '18-20' },
@@ -63,6 +66,7 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
       {
         id: 5,
         nombre: 'Certificaciones',
+        descripcion: 'Se califica la cantidad, relevancia y vigencia de certificaciones profesionales y técnicas',
         peso: 15,
         niveles: {
           excelente: { rango: '13-15' },
@@ -74,6 +78,7 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
       {
         id: 6,
         nombre: 'Informacion Adicional',
+        descripcion: 'Se califica habilidades técnicas, idiomas, proyectos personales y competencias complementarias',
         peso: 10,
         niveles: {
           excelente: { rango: '9-10' },
@@ -136,6 +141,7 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
                 <tr key={criterio.id} className="criterio-row">
                   <td className="criterio-cell">
                     <div className="criterio-nombre">{criterio.nombre}</div>
+                    <div className="criterio-descripcion">{criterio.descripcion}</div>
                     <div className="criterio-peso">{criterio.peso} pts</div>
                   </td>
                   <td className="nivel-cell excelente">
@@ -170,12 +176,7 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
     <>
       <Background />
       <div className="rubrica-page-container">
-        <motion.div
-          className="rubrica-container"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
+        <div className="rubrica-container">
           {/* Header */}
           <div className="rubrica-header">
             <button onClick={handleClose} className="rubrica-back-btn">
@@ -224,14 +225,13 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
                 </thead>
                 <tbody>
                   {rubrica.criterios.map((criterio) => (
-                    <motion.tr
+                    <tr
                       key={criterio.id}
                       className="criterio-row"
-                      whileHover={{ scale: 1.005 }}
-                      transition={{ duration: 0.2 }}
                     >
                       <td className="criterio-cell">
                         <div className="criterio-nombre">{criterio.nombre}</div>
+                        <div className="criterio-descripcion">{criterio.descripcion}</div>
                         <div className="criterio-peso">{criterio.peso} pts</div>
                       </td>
                       <td className="nivel-cell excelente">
@@ -246,7 +246,7 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
                       <td className="nivel-cell deficiente">
                         {criterio.niveles.deficiente.rango}
                       </td>
-                    </motion.tr>
+                    </tr>
                   ))}
                 </tbody>
               </table>
@@ -283,7 +283,7 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
               Cada criterio tiene un peso específico que contribuye a la puntuación final.
             </p>
           </div>
-        </motion.div>
+        </div>
       </div>
     </>
   );

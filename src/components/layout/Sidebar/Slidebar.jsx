@@ -60,6 +60,7 @@ const Slidebar = () => {
               <li className="menu-item"><Link className="menu-link" to="/entrevista" onClick={toggleSlidebar}>Simulacion de entrevista</Link></li>
               <li className="menu-item"><Link className="menu-link" to="/HistorialCV" onClick={toggleSlidebar}>Historial CV</Link></li>
               <li className="menu-item"><Link className="menu-link" to="/rubrica" onClick={toggleSlidebar}>Rubrica de Evaluacion</Link></li>
+              <li className="menu-item"><Link className="menu-link" to="/guia" onClick={toggleSlidebar}>Guia de Usuario</Link></li>
             </>
           )}
         </ul>

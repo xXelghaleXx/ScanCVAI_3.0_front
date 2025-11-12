@@ -6,14 +6,13 @@ import { LoaderProvider, useLoader } from "./context/LoaderContext/LoaderContext
 import Header from "./components/layout/Header/Header";
 import Login from "./pages/Auth/LoginPage";
 import Register from "./pages/Auth/RegisterPage";
-import ForgotPassword from "./pages/Auth/ForgotPasswordPage";
-import ResetPassword from "./pages/Auth/ResetPasswordPage";
 import Welcome from "./pages/Home/WelcomePage";
 import LectorCV from "./components/cv/LectorCV/LectorCV";
 import HistorialCV from "./components/cv/HistorialCV/HistorialCV";
 import ChatEntrevista from "./components/entrevista/Entrevista/Entrevista";
 import Perfil from './pages/Perfil/PerfilPage';
 import RubricaPage from './pages/Rubrica/RubricaPage';
+import GuiaUsuario from './components/guia/GuiaUsuario/GuiaUsuario';
 import AdminDashboard from './pages/Admin/AdminDashboardPage';
 import UserList from './components/admin/UserList/UserList';
 import UserMetrics from './components/admin/UserMetrics/UserMetrics';
@@ -37,9 +36,7 @@ const AppContent = () => {
   const { isLoading, showLoader, hideLoader } = useLoader();
   const isLoginPage = location.pathname === "/" ||
                       location.pathname === "/login" ||
-                      location.pathname === "/register" ||
-                      location.pathname === "/forgot-password" ||
-                      location.pathname === "/reset-password";
+                      location.pathname === "/register";
 
   // Mostrar loader en cambios de ruta
   useEffect(() => {
@@ -146,8 +143,6 @@ const AppContent = () => {
             <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
 
             {/* Welcome */}
             <Route path="/welcome" element={
@@ -208,6 +203,17 @@ const AppContent = () => {
                 <div className="content-with-header">
                   <div className="page-container">
                     <RubricaPage />
+                  </div>
+                </div>
+              </ProtectedRoute>
+            } />
+
+            {/* Guía de Usuario */}
+            <Route path="/guia" element={
+              <ProtectedRoute>
+                <div className="content-with-header">
+                  <div className="page-container">
+                    <GuiaUsuario />
                   </div>
                 </div>
               </ProtectedRoute>

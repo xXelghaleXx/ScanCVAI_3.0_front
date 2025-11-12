@@ -4,6 +4,7 @@ import adminService from '../../services/admin.service';
 import LoadingSpinner from "../../components/ui/LoadingSpinner/LoadingSpinner";
 import Background from "../../components/layout/Background/Background";
 import { toast } from "react-toastify";
+import { Download } from "lucide-react";
 import "../../styles/pages/AdminDashboard.css";
 import {
   Chart as ChartJS,
@@ -56,6 +57,53 @@ function AdminDashboard() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleExport = async (type) => {
+    try {
+      toast.info(`Exportando ${type}...`);
+      let blob;
+      let filename;
+
+      switch (type) {
+        case 'usuarios':
+          blob = await adminService.exportUsers();
+          filename = `usuarios_Tecsup_${new Date().toISOString().split('T')[0]}.xlsx`;
+          break;
+        case 'cvs':
+          blob = await adminService.exportCVs();
+          filename = `cvs_Tecsup_${new Date().toISOString().split('T')[0]}.xlsx`;
+          break;
+        case 'entrevistas':
+          blob = await adminService.exportInterviews();
+          filename = `entrevistas_Tecsup_${new Date().toISOString().split('T')[0]}.xlsx`;
+          break;
+        case 'informes':
+          blob = await adminService.exportReports();
+          filename = `informes_Tecsup_${new Date().toISOString().split('T')[0]}.xlsx`;
+          break;
+        case 'estadisticas':
+          blob = await adminService.exportStatistics();
+          filename = `estadisticas_Tecsup_${new Date().toISOString().split('T')[0]}.xlsx`;
+          break;
+        default:
+          return;
+      }
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} exportados correctamente`);
+    } catch (error) {
+      console.error(`Error exportando ${type}:`, error);
+      toast.error(`Error al exportar ${type}`);
     }
   };
 
@@ -148,6 +196,19 @@ function AdminDashboard() {
     ],
   };
 
+  // Gráfico de uso: CV vs Entrevista
+  const usoModosData = {
+    labels: ["Análisis de CV", "Entrevistas"],
+    datasets: [
+      {
+        data: [resumen.total_cvs, resumen.total_entrevistas],
+        backgroundColor: ["#3b82f6", "#8b5cf6"],
+        borderWidth: 2,
+        borderColor: "#fff",
+      },
+    ],
+  };
+
   return (
     <>
       <Background />
@@ -174,7 +235,52 @@ function AdminDashboard() {
               </svg>
               Ver Lista de Usuarios
             </button>
+
+            <button
+              onClick={() => handleExport('estadisticas')}
+              className="admin-btn admin-btn-success"
+              title="Exportar todas las estadísticas a Excel"
+            >
+              <Download size={18} />
+              Exportar Excel
+            </button>
           </div>
+        </div>
+
+        {/* Sección de exportaciones rápidas */}
+        <div style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => handleExport('usuarios')}
+            className="admin-btn admin-btn-secondary"
+            style={{ flex: '1', minWidth: '150px' }}
+          >
+            <Download size={16} />
+            Usuarios
+          </button>
+          <button
+            onClick={() => handleExport('cvs')}
+            className="admin-btn admin-btn-secondary"
+            style={{ flex: '1', minWidth: '150px' }}
+          >
+            <Download size={16} />
+            CVs
+          </button>
+          <button
+            onClick={() => handleExport('entrevistas')}
+            className="admin-btn admin-btn-secondary"
+            style={{ flex: '1', minWidth: '150px' }}
+          >
+            <Download size={16} />
+            Entrevistas
+          </button>
+          <button
+            onClick={() => handleExport('informes')}
+            className="admin-btn admin-btn-secondary"
+            style={{ flex: '1', minWidth: '150px' }}
+          >
+            <Download size={16} />
+            Informes
+          </button>
         </div>
 
         {/* Tarjetas de Resumen */}
@@ -370,6 +476,33 @@ function AdminDashboard() {
                   responsive: true,
                   maintainAspectRatio: false,
                   plugins: { legend: { position: "bottom" } },
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="admin-chart-card">
+            <h2 className="admin-chart-title">Uso de Funcionalidades</h2>
+            <div className="admin-chart-container">
+              <Pie
+                data={usoModosData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { position: "bottom" },
+                    tooltip: {
+                      callbacks: {
+                        label: function(context) {
+                          const label = context.label || '';
+                          const value = context.parsed || 0;
+                          const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                          const percentage = ((value / total) * 100).toFixed(1);
+                          return `${label}: ${value} (${percentage}%)`;
+                        }
+                      }
+                    }
+                  },
                 }}
               />
             </div>

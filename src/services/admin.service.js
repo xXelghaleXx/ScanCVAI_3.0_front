@@ -104,6 +104,86 @@ const adminService = {
       console.error("Error eliminando usuario:", error);
       throw error;
     }
+  },
+
+  /**
+   * Exportar todos los usuarios a Excel
+   * @returns {Promise<Blob>} Archivo Excel
+   */
+  async exportUsers() {
+    try {
+      const response = await axiosInstance.get(`${API_URL}/exportar/usuarios`, {
+        responseType: 'blob'
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error exportando usuarios:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Exportar todos los CVs a Excel
+   * @returns {Promise<Blob>} Archivo Excel
+   */
+  async exportCVs() {
+    try {
+      const response = await axiosInstance.get(`${API_URL}/exportar/cvs`, {
+        responseType: 'blob'
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error exportando CVs:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Exportar todas las entrevistas a Excel
+   * @returns {Promise<Blob>} Archivo Excel
+   */
+  async exportInterviews() {
+    try {
+      const response = await axiosInstance.get(`${API_URL}/exportar/entrevistas`, {
+        responseType: 'blob'
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error exportando entrevistas:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Exportar todos los informes a Excel
+   * @returns {Promise<Blob>} Archivo Excel
+   */
+  async exportReports() {
+    try {
+      const response = await axiosInstance.get(`${API_URL}/exportar/informes`, {
+        responseType: 'blob'
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error exportando informes:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Exportar estadísticas generales a Excel
+   * @returns {Promise<Blob>} Archivo Excel
+   */
+  async exportStatistics() {
+    try {
+      const response = await axiosInstance.get(`${API_URL}/exportar/estadisticas`, {
+        responseType: 'blob'
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error exportando estadísticas:", error);
+      throw error;
+    }
   }
 };
 
