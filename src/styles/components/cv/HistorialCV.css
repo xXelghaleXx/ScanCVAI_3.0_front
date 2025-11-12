@@ -904,13 +904,163 @@
   box-shadow: 0 4px 6px -1px rgba(29, 78, 216, 0.3);
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .search-input {
-    background: var(--bg-tertiary);
-  }
+/* ==================== DARK MODE ==================== */
+[data-theme="dark"] .historial-container {
+  background: var(--bg-primary);
+  box-shadow: var(--shadow-xl);
+}
 
-  .search-input:focus {
-    background: var(--bg-secondary);
-  }
+[data-theme="dark"] .historial-title {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .historial-subtitle {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .search-container {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .search-input {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .search-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+[data-theme="dark"] .search-input:focus {
+  background: var(--bg-tertiary);
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .search-icon {
+  color: var(--text-tertiary);
+}
+
+[data-theme="dark"] .filter-btn {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .filter-btn:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .filter-btn.active {
+  background: var(--primary);
+  color: var(--text-inverse);
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .cv-card {
+  background: var(--bg-primary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .cv-card:hover {
+  box-shadow: var(--shadow-xl);
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .cv-filename {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .cv-date {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .cv-metadata {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .metadata-item {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .cv-score {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .score-label {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .score-value {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .cv-status.procesado {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--secondary);
+}
+
+[data-theme="dark"] .cv-status.pendiente {
+  background: rgba(251, 191, 36, 0.1);
+  color: var(--accent);
+}
+
+[data-theme="dark"] .action-btn {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .action-btn:hover {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .view-btn:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--text-inverse);
+}
+
+[data-theme="dark"] .informe-btn:hover {
+  background: var(--secondary);
+  border-color: var(--secondary);
+  color: var(--text-inverse);
+}
+
+[data-theme="dark"] .delete-btn:hover {
+  background: var(--error);
+  border-color: var(--error);
+  color: var(--text-inverse);
+}
+
+[data-theme="dark"] .delete-btn:disabled {
+  background: var(--bg-tertiary);
+  border-color: var(--border);
+  color: var(--text-tertiary);
+}
+
+[data-theme="dark"] .loading-container,
+[data-theme="dark"] .error-container,
+[data-theme="dark"] .empty-results {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .stats-container {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .stat-item {
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .stat-label {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .stat-value {
+  color: var(--text-primary);
 }

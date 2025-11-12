@@ -2120,4 +2120,254 @@
     gap: 0.75rem;
   }
 }
+
+/* ==================== DARK MODE ==================== */
+[data-theme="dark"] .entrevista-main-container {
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .chat-container {
+  background: var(--bg-primary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .chat-header {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .chat-title {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .chat-subtitle {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .end-interview-btn {
+  background: var(--bg-tertiary);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .end-interview-btn:hover {
+  background: var(--error);
+  border-color: var(--error);
+  color: var(--text-inverse);
+}
+
+[data-theme="dark"] .chat-messages {
+  background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .message {
+  background: var(--bg-primary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .message.user {
+  background: var(--primary);
+  color: var(--text-inverse);
+}
+
+[data-theme="dark"] .message.assistant {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .message-avatar {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .message.user .message-avatar {
+  background: var(--primary-dark);
+  color: var(--text-inverse);
+}
+
+[data-theme="dark"] .message-content {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .message.user .message-content {
+  color: var(--text-inverse);
+}
+
+[data-theme="dark"] .message-time {
+  color: var(--text-tertiary);
+}
+
+[data-theme="dark"] .message.user .message-time {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] .typing-indicator {
+  background: var(--bg-tertiary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .chat-input-container {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .chat-input {
+  background: var(--bg-tertiary);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .chat-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+[data-theme="dark"] .chat-input:focus {
+  border-color: var(--primary);
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .send-button {
+  background: var(--primary);
+  color: var(--text-inverse);
+}
+
+[data-theme="dark"] .send-button:hover:not(:disabled) {
+  background: var(--primary-dark);
+}
+
+[data-theme="dark"] .send-button:disabled {
+  background: var(--bg-tertiary);
+  color: var(--text-tertiary);
+}
+
+[data-theme="dark"] .interview-start-container,
+[data-theme="dark"] .interview-results {
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .start-card {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .start-card:hover {
+  box-shadow: var(--shadow-xl);
+}
+
+[data-theme="dark"] .start-title {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .start-description {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .start-button {
+  background: var(--primary);
+  color: var(--text-inverse);
+}
+
+[data-theme="dark"] .start-button:hover {
+  background: var(--primary-dark);
+}
+
+[data-theme="dark"] .results-header h2 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .results-score-card {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .score-label {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .score-value {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .results-section {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .section-title {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .section-content {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .results-actions .btn-primary {
+  background: var(--primary);
+  color: var(--text-inverse);
+}
+
+[data-theme="dark"] .results-actions .btn-secondary {
+  background: var(--bg-tertiary);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .selector-carreras-overlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="dark"] .selector-carreras-modal {
+  background: var(--bg-primary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .selector-header h2 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .selector-header p {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .close-selector-btn {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .close-selector-btn:hover {
+  background: var(--error);
+  color: var(--text-inverse);
+}
+
+[data-theme="dark"] .carreras-list {
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .carrera-item {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .carrera-item:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .carrera-info h3 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .carrera-info p {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .select-carrera-btn {
+  background: var(--primary);
+  color: var(--text-inverse);
+}
+
+[data-theme="dark"] .select-carrera-btn:hover {
+  background: var(--primary-dark);
+}
 }

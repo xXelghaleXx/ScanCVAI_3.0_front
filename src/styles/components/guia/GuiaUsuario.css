@@ -278,27 +278,81 @@
 
 /* ==================== DARK MODE ==================== */
 [data-theme="dark"] .guia-container {
-  background: rgba(30, 41, 59, 0.95);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  background: var(--bg-primary);
+  box-shadow: var(--shadow-xl);
+}
+
+[data-theme="dark"] .guia-back-btn {
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .guia-back-btn:hover {
+  background: var(--bg-secondary);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+[data-theme="dark"] .guia-title-section h1 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .guia-title-section p {
+  color: var(--text-secondary);
 }
 
 [data-theme="dark"] .guia-section-card {
-  border-color: rgba(100, 116, 139, 0.3);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .guia-section-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .guia-section-header {
+  background: var(--bg-secondary);
 }
 
 [data-theme="dark"] .guia-section-header:hover {
-  background: rgba(51, 65, 85, 0.8);
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .guia-section-title h3 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .guia-section-toggle {
+  color: var(--text-secondary);
 }
 
 [data-theme="dark"] .guia-section-content {
-  background: rgba(30, 41, 59, 0.95);
-  border-top-color: rgba(100, 116, 139, 0.3);
+  background: var(--bg-primary);
+  border-top-color: var(--border);
+}
+
+[data-theme="dark"] .guia-steps h4,
+[data-theme="dark"] .guia-tips h4 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .guia-steps ol li,
+[data-theme="dark"] .guia-tips ul li {
+  color: var(--text-secondary);
 }
 
 [data-theme="dark"] .guia-tips {
-  background: rgba(51, 65, 85, 0.5);
+  background: var(--bg-secondary);
+  border-left-color: var(--primary);
+}
+
+[data-theme="dark"] .guia-tips h4 {
+  color: var(--primary);
 }
 
 [data-theme="dark"] .guia-footer {
-  background: rgba(51, 65, 85, 0.5);
+  background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .guia-footer p {
+  color: var(--text-secondary);
 }

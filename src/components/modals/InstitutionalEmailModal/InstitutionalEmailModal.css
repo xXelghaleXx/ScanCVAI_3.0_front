@@ -25,3 +25,9 @@
 .toast-message {
   margin: 0;
 }
+
+/* ==================== DARK MODE ==================== */
+[data-theme="dark"] .simple-error-toast {
+  background: var(--error);
+  box-shadow: var(--shadow-xl);
+}

@@ -620,3 +620,80 @@
   position: relative;
   z-index: 1;
 }
+
+/* ==================== DARK MODE ==================== */
+[data-theme="dark"] .welcome-page {
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .welcome-content {
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .welcome-card {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .welcome-card:hover {
+  box-shadow: var(--shadow-xl);
+}
+
+[data-theme="dark"] .card-title {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .card-description {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .card-button {
+  background: var(--primary);
+  color: var(--text-inverse);
+}
+
+[data-theme="dark"] .card-button:hover {
+  background: var(--primary-dark);
+}
+
+[data-theme="dark"] .stats-card {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .stats-card:hover {
+  box-shadow: var(--shadow-xl);
+}
+
+[data-theme="dark"] .stat-label {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .stat-value {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .progress-item {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .progress-item:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+[data-theme="dark"] .progress-label {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .progress-value {
+  color: var(--primary);
+}
+
+[data-theme="dark"] .section-header h2 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .section-header p {
+  color: var(--text-secondary);
+}

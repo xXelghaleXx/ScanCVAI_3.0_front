@@ -952,3 +952,102 @@
     color: var(--tecsup-blanco) !important;
   }
 }
+
+/* ==================== DARK MODE COMPLETO ==================== */
+[data-theme="dark"] .tecsup-page {
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .tecsup-container {
+  background: var(--bg-secondary);
+  box-shadow: var(--shadow-xl);
+}
+
+[data-theme="dark"] .tecsup-form-side {
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .tecsup-form-container {
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .tecsup-logo-text {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .tecsup-system-title {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .tecsup-tagline {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .tecsup-input {
+  background: var(--bg-tertiary);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .tecsup-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+[data-theme="dark"] .tecsup-input:focus {
+  border-color: var(--primary);
+  background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .tecsup-login-btn {
+  background: var(--primary);
+  color: var(--text-inverse);
+}
+
+[data-theme="dark"] .tecsup-login-btn:hover {
+  background: var(--primary-dark);
+}
+
+[data-theme="dark"] .tecsup-google-btn {
+  background: var(--bg-tertiary);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .tecsup-google-btn:hover {
+  background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .tecsup-forgot-link,
+[data-theme="dark"] .tecsup-register-link {
+  color: var(--primary);
+}
+
+[data-theme="dark"] .tecsup-forgot-link:hover,
+[data-theme="dark"] .tecsup-register-link:hover {
+  color: var(--primary-light);
+}
+
+[data-theme="dark"] .tecsup-register {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .tecsup-divider::before,
+[data-theme="dark"] .tecsup-divider::after {
+  background: var(--border);
+}
+
+[data-theme="dark"] .tecsup-divider-text {
+  color: var(--text-tertiary);
+}
+
+[data-theme="dark"] .tecsup-error-message {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: var(--error);
+  color: var(--error);
+}
+
+[data-theme="dark"] .tecsup-success-message {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: var(--secondary);
+  color: var(--secondary);
+}
