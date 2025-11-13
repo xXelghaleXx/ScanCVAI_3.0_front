@@ -336,26 +336,33 @@ const EntrevistaChat = () => {
       
       const result = await entrevistaService.finalizarEntrevista(entrevistaId);
 
+      console.log('📦 Respuesta completa del backend:', result);
+
       if (result.success) {
-        const { evaluacion, aiDisponible } = result.data;
-        
+        // El backend devuelve evaluacion y estadisticas directamente en result.data
+        const evaluacion = result.data.evaluacion;
+        const estadisticas = result.data.estadisticas;
+        const aiDisponible = result.data.ai_disponible;
+
         console.log('✅ Entrevista finalizada:');
-        console.log('  ⭐ Puntuación:', evaluacion.puntuacion_global);
-        console.log('  📊 Nivel:', evaluacion.nivel_desempenio);
+        console.log('  ⭐ Puntuación:', evaluacion?.puntuacion_global);
+        console.log('  📊 Nivel:', evaluacion?.nivel_desempenio);
         console.log('  🤖 IA:', aiDisponible ? 'Disponible' : 'No disponible');
-        
+        console.log('  📈 Estadísticas:', estadisticas);
+
         setEntrevistaFinalizada(true);
-        
-        // Formatear resultados para el componente de resultados
+
+        // Formatear resultados para el componente de resultados pasando TODA la respuesta
         setResultados({
-          puntuacion_general: evaluacion.puntuacion_global,
-          nivel_desempenio: evaluacion.nivel_desempenio,
-          fortalezas: evaluacion.fortalezas || [],
-          areas_mejora: evaluacion.areas_mejora || [],
-          comentario_final: evaluacion.comentario_final || '',
-          carrera: carreraSeleccionada?.nombre || 'Carrera',
+          ...result.data, // Pasar TODO para que ResultadosEntrevista tenga acceso completo
+          puntuacion_general: evaluacion?.puntuacion_global || 0,
+          nivel_desempenio: evaluacion?.nivel_desempenio || 'Regular',
+          fortalezas: evaluacion?.fortalezas || [],
+          areas_mejora: evaluacion?.areas_mejora || [],
+          comentario_final: evaluacion?.comentario_final || '',
+          carrera: estadisticas?.carrera || carreraSeleccionada?.nombre || 'Carrera',
           fecha_entrevista: new Date().toLocaleDateString('es-ES'),
-          metricas_puntuacion: evaluacion.metricas_puntuacion || null,
+          metricas_puntuacion: evaluacion?.metricas_puntuacion || null,
           ai_disponible: aiDisponible
         });
         
