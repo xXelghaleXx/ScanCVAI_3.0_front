@@ -631,8 +631,8 @@ const LectorCV = () => {
       // Validaciones del archivo
       const allowedTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
       if (!allowedTypes.includes(file.type)) {
-        setUploadError("Solo se permiten archivos PDF y DOCX.");
-        toast.error("Solo se permiten archivos PDF y DOCX.");
+        setUploadError("Solo se permiten archivos PDF");
+        toast.error("Solo se permiten archivos PDF");
         return;
       }
 
@@ -691,7 +691,7 @@ const LectorCV = () => {
           <label className="upload-label">
             <input
               type="file"
-              accept=".pdf,.docx"
+              accept=".pdf"
               onChange={handleUpload}
               hidden
             />
@@ -710,7 +710,7 @@ const LectorCV = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1, duration: 0.3 }}
             >
-              Formatos soportados: PDF, DOCX (máx. 10MB)
+              Formatos soportados: PDF ( máx. 10MB)
             </motion.span>
           </label>
         )}
