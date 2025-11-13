@@ -339,7 +339,6 @@ const EntrevistaChat = () => {
       console.log('📦 Respuesta completa del backend:', result);
 
       if (result.success) {
-        // El backend devuelve evaluacion y estadisticas directamente en result.data
         const evaluacion = result.data.evaluacion;
         const estadisticas = result.data.estadisticas;
         const aiDisponible = result.data.ai_disponible;
@@ -348,44 +347,39 @@ const EntrevistaChat = () => {
         console.log('  ⭐ Puntuación:', evaluacion?.puntuacion_global);
         console.log('  📊 Nivel:', evaluacion?.nivel_desempenio);
         console.log('  🤖 IA:', aiDisponible ? 'Disponible' : 'No disponible');
-        console.log('  📈 Estadísticas:', estadisticas);
 
         setEntrevistaFinalizada(true);
-
-        // Limpiar localStorage
         entrevistaService.limpiarEntrevistaLocal();
         
         toast.success('¡Entrevista finalizada!');
 
-        // =============================================================================
-        // CAMBIO CLAVE: NAVEGACIÓN A LA NUEVA RUTA CON DATOS
-        // =============================================================================
+        // Preparar datos para enviar
         const datosResultados = {
-           ...result.data, // Pasar TODO para que ResultadosEntrevista tenga acceso completo
-           puntuacion_general: evaluacion?.puntuacion_global || 0,
-           nivel_desempenio: evaluacion?.nivel_desempenio || 'Regular',
-           fortalezas: evaluacion?.fortalezas || [],
-           areas_mejora: evaluacion?.areas_mejora || [],
-           comentario_final: evaluacion?.comentario_final || '',
-           carrera: estadisticas?.carrera || carreraSeleccionada?.nombre || 'Carrera',
-           fecha_entrevista: new Date().toLocaleDateString('es-ES'),
-           metricas_puntuacion: evaluacion?.metricas_puntuacion || null,
-           ai_disponible: aiDisponible
+          ...result.data,
+          puntuacion_general: evaluacion?.puntuacion_global || 0,
+          nivel_desempenio: evaluacion?.nivel_desempenio || 'Regular',
+          fortalezas: evaluacion?.fortalezas || [],
+          areas_mejora: evaluacion?.areas_mejora || [],
+          comentario_final: evaluacion?.comentario_final || '',
+          carrera: estadisticas?.carrera || carreraSeleccionada?.nombre || 'Carrera',
+          fecha_entrevista: new Date().toLocaleDateString('es-ES'),
+          metricas_puntuacion: evaluacion?.metricas_puntuacion || null,
+          ai_disponible: aiDisponible
         };
 
-        // Navegamos enviando el estado a la ruta configurada en App.jsx
+        console.log('📤 Datos que se envían a resultados:', datosResultados);
+
+        // Navegar con estado
         navigate('/entrevista/resultados', { 
-            state: { resultados: datosResultados } 
+          state: { resultados: datosResultados },
+          replace: false
         });
-        // =============================================================================
 
       } else {
-        // Manejar error específico de mensajes insuficientes
         if (result.mensajesUsuario !== undefined) {
           toast.warning(result.error);
           return;
         }
-        
         throw new Error(result.error);
       }
 
