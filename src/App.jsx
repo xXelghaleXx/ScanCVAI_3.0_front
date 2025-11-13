@@ -10,6 +10,7 @@ import Welcome from "./pages/Home/WelcomePage";
 import LectorCV from "./components/cv/LectorCV/LectorCV";
 import HistorialCV from "./components/cv/HistorialCV/HistorialCV";
 import ChatEntrevista from "./components/entrevista/Entrevista/Entrevista";
+import ResultadosEntrevista from "./components/entrevista/ResultadosEntrevista/ResultadosEntrevista";
 import Perfil from './pages/Perfil/PerfilPage';
 import RubricaPage from './pages/Rubrica/RubricaPage';
 import GuiaUsuario from './components/guia/GuiaUsuario/GuiaUsuario';
@@ -170,6 +171,17 @@ const AppContent = () => {
                 <div className="content-with-header">
                   <div className="page-container">
                     <ChatEntrevista />
+                  </div>
+                </div>
+              </ProtectedRoute>
+            } />
+
+            {/* Resultados de Entrevista */}
+            <Route path="/entrevista/resultados" element={
+              <ProtectedRoute>
+                <div className="content-with-header">
+                  <div className="page-container">
+                    <ResultadosEntrevista />
                   </div>
                 </div>
               </ProtectedRoute>
