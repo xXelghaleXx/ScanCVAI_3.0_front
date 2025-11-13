@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import './ResultadosEntrevista.css';
 
 const ResultadosEntrevista = () => {
   const location = useLocation();
