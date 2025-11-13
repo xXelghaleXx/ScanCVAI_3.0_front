@@ -1,4 +1,4 @@
-// src/components/Entrevista.jsx - VERSIÓN CORREGIDA
+// src/components/entrevista/Entrevista/Entrevista.jsx
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -12,7 +12,7 @@ import ChatInput from "../../chat/ChatInput/ChatInput";
 import VoiceInputSection from "../VoiceInputSection/VoiceInputSection";
 import VoiceInterview from "../VoiceInterview/VoiceInterview";
 import CarreraSelector from "../../forms/CarreraSelector/CarreraSelector";
-import ResultadosEntrevista from "../ResultadosEntrevista/ResultadosEntrevista";
+// ELIMINADO: import ResultadosEntrevista from "../ResultadosEntrevista/ResultadosEntrevista"; (Ya no se renderiza aquí)
 import Background from "../../layout/Background/Background";
 import entrevistaService from '../../../services/entrevista.service';
 import "../../../styles/components/chat/Chat.css";
@@ -36,7 +36,7 @@ const EntrevistaChat = () => {
   const [modalidadSeleccionada, setModalidadSeleccionada] = useState(null);
   const [vozSeleccionada, setVozSeleccionada] = useState('alloy'); // Voz por defecto
   const [entrevistaFinalizada, setEntrevistaFinalizada] = useState(false);
-  const [resultados, setResultados] = useState(null);
+  // ELIMINADO: const [resultados, setResultados] = useState(null); (Ya no guardamos resultados en estado local)
 
   // ========== VERIFICAR ENTREVISTA EXISTENTE AL CARGAR ==========
   useEffect(() => {
@@ -294,15 +294,15 @@ const EntrevistaChat = () => {
       setError(error.message || 'Error al enviar tu respuesta');
       toast.error(error.message);
       
-      // Revertir chat en caso de error
-      setChat(chat);
-      setMensaje(mensaje);
+      // Revertir chat en caso de error (opcional, pero recomendado)
+      setChat(chat); 
+      if (textoMensaje === null) setMensaje(mensaje);
     } finally {
       setLoading(false);
     }
   };
 
-  // ========== FINALIZAR ENTREVISTA ==========
+  // ========== FINALIZAR ENTREVISTA (MODIFICADO) ==========
   const finalizarEntrevista = async () => {
     if (!entrevistaId) {
       toast.error('No hay entrevista activa');
@@ -352,24 +352,32 @@ const EntrevistaChat = () => {
 
         setEntrevistaFinalizada(true);
 
-        // Formatear resultados para el componente de resultados pasando TODA la respuesta
-        setResultados({
-          ...result.data, // Pasar TODO para que ResultadosEntrevista tenga acceso completo
-          puntuacion_general: evaluacion?.puntuacion_global || 0,
-          nivel_desempenio: evaluacion?.nivel_desempenio || 'Regular',
-          fortalezas: evaluacion?.fortalezas || [],
-          areas_mejora: evaluacion?.areas_mejora || [],
-          comentario_final: evaluacion?.comentario_final || '',
-          carrera: estadisticas?.carrera || carreraSeleccionada?.nombre || 'Carrera',
-          fecha_entrevista: new Date().toLocaleDateString('es-ES'),
-          metricas_puntuacion: evaluacion?.metricas_puntuacion || null,
-          ai_disponible: aiDisponible
-        });
-        
         // Limpiar localStorage
         entrevistaService.limpiarEntrevistaLocal();
         
         toast.success('¡Entrevista finalizada!');
+
+        // =============================================================================
+        // CAMBIO CLAVE: NAVEGACIÓN A LA NUEVA RUTA CON DATOS
+        // =============================================================================
+        const datosResultados = {
+           ...result.data, // Pasar TODO para que ResultadosEntrevista tenga acceso completo
+           puntuacion_general: evaluacion?.puntuacion_global || 0,
+           nivel_desempenio: evaluacion?.nivel_desempenio || 'Regular',
+           fortalezas: evaluacion?.fortalezas || [],
+           areas_mejora: evaluacion?.areas_mejora || [],
+           comentario_final: evaluacion?.comentario_final || '',
+           carrera: estadisticas?.carrera || carreraSeleccionada?.nombre || 'Carrera',
+           fecha_entrevista: new Date().toLocaleDateString('es-ES'),
+           metricas_puntuacion: evaluacion?.metricas_puntuacion || null,
+           ai_disponible: aiDisponible
+        };
+
+        // Navegamos enviando el estado a la ruta configurada en App.jsx
+        navigate('/entrevista/resultados', { 
+            state: { resultados: datosResultados } 
+        });
+        // =============================================================================
 
       } else {
         // Manejar error específico de mensajes insuficientes
@@ -420,7 +428,7 @@ const EntrevistaChat = () => {
         setCarreraSeleccionada(null);
         setDificultadSeleccionada(null);
         setEntrevistaFinalizada(false);
-        setResultados(null);
+        // setResultados(null); // Eliminado
         setMostrarSelectorCarrera(true);
         setError(null);
         
@@ -438,38 +446,10 @@ const EntrevistaChat = () => {
     }
   };
 
-  // ========== NUEVA ENTREVISTA ==========
-  const handleNuevaEntrevista = () => {
-    console.log('🆕 Iniciando nueva entrevista');
-    
-    // Limpiar localStorage
-    entrevistaService.limpiarEntrevistaLocal();
-    
-    // Reiniciar estado
-    setEntrevistaId(null);
-    setChat([]);
-    setCarreraSeleccionada(null);
-    setDificultadSeleccionada(null);
-    setEntrevistaFinalizada(false);
-    setResultados(null);
-    setMostrarSelectorCarrera(true);
-    setError(null);
-    setMensaje("");
-    
-    toast.info('Selecciona una carrera para comenzar');
-  };
-
   // ========== RENDER ==========
   
-  // Si la entrevista está finalizada, mostrar resultados
-  if (entrevistaFinalizada && resultados) {
-    return (
-      <ResultadosEntrevista
-        resultados={resultados}
-        onNuevaEntrevista={handleNuevaEntrevista}
-      />
-    );
-  }
+  // NOTA: El bloque "if (entrevistaFinalizada && resultados)" ha sido eliminado 
+  // porque ahora redirigimos a otra página.
 
   // Si hay que mostrar el selector de carrera
   if (mostrarSelectorCarrera) {
