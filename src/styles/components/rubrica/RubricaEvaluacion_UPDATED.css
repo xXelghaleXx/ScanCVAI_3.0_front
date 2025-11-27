@@ -1,0 +1,610 @@
+/* ===== RÚBRICA DE EVALUACIÓN - DISEÑO MONOCROMÁTICO ===== */
+
+/* Paleta de colores monocromática */
+:root {
+    --rubrica-primary: #2b7de9;
+    /* Morado/Azul principal */
+    --rubrica-secondary: #10b981;
+    /* Celeste/Verde */
+    --rubrica-purple: #8b5cf6;
+    /* Púrpura */
+    --rubrica-neutral: #94a3b8;
+    /* Gris neutral */
+    --rubrica-white: #ffffff;
+    --rubrica-light-bg: #f8f9fa;
+    --rubrica-border: #e2e8f0;
+
+    /* Niveles */
+    --nivel-excelente: #10b981;
+    --nivel-bueno: #2b7de9;
+    --nivel-regular: #8b5cf6;
+    --nivel-deficiente: #94a3b8;
+}
+
+/* ===== CONTENEDOR PRINCIPAL ===== */
+.rubrica-page-container {
+    min-height: 100vh;
+    background: var(--rubrica-light-bg);
+    padding: 2rem 1rem;
+}
+
+.rubrica-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* ===== HEADER ===== */
+.rubrica-header {
+    background: var(--rubrica-white);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(43, 125, 233, 0.08);
+    border: 1px solid var(--rubrica-border);
+    position: relative;
+    overflow: hidden;
+}
+
+.rubrica-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--rubrica-primary) 0%, var(--rubrica-secondary) 100%);
+}
+
+.rubrica-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid var(--rubrica-border);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 1.5rem;
+}
+
+.rubrica-back-btn:hover {
+    background: var(--rubrica-light-bg);
+    border-color: var(--rubrica-primary);
+    color: var(--rubrica-primary);
+}
+
+.rubrica-title-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.rubrica-icon {
+    color: var(--rubrica-primary);
+    flex-shrink: 0;
+}
+
+.rubrica-title-section h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+    background: linear-gradient(135deg, var(--rubrica-primary) 0%, var(--rubrica-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.rubrica-title-section p {
+    color: var(--text-secondary);
+    margin: 0;
+    font-size: 1rem;
+}
+
+/* ===== TABS ===== */
+.rubrica-tabs {
+    display: flex;
+    gap: 1rem;
+    background: var(--rubrica-white);
+    padding: 0.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--rubrica-border);
+    box-shadow: 0 2px 4px rgba(43, 125, 233, 0.05);
+}
+
+.rubrica-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.rubrica-tab:hover {
+    background: var(--rubrica-light-bg);
+    color: var(--rubrica-primary);
+}
+
+.rubrica-tab.active {
+    background: linear-gradient(135deg, var(--rubrica-primary) 0%, var(--rubrica-secondary) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(43, 125, 233, 0.25);
+}
+
+.rubrica-tab svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* ===== DESCRIPCIÓN DE VISTA ===== */
+.vista-descripcion {
+    background: var(--rubrica-white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid var(--rubrica-border);
+    border-left: 4px solid var(--rubrica-primary);
+}
+
+.vista-descripcion p {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.vista-descripcion strong {
+    color: var(--rubrica-primary);
+    font-weight: 600;
+}
+
+/* ===== TABLA DE RÚBRICA ===== */
+.rubrica-table-wrapper {
+    background: var(--rubrica-white);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(43, 125, 233, 0.08);
+    border: 1px solid var(--rubrica-border);
+    overflow: hidden;
+}
+
+.rubrica-table-container {
+    overflow-x: auto;
+}
+
+.rubrica-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.rubrica-table thead {
+    background: linear-gradient(135deg, var(--rubrica-primary) 0%, var(--rubrica-secondary) 100%);
+}
+
+.rubrica-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: white;
+    border: none;
+}
+
+.rubrica-table th.criterio-column {
+    min-width: 280px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.rubrica-table th.nivel-column {
+    min-width: 180px;
+    text-align: center;
+}
+
+.rubrica-table tbody tr {
+    border-bottom: 1px solid var(--rubrica-border);
+    transition: all 0.2s;
+}
+
+.rubrica-table tbody tr:hover {
+    background: var(--rubrica-light-bg);
+}
+
+.rubrica-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.criterio-cell {
+    padding: 1.5rem 1rem;
+    vertical-align: top;
+}
+
+.criterio-nombre {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 1.05rem;
+}
+
+.criterio-descripcion {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+}
+
+.criterio-peso {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: linear-gradient(135deg, var(--rubrica-primary) 0%, var(--rubrica-secondary) 100%);
+    color: white;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.nivel-cell {
+    padding: 1.5rem 1rem;
+    text-align: center;
+    vertical-align: top;
+    position: relative;
+}
+
+.nivel-cell::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    border-radius: 0 2px 2px 0;
+}
+
+.nivel-cell.excelente::before {
+    background: var(--nivel-excelente);
+}
+
+.nivel-cell.bueno::before {
+    background: var(--nivel-bueno);
+}
+
+.nivel-cell.regular::before {
+    background: var(--nivel-regular);
+}
+
+.nivel-cell.deficiente::before {
+    background: var(--nivel-deficiente);
+}
+
+.nivel-rango {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    font-family: var(--font-mono);
+}
+
+.nivel-cell.excelente .nivel-rango {
+    color: var(--nivel-excelente);
+}
+
+.nivel-cell.bueno .nivel-rango {
+    color: var(--nivel-bueno);
+}
+
+.nivel-cell.regular .nivel-rango {
+    color: var(--nivel-regular);
+}
+
+.nivel-cell.deficiente .nivel-rango {
+    color: var(--nivel-deficiente);
+}
+
+.nivel-descripcion {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* ===== CV DE REFERENCIA ===== */
+.cv-referencia-section {
+    background: var(--rubrica-white);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(43, 125, 233, 0.08);
+    border: 1px solid var(--rubrica-border);
+}
+
+.cv-referencia-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--rubrica-border);
+}
+
+.cv-referencia-header svg {
+    color: var(--rubrica-primary);
+    flex-shrink: 0;
+}
+
+.cv-referencia-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.cv-referencia-header p {
+    color: var(--text-secondary);
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.cv-referencia-viewer {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* ===== NIVELES DE DESEMPEÑO ===== */
+.rubrica-niveles-desempenio {
+    background: var(--rubrica-white);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(43, 125, 233, 0.08);
+    border: 1px solid var(--rubrica-border);
+}
+
+.rubrica-niveles-desempenio h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rubrica-niveles-desempenio h3::before {
+    content: '📊';
+    font-size: 1.5rem;
+}
+
+.niveles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.nivel-card {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid;
+    transition: all 0.3s;
+    background: var(--rubrica-white);
+}
+
+.nivel-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(43, 125, 233, 0.15);
+}
+
+.nivel-header {
+    padding: 1rem;
+    text-align: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-transform: capitalize;
+}
+
+.nivel-body {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.nivel-rango-desempenio {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-family: var(--font-mono);
+}
+
+.nivel-descripcion-desempenio {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* ===== FOOTER ===== */
+.rubrica-footer {
+    background: var(--rubrica-white);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(43, 125, 233, 0.08);
+    border: 1px solid var(--rubrica-border);
+    border-top: 4px solid var(--rubrica-primary);
+}
+
+.rubrica-total {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.rubrica-total svg {
+    color: var(--rubrica-primary);
+}
+
+.rubrica-total strong {
+    color: var(--rubrica-primary);
+    font-size: 1.3rem;
+}
+
+.rubrica-note {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* ===== EMBEDDED VERSION ===== */
+.rubrica-embedded {
+    background: var(--rubrica-white);
+    border-radius: 12px;
+    border: 1px solid var(--rubrica-border);
+    overflow: hidden;
+}
+
+.rubrica-header-embedded {
+    background: linear-gradient(135deg, var(--rubrica-primary) 0%, var(--rubrica-secondary) 100%);
+    padding: 1.5rem;
+    color: white;
+}
+
+.rubrica-header-embedded .rubrica-title-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.rubrica-header-embedded h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+}
+
+.rubrica-footer-embedded {
+    padding: 1rem 1.5rem;
+    background: var(--rubrica-light-bg);
+    border-top: 1px solid var(--rubrica-border);
+}
+
+.rubrica-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.rubrica-info svg {
+    color: var(--rubrica-primary);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .rubrica-table th.criterio-column {
+        min-width: 220px;
+    }
+
+    .rubrica-table th.nivel-column {
+        min-width: 140px;
+    }
+
+    .niveles-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .rubrica-page-container {
+        padding: 1rem 0.5rem;
+    }
+
+    .rubrica-container {
+        gap: 1.5rem;
+    }
+
+    .rubrica-header {
+        padding: 1.5rem;
+    }
+
+    .rubrica-title-section h1 {
+        font-size: 1.5rem;
+    }
+
+    .rubrica-tabs {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .rubrica-tab {
+        width: 100%;
+    }
+
+    .rubrica-table-wrapper {
+        padding: 1rem;
+    }
+
+    .rubrica-table {
+        font-size: 0.85rem;
+    }
+
+    .rubrica-table th,
+    .rubrica-table td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .criterio-nombre {
+        font-size: 0.95rem;
+    }
+
+    .criterio-descripcion {
+        font-size: 0.8rem;
+    }
+
+    .nivel-rango {
+        font-size: 1rem;
+    }
+
+    .nivel-descripcion {
+        font-size: 0.75rem;
+    }
+
+    .niveles-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cv-referencia-section {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .rubrica-title-section {
+        flex-direction: column;
+    }
+
+    .rubrica-title-section h1 {
+        font-size: 1.25rem;
+    }
+
+    .rubrica-table th.criterio-column {
+        min-width: 180px;
+    }
+
+    .rubrica-table th.nivel-column {
+        min-width: 120px;
+    }
+
+    .cv-referencia-header {
+        flex-direction: column;
+    }
+}

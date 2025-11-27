@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, X, Download, Search, FileText } from "lucide-react";
 import Background from "../../layout/Background/Background";
-import CVScorePanel from "../CVScorePanel/CVScorePanel";
 import { toast } from 'react-toastify';
 import { API_BASE_URL } from '../../../config/api.config.js';
 import '../../../styles/components/cv/LectorCV.css';
@@ -255,8 +254,6 @@ const LectorCV = () => {
   const [analysisText, setAnalysisText] = useState("");
   const [loadingText, setLoadingText] = useState("Procesando...");
   const [analysisData, setAnalysisData] = useState(null);
-  const [scoringData, setScoringData] = useState(null);
-  const [showScoring, setShowScoring] = useState(false);
 
   // Usar nuestro hook personalizado de escritura
   const { displayedText, isTyping, typeText, resetText } = useGeminiTypewriter();
@@ -364,7 +361,7 @@ const LectorCV = () => {
       console.log('✅ Análisis completado:', data);
 
       // Extraer datos del análisis
-      const { analisis, validation, processing_time, scoring, mostrar_scoring, informe } = data;
+      const { analisis, validation, processing_time, informe } = data;
 
       setAnalysisData({
         ...analisis,
@@ -372,30 +369,16 @@ const LectorCV = () => {
         processing_time
       });
 
-      // Guardar datos de scoring
-      if (scoring) {
-        setScoringData(scoring);
-      }
-
       // Guardar el reportId si viene en el informe
       if (informe && informe.id) {
         setReportId(informe.id);
       }
 
-      // Decidir qué mostrar basado en el scoring
-      if (mostrar_scoring && scoring && scoring.es_cv_ideal) {
-        // CV Ideal: Mostrar pantalla de scoring
-        setShowScoring(true);
-        setReportReady(false);
-        toast.success('¡Excelente! Tu CV cumple con los estándares ideales');
-      } else {
-        // CV necesita mejoras: Mostrar análisis con mejoras
-        setShowScoring(false);
-        const analysisDisplayText = formatAnalysisForDisplay(analisis, validation);
-        setAnalysisText(analysisDisplayText);
-        setReportReady(true);
-        toast.success('Análisis completado. Revisa las recomendaciones de mejora');
-      }
+      // Mostrar análisis comparativo
+      const analysisDisplayText = formatAnalysisForDisplay(analisis, validation);
+      setAnalysisText(analysisDisplayText);
+      setReportReady(true);
+      toast.success(\'Análisis completado. Revisa las recomendaciones\');
 
       setUploadError(null);
     } catch (error) {
@@ -609,8 +592,6 @@ const LectorCV = () => {
       setReportId(null);
       setAnalysisText("");
       setAnalysisData(null);
-      setScoringData(null);
-      setShowScoring(false);
       resetText();
       setUploadError(null);
       

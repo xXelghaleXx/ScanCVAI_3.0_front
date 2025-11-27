@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/layout/Header.css";
 import Slidebar from "../Sidebar/Slidebar";
-import ThemeToggle from "../ThemeToggle/ThemeToggle";
+
 import { FaPowerOff, FaUserCircle, FaUserShield } from "react-icons/fa";
 import authService from '../../../services/auth.service';
 
@@ -61,11 +61,11 @@ const Header = ({ onLogout }) => {
 
   const handleLogout = () => {
     authService.logout(); // Usa el método de authService que ya limpia todo
-    
+
     if (onLogout) {
       onLogout();
     }
-    
+
     navigate("/");
   };
 
@@ -92,7 +92,7 @@ const Header = ({ onLogout }) => {
         <div className="user-info">
           <span className="user-name">{nombreCompleto}</span>
 
-          <ThemeToggle />
+
 
           {isAdmin && (
             <button

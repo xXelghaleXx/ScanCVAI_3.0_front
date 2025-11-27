@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../../../styles/layout/Slidebar.css";
 import logo from "../../../assets/logo.png";
 import authService from '../../../services/auth.service';
+import { FaPowerOff } from "react-icons/fa";
 
 const Slidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const slidebarRef = useRef(null);
+  const navigate = useNavigate();
 
   const toggleSlidebar = () => {
     setIsOpen(!isOpen);
@@ -16,6 +18,12 @@ const Slidebar = () => {
     if (slidebarRef.current && !slidebarRef.current.contains(event.target)) {
       setIsOpen(false);
     }
+  };
+
+  const handleLogout = () => {
+    authService.logout();
+    setIsOpen(false);
+    navigate("/");
   };
 
   useEffect(() => {
@@ -63,6 +71,14 @@ const Slidebar = () => {
               <li className="menu-item"><Link className="menu-link" to="/guia" onClick={toggleSlidebar}>Guia de Usuario</Link></li>
             </>
           )}
+
+          {/* Botón de logout para móviles */}
+          <li className="menu-item menu-item-logout">
+            <button className="menu-link logout-link" onClick={handleLogout}>
+              <FaPowerOff className="logout-icon-menu" />
+              Cerrar Sesión
+            </button>
+          </li>
         </ul>
       </div>
     </div>

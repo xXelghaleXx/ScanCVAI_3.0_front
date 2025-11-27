@@ -1,7 +1,7 @@
 // src/components/rubrica/RubricaEvaluacion/RubricaEvaluacion.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Award, Info, ArrowLeft, FileText, MessageCircle } from 'lucide-react';
+import { Award, Info, ArrowLeft, FileText, MessageCircle, Download } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext/ThemeContext';
 import Background from '../../layout/Background/Background';
 import '../../../styles/components/rubrica/RubricaEvaluacion.css';
@@ -209,6 +209,43 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
               </div>
             </div>
           </div>
+
+          {/* CV de Referencia */}
+          \u003cdiv className="cv-referencia-section"\u003e
+          \u003cdiv className="cv-referencia-header"\u003e
+          \u003cFileText size={24} /\u003e
+          \u003cdiv\u003e
+          \u003ch2\u003eCV de Referencia TECSUP\u003c/h2\u003e
+          \u003cp\u003eEste es el CV ideal con el cual se comparan todos los CVs\u003c/p\u003e
+          \u003c/div\u003e
+          \u003cdiv className="cv-referencia-viewer"\u003e
+          \u003ciframe
+          src="http://localhost:3000/api/cv/reference/cv-ejemplo"
+          title="CV de Referencia"
+          style={{ width: '100%', height: '600px', border: '1px solid #ddd' }}
+          \u003e\u003c/iframe\u003e
+          \u003cdiv style={{ marginTop: '1rem', textAlign: 'center' }}\u003e
+          \u003ca
+          href="http://localhost:3000/api/cv/reference/cv-ejemplo"
+          download="CV_ejemplo_TECSUP.docx"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.75rem 1.5rem',
+            background: 'var(--primary)',
+            color: 'white',
+            textDecoration: 'none',
+            borderRadius: '8px',
+            fontWeight: '500'
+          }}
+          \u003e
+          \u003cDownload size={20} /\u003e
+          Descargar CV de Referencia
+          \u003c/a\u003e
+          \u003c/div\u003e
+          \u003c/div\u003e
+          \u003c/div\u003e
 
           {/* Tabla de rúbrica */}
           <div className="rubrica-table-wrapper">
