@@ -180,9 +180,9 @@ const EntrevistaChat = () => {
       // Ocultar selector
       setMostrarSelectorCarrera(false);
       setEntrevistaFinalizada(false);
-      
+
       console.log('✅ Entrevista configurada correctamente');
-      
+
     } catch (error) {
       console.error('❌ Error al procesar entrevista:', error);
       setError(error.message || 'Error al procesar la entrevista');
@@ -266,18 +266,10 @@ const EntrevistaChat = () => {
 
               if (entrevistaFinalizadaPorIA) {
                 console.log('🏁 IA ha finalizado la entrevista automáticamente');
-
-                // Verificar que tenga al menos 10 preguntas
-                const preguntasUsuario = chatActualizado.filter(m => m.tipo === 'usuario');
-
-                if (preguntasUsuario.length >= 10) {
-                  toast.success('La entrevista ha finalizado. Generando resultados...');
-                  setTimeout(() => {
-                    finalizarEntrevista();
-                  }, 2000);
-                } else {
-                  toast.info(`Necesitas responder al menos ${10 - preguntasUsuario.length} preguntas más antes de finalizar.`);
-                }
+                toast.success('La entrevista ha finalizado. Generando resultados...');
+                setTimeout(() => {
+                  finalizarEntrevista();
+                }, 2000);
               }
 
               return chatActualizado;
@@ -293,9 +285,9 @@ const EntrevistaChat = () => {
       console.error('❌ Error al enviar mensaje:', error);
       setError(error.message || 'Error al enviar tu respuesta');
       toast.error(error.message);
-      
+
       // Revertir chat en caso de error (opcional, pero recomendado)
-      setChat(chat); 
+      setChat(chat);
       if (textoMensaje === null) setMensaje(mensaje);
     } finally {
       setLoading(false);
@@ -309,21 +301,13 @@ const EntrevistaChat = () => {
       return;
     }
 
-    // Verificar que haya al menos 10 mensajes del usuario
+    // Contar mensajes del usuario para mostrar en confirmación
     const mensajesUsuario = chat.filter(m => m.tipo === 'usuario');
-
-    if (mensajesUsuario.length < 10) {
-      toast.warning(
-        `Debes responder al menos 10 preguntas para finalizar la entrevista.\n` +
-        `Actualmente has respondido ${mensajesUsuario.length} pregunta${mensajesUsuario.length !== 1 ? 's' : ''}.`
-      );
-      return;
-    }
 
     const confirmar = window.confirm(
       '¿Estás seguro de que deseas finalizar la entrevista?\n\n' +
       `Has respondido ${mensajesUsuario.length} pregunta${mensajesUsuario.length !== 1 ? 's' : ''}.\n` +
-      'Se generará tu evaluación final.'
+      'Se generará tu evaluación basada en tus respuestas.'
     );
 
     if (!confirmar) return;
@@ -331,9 +315,9 @@ const EntrevistaChat = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       console.log('🏁 Finalizando entrevista:', entrevistaId);
-      
+
       const result = await entrevistaService.finalizarEntrevista(entrevistaId);
 
       console.log('📦 Respuesta completa del backend:', result);
@@ -350,7 +334,7 @@ const EntrevistaChat = () => {
 
         setEntrevistaFinalizada(true);
         entrevistaService.limpiarEntrevistaLocal();
-        
+
         toast.success('¡Entrevista finalizada!');
 
         // Preparar datos para enviar
@@ -370,7 +354,7 @@ const EntrevistaChat = () => {
         console.log('📤 Datos que se envían a resultados:', datosResultados);
 
         // Navegar con estado
-        navigate('/entrevista/resultados', { 
+        navigate('/entrevista/resultados', {
           state: { resultados: datosResultados },
           replace: false
         });
@@ -395,27 +379,27 @@ const EntrevistaChat = () => {
   // ========== ABANDONAR ENTREVISTA ==========
   const abandonarEntrevista = async () => {
     if (!entrevistaId) return;
-    
+
     const confirmacion = window.confirm(
       "¿Estás seguro de que deseas abandonar la entrevista?\n\n" +
       "Perderás todo el progreso actual."
     );
-    
+
     if (!confirmacion) return;
 
     try {
       setLoading(true);
-      
+
       console.log('🚪 Abandonando entrevista:', entrevistaId);
-      
+
       const result = await entrevistaService.abandonarEntrevista(entrevistaId);
 
       if (result.success) {
         console.log('✅ Entrevista abandonada');
-        
+
         // Limpiar localStorage
         entrevistaService.limpiarEntrevistaLocal();
-        
+
         // Reiniciar estado
         setEntrevistaId(null);
         setChat([]);
@@ -425,7 +409,7 @@ const EntrevistaChat = () => {
         // setResultados(null); // Eliminado
         setMostrarSelectorCarrera(true);
         setError(null);
-        
+
         toast.info('Entrevista abandonada');
       } else {
         throw new Error(result.error);
@@ -441,7 +425,7 @@ const EntrevistaChat = () => {
   };
 
   // ========== RENDER ==========
-  
+
   // NOTA: El bloque "if (entrevistaFinalizada && resultados)" ha sido eliminado 
   // porque ahora redirigimos a otra página.
 
@@ -492,142 +476,142 @@ const EntrevistaChat = () => {
         >
           <div className="header-content-wrapper">
             <div className="header-icon-wrapper">
-            <MessageCircle size={24} />
+              <MessageCircle size={24} />
+            </div>
+            <div className="header-text">
+              <h2 className="entrevista-title">Simulador de Entrevista con IA</h2>
+              <p className="entrevista-subtitle">
+                {carreraSeleccionada && dificultadSeleccionada ? (
+                  <>
+                    <strong>{carreraSeleccionada.nombre}</strong> - Nivel: <strong>{dificultadSeleccionada.nombre}</strong>
+                  </>
+                ) : carreraSeleccionada ? (
+                  <>Carrera: <strong>{carreraSeleccionada.nombre}</strong></>
+                ) : (
+                  'Practica y mejora tus habilidades de entrevista'
+                )}
+              </p>
+            </div>
           </div>
-          <div className="header-text">
-            <h2 className="entrevista-title">Simulador de Entrevista con IA</h2>
-            <p className="entrevista-subtitle">
-              {carreraSeleccionada && dificultadSeleccionada ? (
-                <>
-                  <strong>{carreraSeleccionada.nombre}</strong> - Nivel: <strong>{dificultadSeleccionada.nombre}</strong>
-                </>
-              ) : carreraSeleccionada ? (
-                <>Carrera: <strong>{carreraSeleccionada.nombre}</strong></>
-              ) : (
-                'Practica y mejora tus habilidades de entrevista'
-              )}
-            </p>
-          </div>
+
+          {entrevistaId && !entrevistaFinalizada && (
+            <div className="entrevista-actions">
+              <button
+                className="btn-secondary-small"
+                onClick={finalizarEntrevista}
+                disabled={loading}
+                style={{
+                  padding: '0.5rem 1rem',
+                  fontSize: '0.875rem',
+                  borderRadius: '8px',
+                  border: '2px solid #e5e7eb',
+                  background: 'white',
+                  color: '#6b7280',
+                  fontWeight: 600,
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  opacity: loading ? 0.5 : 1
+                }}
+              >
+                Finalizar
+              </button>
+              <button
+                className="btn-danger-small"
+                onClick={abandonarEntrevista}
+                disabled={loading}
+                style={{
+                  padding: '0.5rem 1rem',
+                  fontSize: '0.875rem',
+                  borderRadius: '8px',
+                  border: '2px solid #ef4444',
+                  background: '#ef4444',
+                  color: 'white',
+                  fontWeight: 600,
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  opacity: loading ? 0.5 : 1
+                }}
+              >
+                Abandonar
+              </button>
+            </div>
+          )}
+        </motion.div>
+
+        {/* Error Message */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              className="error-banner"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              style={{
+                padding: '1rem',
+                margin: '1rem',
+                background: '#fef2f2',
+                border: '1px solid #fecaca',
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                color: '#dc2626'
+              }}
+            >
+              <AlertCircle size={18} />
+              <span style={{ flex: 1 }}>{error}</span>
+              <button
+                onClick={() => setError(null)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#dc2626',
+                  fontSize: '1.25rem',
+                  cursor: 'pointer',
+                  padding: '0 0.5rem'
+                }}
+              >
+                ×
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Chat Container - Renderizado condicional según modalidad */}
+        <div className="chat-main-container">
+          <ChatBox
+            chat={chat}
+            loading={loading}
+            preguntaInicial={chat.length === 0 ?
+              (modalidadSeleccionada?.id === 'voz'
+                ? "¡Hola! Estoy aquí para ayudarte a practicar tu entrevista por voz."
+                : "¡Hola! Estoy aquí para ayudarte a practicar tu entrevista."
+              ) : ""}
+            ref={chatBoxRef}
+          />
+
+          {modalidadSeleccionada?.id === 'voz' ? (
+            // Modo Voz
+            <VoiceInputSection
+              onSendMessage={handleEnviarMensaje}
+              loading={loading}
+              lastAIMessage={
+                chat.length > 0 && chat[chat.length - 1]?.tipo === 'ia'
+                  ? chat[chat.length - 1]?.texto
+                  : null
+              }
+              disabled={entrevistaFinalizada || !entrevistaId}
+            />
+          ) : (
+            // Modo Chat (por defecto)
+            <ChatInput
+              mensaje={mensaje}
+              setMensaje={setMensaje}
+              onEnviar={handleEnviarMensaje}
+              disabled={loading || entrevistaFinalizada || !entrevistaId}
+              loading={loading}
+            />
+          )}
         </div>
-        
-        {entrevistaId && !entrevistaFinalizada && (
-          <div className="entrevista-actions">
-            <button 
-              className="btn-secondary-small"
-              onClick={finalizarEntrevista}
-              disabled={loading}
-              style={{
-                padding: '0.5rem 1rem',
-                fontSize: '0.875rem',
-                borderRadius: '8px',
-                border: '2px solid #e5e7eb',
-                background: 'white',
-                color: '#6b7280',
-                fontWeight: 600,
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.5 : 1
-              }}
-            >
-              Finalizar
-            </button>
-            <button 
-              className="btn-danger-small"
-              onClick={abandonarEntrevista}
-              disabled={loading}
-              style={{
-                padding: '0.5rem 1rem',
-                fontSize: '0.875rem',
-                borderRadius: '8px',
-                border: '2px solid #ef4444',
-                background: '#ef4444',
-                color: 'white',
-                fontWeight: 600,
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.5 : 1
-              }}
-            >
-              Abandonar
-            </button>
-          </div>
-        )}
-      </motion.div>
-
-      {/* Error Message */}
-      <AnimatePresence>
-        {error && (
-          <motion.div 
-            className="error-banner"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            style={{
-              padding: '1rem',
-              margin: '1rem',
-              background: '#fef2f2',
-              border: '1px solid #fecaca',
-              borderRadius: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              color: '#dc2626'
-            }}
-          >
-            <AlertCircle size={18} />
-            <span style={{ flex: 1 }}>{error}</span>
-            <button 
-              onClick={() => setError(null)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#dc2626',
-                fontSize: '1.25rem',
-                cursor: 'pointer',
-                padding: '0 0.5rem'
-              }}
-            >
-              ×
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Chat Container - Renderizado condicional según modalidad */}
-      <div className="chat-main-container">
-        <ChatBox
-          chat={chat}
-          loading={loading}
-          preguntaInicial={chat.length === 0 ?
-            (modalidadSeleccionada?.id === 'voz'
-              ? "¡Hola! Estoy aquí para ayudarte a practicar tu entrevista por voz."
-              : "¡Hola! Estoy aquí para ayudarte a practicar tu entrevista."
-            ) : ""}
-          ref={chatBoxRef}
-        />
-
-        {modalidadSeleccionada?.id === 'voz' ? (
-          // Modo Voz
-          <VoiceInputSection
-            onSendMessage={handleEnviarMensaje}
-            loading={loading}
-            lastAIMessage={
-              chat.length > 0 && chat[chat.length - 1]?.tipo === 'ia'
-                ? chat[chat.length - 1]?.texto
-                : null
-            }
-            disabled={entrevistaFinalizada || !entrevistaId}
-          />
-        ) : (
-          // Modo Chat (por defecto)
-          <ChatInput
-            mensaje={mensaje}
-            setMensaje={setMensaje}
-            onEnviar={handleEnviarMensaje}
-            disabled={loading || entrevistaFinalizada || !entrevistaId}
-            loading={loading}
-          />
-        )}
       </div>
-    </div>
     </>
   );
 };
