@@ -14,7 +14,7 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
   const [selectedCarrera, setSelectedCarrera] = useState(null);
   const [selectedDificultad, setSelectedDificultad] = useState(null);
   const [selectedModalidad, setSelectedModalidad] = useState(null);
-  const [selectedVoz, setSelectedVoz] = useState('alloy'); // Voz por defecto
+  const [selectedVoz, setSelectedVoz] = useState('Microsoft Helena - Spanish (Spain)'); // Voz por defecto
   const [iniciandoEntrevista, setIniciandoEntrevista] = useState(false);
   const [error, setError] = useState(null);
 
@@ -65,12 +65,10 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
   ];
 
   const voces = [
-    { id: 'alloy', nombre: 'Alloy', descripcion: 'Voz neutral y profesional' },
-    { id: 'echo', nombre: 'Echo', descripcion: 'Voz masculina clara' },
-    { id: 'fable', nombre: 'Fable', descripcion: 'Voz masculina expresiva' },
-    { id: 'onyx', nombre: 'Onyx', descripcion: 'Voz masculina profunda' },
-    { id: 'nova', nombre: 'Nova', descripcion: 'Voz femenina amigable' },
-    { id: 'shimmer', nombre: 'Shimmer', descripcion: 'Voz femenina suave' }
+    { id: 'Microsoft Helena - Spanish (Spain)', nombre: 'Helena', descripcion: 'Voz femenina española (Microsoft)' },
+    { id: 'Microsoft Pablo - Spanish (Spain)', nombre: 'Pablo', descripcion: 'Voz masculina española (Microsoft)' },
+    { id: 'Microsoft Sabina - Spanish (Mexico)', nombre: 'Sabina', descripcion: 'Voz femenina mexicana (Microsoft)' },
+    { id: 'Microsoft Raul - Spanish (Mexico)', nombre: 'Raúl', descripcion: 'Voz masculina mexicana (Microsoft)' }
   ];
 
   useEffect(() => {
@@ -277,8 +275,8 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
           background: paso === 1
             ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
             : paso === 2
-            ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
-            : 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
+              ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+              : 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
             {paso === 1 ? (
@@ -296,8 +294,8 @@ const CarreraSelector = ({ onEntrevistaIniciada, onCancel }) => {
             {paso === 1
               ? 'Elige la carrera para la cual deseas practicar tu entrevista'
               : paso === 2
-              ? `Carrera seleccionada: ${selectedCarrera?.nombre}`
-              : `Dificultad: ${selectedDificultad?.nombre}`
+                ? `Carrera seleccionada: ${selectedCarrera?.nombre}`
+                : `Dificultad: ${selectedDificultad?.nombre}`
             }
           </p>
 
