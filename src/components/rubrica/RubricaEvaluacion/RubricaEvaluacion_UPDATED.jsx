@@ -298,112 +298,118 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
                     <div className="vista-descripcion">
                         {vistaActual === 'cv' ? (
                             <p>
-                                <strong>Evaluación de CVs:</strong> Los criterios se aplican al análisis de tu currículum vitae,
-                                evaluando formato, contenido y presentación profesional según los estándares de TECSUP.
+                                <strong>CV de Referencia TECSUP:</strong> Este es el CV ideal con el cual se comparan todos los CVs que subes al sistema.
+                                Puedes visualizarlo y descargarlo para usarlo como guía.
                             </p>
                         ) : (
                             <p>
-                                <strong>Evaluación de Entrevistas:</strong> Los mismos criterios se adaptan para evaluar
+                                <strong>Rúbrica de Evaluación:</strong> Criterios oficiales utilizados para evaluar
                                 tu desempeño en entrevistas, analizando comunicación, conocimientos y competencias demostradas.
                             </p>
                         )}
                     </div>
 
-                    {/* Tabla de rúbrica */}
-                    <div className="rubrica-table-wrapper">
-                        <div className="rubrica-table-container">
-                            <table className="rubrica-table">
-                                <thead>
-                                    <tr>
-                                        <th className="criterio-column">Criterio</th>
-                                        <th className="nivel-column excelente">Excelente</th>
-                                        <th className="nivel-column bueno">Bueno</th>
-                                        <th className="nivel-column regular">Regular</th>
-                                        <th className="nivel-column deficiente">Deficiente</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {rubrica.criterios.map((criterio) => (
-                                        <tr key={criterio.id} className="criterio-row">
-                                            <td className="criterio-cell">
-                                                <div className="criterio-nombre">{criterio.nombre}</div>
-                                                <div className="criterio-descripcion">
-                                                    {vistaActual === 'cv' ? criterio.descripcion_cv : criterio.descripcion_entrevista}
-                                                </div>
-                                                <div className="criterio-peso">{criterio.peso} pts</div>
-                                            </td>
-                                            <td className="nivel-cell excelente">
-                                                <div className="nivel-rango">{criterio.niveles.excelente.rango}</div>
-                                                <div className="nivel-descripcion">{criterio.niveles.excelente.descripcion}</div>
-                                            </td>
-                                            <td className="nivel-cell bueno">
-                                                <div className="nivel-rango">{criterio.niveles.bueno.rango}</div>
-                                                <div className="nivel-descripcion">{criterio.niveles.bueno.descripcion}</div>
-                                            </td>
-                                            <td className="nivel-cell regular">
-                                                <div className="nivel-rango">{criterio.niveles.regular.rango}</div>
-                                                <div className="nivel-descripcion">{criterio.niveles.regular.descripcion}</div>
-                                            </td>
-                                            <td className="nivel-cell deficiente">
-                                                <div className="nivel-rango">{criterio.niveles.deficiente.rango}</div>
-                                                <div className="nivel-descripcion">{criterio.niveles.deficiente.descripcion}</div>
-                                            </td>
+                    {/* Mostrar solo rúbrica si es vista de entrevista */}
+                    {vistaActual === 'entrevista' && (
+                        <div className="rubrica-table-wrapper">
+                            <div className="rubrica-table-container">
+                                <table className="rubrica-table">
+                                    <thead>
+                                        <tr>
+                                            <th className="criterio-column">Criterio</th>
+                                            <th className="nivel-column excelente">Excelente</th>
+                                            <th className="nivel-column bueno">Bueno</th>
+                                            <th className="nivel-column regular">Regular</th>
+                                            <th className="nivel-column deficiente">Deficiente</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    {/* CV de Referencia */}
-                    <div className="cv-referencia-section">
-                        <div className="cv-referencia-header">
-                            <FileText size={24} />
-                            <div>
-                                <h2>CV de Referencia TECSUP</h2>
-                                <p>Este es el CV ideal con el cual se comparan todos los CVs que subes al sistema</p>
+                                    </thead>
+                                    <tbody>
+                                        {rubrica.criterios.map((criterio) => (
+                                            <tr key={criterio.id} className="criterio-row">
+                                                <td className="criterio-cell">
+                                                    <div className="criterio-nombre">{criterio.nombre}</div>
+                                                    <div className="criterio-descripcion">
+                                                        {criterio.descripcion_entrevista}
+                                                    </div>
+                                                    <div className="criterio-peso">{criterio.peso} pts</div>
+                                                </td>
+                                                <td className="nivel-cell excelente">
+                                                    <div className="nivel-rango">{criterio.niveles.excelente.rango}</div>
+                                                    <div className="nivel-descripcion">{criterio.niveles.excelente.descripcion}</div>
+                                                </td>
+                                                <td className="nivel-cell bueno">
+                                                    <div className="nivel-rango">{criterio.niveles.bueno.rango}</div>
+                                                    <div className="nivel-descripcion">{criterio.niveles.bueno.descripcion}</div>
+                                                </td>
+                                                <td className="nivel-cell regular">
+                                                    <div className="nivel-rango">{criterio.niveles.regular.rango}</div>
+                                                    <div className="nivel-descripcion">{criterio.niveles.regular.descripcion}</div>
+                                                </td>
+                                                <td className="nivel-cell deficiente">
+                                                    <div className="nivel-rango">{criterio.niveles.deficiente.rango}</div>
+                                                    <div className="nivel-descripcion">{criterio.niveles.deficiente.descripcion}</div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                        <div className="cv-referencia-viewer">
-                            <iframe
-                                src="https://view.officeapps.live.com/op/embed.aspx?src=https://res.cloudinary.com/dww7z8jx5/raw/upload/v1764486374/scancvai/reference/cv_ejemplo_tecsup.docx"
-                                title="CV de Referencia"
-                                style={{ width: '100%', height: '600px', border: '1px solid var(--border)', borderRadius: '8px' }}
-                            ></iframe>
-                            <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-                                <a
-                                    href="https://res.cloudinary.com/dww7z8jx5/raw/upload/v1764486374/scancvai/reference/cv_ejemplo_tecsup.docx"
-                                    download="CV_ejemplo_TECSUP.docx"
-                                    className="cv-download-btn"
-                                >
-                                    <Download size={20} />
-                                    Descargar CV de Referencia
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                    )}
 
-                    {/* Niveles de desempeño */}
-                    <div className="rubrica-niveles-desempenio">
-                        <h3>Niveles de Desempeño Global</h3>
-                        <div className="niveles-grid">
-                            {Object.entries(rubrica.niveles_desempenio).map(([nivel, data]) => (
-                                <div key={nivel} className="nivel-card" style={{ borderColor: data.color }}>
-                                    <div className="nivel-header" style={{ background: data.color }}>
-                                        <span className="nivel-nombre">{nivel.charAt(0).toUpperCase() + nivel.slice(1)}</span>
-                                    </div>
-                                    <div className="nivel-body">
-                                        <div className="nivel-rango-desempenio">
-                                            {data.min} - {data.max} puntos
-                                        </div>
-                                        <div className="nivel-descripcion-desempenio">
-                                            {data.descripcion}
-                                        </div>
-                                    </div>
+                    {/* Mostrar solo CV si es vista de CV */}
+                    {vistaActual === 'cv' && (
+                        <div className="cv-referencia-section">
+                            <div className="cv-referencia-header">
+                                <FileText size={24} />
+                                <div>
+                                    <h2>CV de Referencia TECSUP</h2>
+                                    <p>Visualiza y descarga el CV ideal que sirve como referencia para el sistema</p>
                                 </div>
-                            ))}
+                            </div>
+                            <div className="cv-referencia-viewer">
+                                <iframe
+                                    src="https://view.officeapps.live.com/op/embed.aspx?src=https://res.cloudinary.com/dww7z8jx5/raw/upload/v1764486374/scancvai/reference/cv_ejemplo_tecsup.docx"
+                                    title="CV de Referencia"
+                                    style={{ width: '100%', height: '600px', border: '1px solid var(--border)', borderRadius: '8px' }}
+                                ></iframe>
+                                <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                                    <a
+                                        href="https://res.cloudinary.com/dww7z8jx5/raw/upload/v1764486374/scancvai/reference/cv_ejemplo_tecsup.docx"
+                                        download="CV_ejemplo_TECSUP.docx"
+                                        className="cv-download-btn"
+                                    >
+                                        <Download size={20} />
+                                        Descargar CV de Referencia
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    )}
+
+                    {/* Niveles de desempeño - solo en vista de entrevista */}
+                    {vistaActual === 'entrevista' && (
+                        <div className="rubrica-niveles-desempenio">
+                            <h3>Niveles de Desempeño Global</h3>
+                            <div className="niveles-grid">
+                                {Object.entries(rubrica.niveles_desempenio).map(([nivel, data]) => (
+                                    <div key={nivel} className="nivel-card" style={{ borderColor: data.color }}>
+                                        <div className="nivel-header" style={{ background: data.color }}>
+                                            <span className="nivel-nombre">{nivel.charAt(0).toUpperCase() + nivel.slice(1)}</span>
+                                        </div>
+                                        <div className="nivel-body">
+                                            <div className="nivel-rango-desempenio">
+                                                {data.min} - {data.max} puntos
+                                            </div>
+                                            <div className="nivel-descripcion-desempenio">
+                                                {data.descripcion}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Footer */}
                     <div className="rubrica-footer">
