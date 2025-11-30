@@ -83,67 +83,62 @@ const VoiceInterview = ({
     const loadVoices = () => {
       const voices = synthRef.current.getVoices();
 
-      // Filtrar voces en español
-      const spanishVoices = voices.filter(voice =>
-        voice.lang.includes('es') || voice.lang.includes('ES')
-      );
+      console.log('🔊 Todas las voces disponibles:', voices.map(v => ({ name: v.name, lang: v.lang })));
 
-      setAvailableVoices(spanishVoices.length > 0 ? spanishVoices : voices);
-
-      // Filtrar solo voces chilenas naturales
-      const chileanVoices = voices.filter(voice => {
+      // PASO 1: Filtrar voces de español LATINO (evitar España)
+      const latinSpanishVoices = voices.filter(voice => {
         const nameLower = voice.name.toLowerCase();
         const langLower = voice.lang.toLowerCase();
-
-        // Buscar voces que contengan "chile" o "chilean" o "es-cl"
-        return (
-          nameLower.includes('chile') ||
-          nameLower.includes('chilean') ||
-          langLower.includes('es-cl') ||
-          langLower.includes('chile')
+        const isLatinAmerican = (
+          langLower.includes('es-mx') || langLower.includes('es-pe') || langLower.includes('es-co') ||
+          langLower.includes('es-ar') || langLower.includes('es-cl') || langLower.includes('es-ve') ||
+          nameLower.includes('raul') || nameLower.includes('sabina') || nameLower.includes('jorge') || nameLower.includes('camila')
         );
+        const isSpain = langLower.includes('es-es') || nameLower.includes('elena') || nameLower.includes('pablo') || nameLower.includes('alvaro');
+        return isLatinAmerican && !isSpain;
       });
 
-      console.log('🇨🇱 Voces chilenas encontradas:', chileanVoices.map(v => v.name));
+      // PASO 2: Filtrar solo voces NATURALES/NEURALES (no robóticas)
+      const naturalVoices = latinSpanishVoices.filter(voice => {
+        const nameLower = voice.name.toLowerCase();
+        return nameLower.includes('neural') || nameLower.includes('natural') || nameLower.includes('online') ||
+          nameLower.includes('raul') || nameLower.includes('sabina') || nameLower.includes('jorge') || nameLower.includes('camila');
+      });
 
-      // Si no hay voces chilenas específicas, buscar voces españolas de Chile
-      let voicesChile = chileanVoices;
+      console.log('🎙️ Voces naturales latinas:', naturalVoices.map(v => v.name));
 
-      if (voicesChile.length === 0) {
-        // Buscar voces naturales en español (Google, Microsoft Natural)
-        voicesChile = spanishVoices.filter(voice => {
-          const nameLower = voice.name.toLowerCase();
-          return (
-            nameLower.includes('natural') ||
-            nameLower.includes('neural') ||
-            nameLower.includes('google')
-          );
+      // Usar voces naturales o latinas como fallback
+      let selectedVoices = naturalVoices.length > 0 ? naturalVoices : latinSpanishVoices;
+
+      // Si no hay latinas, buscar cualquier español natural (sin España)
+      if (selectedVoices.length === 0) {
+        selectedVoices = voices.filter(v => {
+          const n = v.name.toLowerCase(), l = v.lang.toLowerCase();
+          return (l.includes('es') && !l.includes('es-es') && (n.includes('neural') || n.includes('natural')));
         });
-        console.log('🔊 Voces naturales en español encontradas:', voicesChile.map(v => v.name));
       }
 
-      // Si aún no hay voces, usar las primeras 3 voces en español
-      if (voicesChile.length === 0) {
-        voicesChile = spanishVoices.slice(0, 3);
-        console.log('📢 Usando voces en español por defecto:', voicesChile.map(v => v.name));
+      // Último recurso: cualquier español
+      if (selectedVoices.length === 0) {
+        selectedVoices = voices.filter(v => v.lang.toLowerCase().includes('es')).slice(0, 4);
       }
 
-      // Limitar a máximo 3 voces
-      const selectedVoices = voicesChile.slice(0, 3);
+      // Limitar a máximo 4 voces
+      const finalVoices = selectedVoices.slice(0, 4);
 
       // Formatear las voces seleccionadas
-      const foundPresets = selectedVoices.map((voice, index) => {
+      const foundPresets = finalVoices.map((voice, index) => {
         // Determinar si es femenina o masculina basándose en el nombre
         const nameLower = voice.name.toLowerCase();
         let gender = 'Neutral';
 
         if (nameLower.includes('female') || nameLower.includes('mujer') ||
-            nameLower.includes('helena') || nameLower.includes('monica') ||
-            nameLower.includes('sabina') || nameLower.includes('paulina')) {
+          nameLower.includes('helena') || nameLower.includes('monica') ||
+          nameLower.includes('sabina') || nameLower.includes('paulina')) {
           gender = 'Femenina';
         } else if (nameLower.includes('male') || nameLower.includes('hombre') ||
-                   nameLower.includes('pablo') || nameLower.includes('jorge') ||
-                   nameLower.includes('raul') || nameLower.includes('diego')) {
+          nameLower.includes('pablo') || nameLower.includes('jorge') ||
+          nameLower.includes('raul') || nameLower.includes('diego')) {
           gender = 'Masculina';
         }
 
@@ -611,82 +606,82 @@ const VoiceInterview = ({
         position: 'relative',
         zIndex: 1
       }}>
-      {/* HEADER */}
-      <div style={{
-        background: colors.headerBg,
-        backdropFilter: 'blur(10px)',
-        borderRadius: 'clamp(8px, 2vw, 12px)',
-        padding: 'clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        border: `1px solid ${colors.border}`,
-        flexWrap: 'wrap',
-        gap: '0.75rem'
-      }}>
-        <h2 style={{
-          margin: 0,
-          color: colors.textPrimary,
-          fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
-          fontWeight: 700
+        {/* HEADER */}
+        <div style={{
+          background: colors.headerBg,
+          backdropFilter: 'blur(10px)',
+          borderRadius: 'clamp(8px, 2vw, 12px)',
+          padding: 'clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          border: `1px solid ${colors.border}`,
+          flexWrap: 'wrap',
+          gap: '0.75rem'
         }}>
-          ENTREVISTA POR VOZ
-        </h2>
+          <h2 style={{
+            margin: 0,
+            color: colors.textPrimary,
+            fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
+            fontWeight: 700
+          }}>
+            ENTREVISTA POR VOZ
+          </h2>
 
-        {/* Botones de Finalizar y Abandonar */}
+          {/* Botones de Finalizar y Abandonar */}
+          <div style={{
+            display: 'flex',
+            gap: '0.75rem',
+            alignItems: 'center'
+          }}>
+            <button
+              onClick={onFinalizarEntrevista}
+              disabled={disabled || loading}
+              style={{
+                padding: 'clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2.5vw, 1.5rem)',
+                background: 'white',
+                color: '#6b7280',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: 'clamp(0.75rem, 1.8vw, 0.875rem)',
+                fontWeight: 600,
+                cursor: disabled || loading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.3s ease',
+                whiteSpace: 'nowrap',
+                opacity: disabled || loading ? 0.5 : 1
+              }}
+            >
+              Finalizar
+            </button>
+            <button
+              onClick={onAbandonarEntrevista}
+              disabled={disabled || loading}
+              style={{
+                padding: 'clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2.5vw, 1.5rem)',
+                background: colors.error,
+                color: 'white',
+                border: `2px solid ${colors.error}`,
+                borderRadius: '8px',
+                fontSize: 'clamp(0.75rem, 1.8vw, 0.875rem)',
+                fontWeight: 600,
+                cursor: disabled || loading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.3s ease',
+                whiteSpace: 'nowrap',
+                opacity: disabled || loading ? 0.5 : 1
+              }}
+            >
+              Abandonar
+            </button>
+          </div>
+        </div>
+
+        {/* LAYOUT PRINCIPAL */}
         <div style={{
           display: 'flex',
-          gap: '0.75rem',
-          alignItems: 'center'
+          flexDirection: 'column',
+          gap: 'clamp(1rem, 2vw, 1.5rem)',
+          flex: 1
         }}>
-          <button
-            onClick={onFinalizarEntrevista}
-            disabled={disabled || loading}
-            style={{
-              padding: 'clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2.5vw, 1.5rem)',
-              background: 'white',
-              color: '#6b7280',
-              border: '2px solid #e5e7eb',
-              borderRadius: '8px',
-              fontSize: 'clamp(0.75rem, 1.8vw, 0.875rem)',
-              fontWeight: 600,
-              cursor: disabled || loading ? 'not-allowed' : 'pointer',
-              transition: 'all 0.3s ease',
-              whiteSpace: 'nowrap',
-              opacity: disabled || loading ? 0.5 : 1
-            }}
-          >
-            Finalizar
-          </button>
-          <button
-            onClick={onAbandonarEntrevista}
-            disabled={disabled || loading}
-            style={{
-              padding: 'clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2.5vw, 1.5rem)',
-              background: colors.error,
-              color: 'white',
-              border: `2px solid ${colors.error}`,
-              borderRadius: '8px',
-              fontSize: 'clamp(0.75rem, 1.8vw, 0.875rem)',
-              fontWeight: 600,
-              cursor: disabled || loading ? 'not-allowed' : 'pointer',
-              transition: 'all 0.3s ease',
-              whiteSpace: 'nowrap',
-              opacity: disabled || loading ? 0.5 : 1
-            }}
-          >
-            Abandonar
-          </button>
-        </div>
-      </div>
-
-      {/* LAYOUT PRINCIPAL */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 'clamp(1rem, 2vw, 1.5rem)',
-        flex: 1
-      }}>
           {/* SECCIÓN: TEXTO DE ENTREVISTA */}
           <div style={{
             background: colors.bgSecondary,
@@ -1013,10 +1008,10 @@ const VoiceInterview = ({
               </motion.button>
             </div>
           </div>
-      </div>
+        </div>
 
-      {/* Estilos para animaciones */}
-      <style>{`
+        {/* Estilos para animaciones */}
+        <style>{`
         @keyframes pulse {
           0% {
             box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
