@@ -366,25 +366,15 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
                         </div>
                         <div className="cv-referencia-viewer">
                             <iframe
-                                src="http://localhost:3000/api/cv/reference/cv-ejemplo"
+                                src="https://view.officeapps.live.com/op/embed.aspx?src=https://res.cloudinary.com/dww7z8jx5/raw/upload/v1764486374/scancvai/reference/cv_ejemplo_tecsup.docx"
                                 title="CV de Referencia"
                                 style={{ width: '100%', height: '600px', border: '1px solid var(--border)', borderRadius: '8px' }}
                             ></iframe>
                             <div style={{ marginTop: '1rem', textAlign: 'center' }}>
                                 <a
-                                    href="http://localhost:3000/api/cv/reference/cv-ejemplo"
+                                    href="https://res.cloudinary.com/dww7z8jx5/raw/upload/v1764486374/scancvai/reference/cv_ejemplo_tecsup.docx"
                                     download="CV_ejemplo_TECSUP.docx"
-                                    style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        padding: '0.75rem 1.5rem',
-                                        background: 'var(--primary)',
-                                        color: 'white',
-                                        textDecoration: 'none',
-                                        borderRadius: '8px',
-                                        fontWeight: '500'
-                                    }}
+                                    className="cv-download-btn"
                                 >
                                     <Download size={20} />
                                     Descargar CV de Referencia

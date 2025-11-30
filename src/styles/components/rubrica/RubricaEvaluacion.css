@@ -1,355 +1,450 @@
-/* src/styles/components/rubrica/RubricaEvaluacion.css */
+/* ===== RÚBRICA EVALUACIÓN - DISEÑO MINIMALISTA Y FORMAL ===== */
 
-/* ==================== CONTAINER ==================== */
+/* Container Principal */
 .rubrica-page-container {
   min-height: 100vh;
-  padding: clamp(1rem, 3vw, 2rem);
+  padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem);
   position: relative;
   z-index: 1;
 }
 
 .rubrica-container {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
-  background: var(--bg-primary);
-  border-radius: 20px;
-  padding: clamp(1.5rem, 4vw, 3rem);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* ==================== HEADER ==================== */
+/* Header */
 .rubrica-header {
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 2px solid var(--border-color);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: clamp(2rem, 5vw, 3rem);
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .rubrica-back-btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
-  background: transparent;
-  border: 2px solid var(--border-color);
+  background: var(--bg-secondary);
+  border: 2px solid var(--border);
   border-radius: 10px;
   color: var(--text-primary);
   font-weight: 600;
-  font-size: 0.95rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  align-self: flex-start;
+  transition: all 0.2s ease;
 }
 
 .rubrica-back-btn:hover {
-  background: var(--bg-secondary);
-  border-color: var(--accent-primary);
-  color: var(--accent-primary);
-  transform: translateX(-5px);
+  background: var(--bg-tertiary);
+  border-color: var(--primary);
+  transform: translateX(-4px);
 }
 
 .rubrica-title-section {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
+  flex: 1;
 }
 
 .rubrica-icon {
-  color: var(--accent-primary);
+  color: var(--primary);
   flex-shrink: 0;
 }
 
 .rubrica-title-section h1 {
-  margin: 0;
   font-size: clamp(1.5rem, 4vw, 2rem);
   font-weight: 700;
   color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .rubrica-title-section p {
-  margin: 0.5rem 0 0 0;
-  font-size: clamp(0.875rem, 2vw, 1rem);
+  font-size: clamp(0.9rem, 2vw, 1rem);
   color: var(--text-secondary);
+  margin: 0.25rem 0 0 0;
 }
 
-/* ==================== INFO CARDS ==================== */
-.rubrica-info-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
+/* Tabs */
+.rubrica-tabs {
+  display: flex;
+  gap: 1rem;
   margin-bottom: 2rem;
+  border-bottom: 2px solid var(--border);
 }
 
-.info-card {
+.rubrica-tab {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1.5rem;
-  background: #2b7de9;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-secondary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: -2px;
+}
+
+.rubrica-tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+}
+
+.rubrica-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* Vista Descripción */
+.vista-descripcion {
+  background: var(--bg-secondary);
+  padding: 1.25rem;
   border-radius: 12px;
-  color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.info-card svg {
-  flex-shrink: 0;
-  opacity: 0.9;
-}
-
-.info-card h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.1rem;
-  font-weight: 700;
-}
-
-.info-card p {
-  margin: 0;
-  font-size: 0.875rem;
-  opacity: 0.95;
-  line-height: 1.4;
-}
-
-/* ==================== TABLE ==================== */
-.rubrica-table-wrapper {
+  border-left: 4px solid var(--primary);
   margin-bottom: 2rem;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 2px solid var(--border-color);
+}
+
+.vista-descripcion p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.vista-descripcion strong {
+  color: var(--text-primary);
+}
+
+/* Tabla de Rúbrica */
+.rubrica-table-wrapper {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border);
+  margin-bottom: 2rem;
+  overflow-x: auto;
 }
 
 .rubrica-table-container {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .rubrica-table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--bg-primary);
-  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  min-width: 800px;
 }
 
 .rubrica-table thead {
-  background: #2b7de9;
-  color: white;
+  background: var(--bg-secondary);
 }
 
-.rubrica-table thead th {
+.rubrica-table th {
   padding: 1rem;
-  text-align: center;
+  text-align: left;
   font-weight: 700;
-  font-size: clamp(0.75rem, 1.8vw, 0.95rem);
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border);
+  font-size: 0.875rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
+  letter-spacing: 0.05em;
 }
 
 .criterio-column {
-  text-align: left !important;
-  min-width: 150px;
+  width: 30%;
+  min-width: 200px;
 }
 
 .nivel-column {
-  min-width: 180px;
+  width: 17.5%;
+  text-align: center !important;
 }
 
-/* ==================== CRITERIO ROW ==================== */
+.nivel-column.excelente {
+  color: #10b981;
+}
+
+.nivel-column.bueno {
+  color: #2b7de9;
+}
+
+.nivel-column.regular {
+  color: #8b5cf6;
+}
+
+.nivel-column.deficiente {
+  color: #94a3b8;
+}
+
 .criterio-row {
-  border-bottom: 1px solid var(--border-color);
-  transition: all 0.3s ease;
-  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s ease;
 }
 
 .criterio-row:hover {
   background: var(--bg-secondary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.criterio-row.selected {
-  background: var(--bg-tertiary);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .criterio-cell {
   padding: 1.5rem 1rem;
-  border-right: 1px solid var(--border-color);
 }
 
 .criterio-nombre {
   font-weight: 700;
-  font-size: clamp(0.875rem, 2vw, 1rem);
   color: var(--text-primary);
+  font-size: 1rem;
   margin-bottom: 0.5rem;
 }
 
 .criterio-descripcion {
-  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  font-size: 0.875rem;
   color: var(--text-secondary);
-  line-height: 1.4;
-  margin-bottom: 0.75rem;
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
 }
 
 .criterio-peso {
   display: inline-block;
   padding: 0.25rem 0.75rem;
-  background: #2b7de9;
+  background: var(--primary);
   color: white;
-  border-radius: 20px;
+  border-radius: 50px;
+  font-size: 0.75rem;
   font-weight: 700;
-  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
 }
 
-/* ==================== NIVEL CELLS (MINIMALISTA) ==================== */
 .nivel-cell {
   padding: 1.5rem 1rem;
   text-align: center;
-  border-right: 1px solid var(--border-color);
-  vertical-align: middle;
-  font-weight: 600;
-  font-size: clamp(0.85rem, 1.8vw, 1rem);
+  vertical-align: top;
+}
+
+.nivel-rango {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.nivel-cell.excelente .nivel-rango {
+  color: #10b981;
+}
+
+.nivel-cell.bueno .nivel-rango {
+  color: #2b7de9;
+}
+
+.nivel-cell.regular .nivel-rango {
+  color: #8b5cf6;
+}
+
+.nivel-cell.deficiente .nivel-rango {
+  color: #94a3b8;
+}
+
+.nivel-descripcion {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* CV de Referencia */
+.cv-referencia-section {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.cv-referencia-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.cv-referencia-header svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.cv-referencia-header h2 {
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  font-weight: 700;
   color: var(--text-primary);
+  margin: 0;
 }
 
-.nivel-cell:last-child {
-  border-right: none;
+.cv-referencia-header p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0 0;
 }
 
-.nivel-cell.excelente {
-  background: rgba(16, 185, 129, 0.08);
-  color: #059669;
+.cv-referencia-viewer {
+  width: 100%;
 }
 
-.nivel-cell.bueno {
-  background: rgba(59, 130, 246, 0.08);
-  color: #2563eb;
+.cv-referencia-viewer iframe {
+  width: 100%;
+  height: 600px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: white;
 }
 
-.nivel-cell.regular {
-  background: rgba(245, 158, 11, 0.08);
-  color: #d97706;
+.cv-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  transition: all 0.2s ease;
+  margin-top: 1rem;
 }
 
-.nivel-cell.deficiente {
-  background: rgba(239, 68, 68, 0.08);
-  color: #dc2626;
+.cv-download-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
-/* ==================== NIVELES DE DESEMPEÑO ==================== */
+/* Niveles de Desempeño */
 .rubrica-niveles-desempenio {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border);
   margin-bottom: 2rem;
 }
 
 .rubrica-niveles-desempenio h3 {
-  margin: 0 0 1.5rem 0;
-  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  font-size: clamp(1.1rem, 2.5vw, 1.3rem);
   font-weight: 700;
   color: var(--text-primary);
+  margin: 0 0 1.5rem 0;
 }
 
 .niveles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.25rem;
 }
 
 .nivel-card {
   border-radius: 12px;
-  overflow: hidden;
   border: 2px solid;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .nivel-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .nivel-header {
   padding: 1rem;
-  color: white;
   text-align: center;
 }
 
 .nivel-nombre {
+  color: white;
   font-weight: 700;
   font-size: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  text-transform: capitalize;
 }
 
 .nivel-body {
-  padding: 1rem;
-  background: var(--bg-primary);
-  text-align: center;
+  padding: 1.25rem;
+  background: var(--bg-secondary);
 }
 
 .nivel-rango-desempenio {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  text-align: center;
 }
 
-/* ==================== FOOTER ==================== */
+.nivel-descripcion-desempenio {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* Footer */
 .rubrica-footer {
-  padding-top: 2rem;
-  border-top: 2px solid var(--border-color);
+  background: var(--bg-primary);
+  border-radius: 16px;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border);
 }
 
 .rubrica-total {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1rem 1.5rem;
-  background: #2b7de9;
-  color: white;
-  border-radius: 12px;
-  font-size: 1.1rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 10px;
   margin-bottom: 1rem;
 }
 
 .rubrica-total svg {
-  flex-shrink: 0;
+  color: var(--primary);
+}
+
+.rubrica-total span {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.rubrica-total strong {
+  color: var(--text-primary);
+  font-size: 1.1rem;
 }
 
 .rubrica-note {
-  margin: 1rem 0 0 0;
-  padding: 1rem;
-  background: var(--bg-secondary);
-  border-left: 4px solid var(--accent-primary);
-  border-radius: 8px;
   font-size: 0.9rem;
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.7;
+  margin: 0;
+  text-align: justify;
 }
 
-/* ==================== EMBEDDED MODE ==================== */
+/* Embedded Mode */
 .rubrica-embedded {
   width: 100%;
-  background: var(--bg-primary);
-  border-radius: 12px;
-  padding: 1.5rem;
-  border: 2px solid var(--border-color);
 }
 
 .rubrica-header-embedded {
   margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid var(--border-color);
-}
-
-.rubrica-header-embedded .rubrica-title-section h2 {
-  margin: 0;
-  font-size: clamp(1.1rem, 3vw, 1.5rem);
-  font-weight: 700;
-  color: var(--text-primary);
 }
 
 .rubrica-footer-embedded {
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--border-color);
+  border-top: 2px solid var(--border);
 }
 
 .rubrica-info {
@@ -360,124 +455,88 @@
   font-size: 0.9rem;
 }
 
-/* ==================== RESPONSIVE ==================== */
+/* Responsive */
 @media (max-width: 1024px) {
   .rubrica-table {
-    font-size: 0.75rem;
+    min-width: 700px;
   }
 
-  .nivel-column {
-    min-width: 150px;
-  }
-
-  .criterio-column {
-    min-width: 120px;
-  }
-
-  .nivel-descripcion {
-    font-size: 0.7rem;
+  .niveles-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 }
 
 @media (max-width: 768px) {
-  .rubrica-page-container {
-    padding: 1rem;
-  }
-
-  .rubrica-container {
-    padding: 1.5rem;
-  }
-
-  .rubrica-title-section {
+  .rubrica-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
   }
 
-  .rubrica-info-cards {
-    grid-template-columns: 1fr;
+  .rubrica-tabs {
+    flex-direction: column;
+    gap: 0;
+    border-bottom: none;
   }
 
-  .rubrica-table {
-    font-size: 0.7rem;
+  .rubrica-tab {
+    border-bottom: 1px solid var(--border);
+    border-left: 3px solid transparent;
+    margin-bottom: 0;
   }
 
-  .nivel-column {
-    min-width: 130px;
+  .rubrica-tab.active {
+    border-left-color: var(--primary);
+    border-bottom-color: var(--border);
   }
 
-  .criterio-cell {
-    padding: 1rem 0.75rem;
-  }
-
-  .nivel-cell {
-    padding: 1rem 0.5rem;
+  .cv-referencia-viewer iframe {
+    height: 400px;
   }
 
   .niveles-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 480px) {
-  .rubrica-table thead th {
-    padding: 0.75rem 0.5rem;
-    font-size: 0.7rem;
+
+  .rubrica-table-wrapper,
+  .cv-referencia-section,
+  .rubrica-niveles-desempenio,
+  .rubrica-footer {
+    padding: 1.25rem;
   }
 
-  .nivel-rango {
-    font-size: 0.7rem;
-    padding: 0.25rem 0.5rem;
+  .criterio-cell,
+  .nivel-cell {
+    padding: 1rem 0.75rem;
   }
 
-  .nivel-descripcion {
-    font-size: 0.65rem;
-  }
-
-  .criterio-nombre {
-    font-size: 0.8rem;
-  }
-
-  .criterio-peso {
-    font-size: 0.7rem;
-    padding: 0.2rem 0.5rem;
-  }
-
-  .niveles-grid {
-    grid-template-columns: 1fr;
+  .cv-referencia-viewer iframe {
+    height: 300px;
   }
 }
 
-/* ==================== DARK MODE ==================== */
-[data-theme="dark"] .rubrica-container {
-  background: rgba(30, 41, 59, 0.95);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-[data-theme="dark"] .rubrica-table {
+/* Dark Mode */
+[data-theme="dark"] .rubrica-table-wrapper,
+[data-theme="dark"] .cv-referencia-section,
+[data-theme="dark"] .rubrica-niveles-desempenio,
+[data-theme="dark"] .rubrica-footer {
   background: rgba(30, 41, 59, 0.95);
 }
 
-[data-theme="dark"] .criterio-row:hover {
+[data-theme="dark"] .rubrica-table thead {
   background: rgba(51, 65, 85, 0.8);
 }
 
-[data-theme="dark"] .criterio-row.selected {
-  background: rgba(71, 85, 105, 0.8);
-}
-
-[data-theme="dark"] .nivel-card {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-
-[data-theme="dark"] .nivel-card:hover {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+[data-theme="dark"] .criterio-row:hover {
+  background: rgba(51, 65, 85, 0.6);
 }
 
 [data-theme="dark"] .nivel-body {
-  background: rgba(30, 41, 59, 0.95);
+  background: rgba(51, 65, 85, 0.6);
 }
 
-[data-theme="dark"] .rubrica-embedded {
-  background: rgba(30, 41, 59, 0.95);
+[data-theme="dark"] .cv-referencia-viewer iframe {
+  background: rgba(255, 255, 255, 0.95);
 }
