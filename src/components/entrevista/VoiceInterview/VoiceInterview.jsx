@@ -680,20 +680,13 @@ const VoiceInterview = ({
         </div>
       </div>
 
-      {/* LAYOUT PRINCIPAL: 2 COLUMNAS */}
+      {/* LAYOUT PRINCIPAL */}
       <div style={{
-        display: 'grid',
-        gridTemplateColumns: window.innerWidth >= 1024 ? '1fr 350px' : '1fr',
+        display: 'flex',
+        flexDirection: 'column',
         gap: 'clamp(1rem, 2vw, 1.5rem)',
-        flex: 1,
-        overflow: 'hidden'
+        flex: 1
       }}>
-        {/* COLUMNA IZQUIERDA */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 'clamp(1rem, 2vw, 1.5rem)'
-        }}>
           {/* SECCIÓN: TEXTO DE ENTREVISTA */}
           <div style={{
             background: colors.bgSecondary,
@@ -1020,140 +1013,6 @@ const VoiceInterview = ({
               </motion.button>
             </div>
           </div>
-        </div>
-
-        {/* COLUMNA DERECHA: SELECTOR DE VOCES */}
-        <div style={{
-          background: colors.bgSecondary,
-          backdropFilter: 'blur(10px)',
-          borderRadius: '12px',
-          padding: '2rem',
-          display: 'flex',
-          flexDirection: 'column',
-          border: `1px solid ${colors.border}`
-        }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '1.5rem'
-          }}>
-            <h3 style={{
-              margin: 0,
-              fontSize: '1rem',
-              fontWeight: 700,
-              color: colors.textPrimary,
-              letterSpacing: '1px',
-              textTransform: 'uppercase'
-            }}>
-              SELECTOR DE VOCES
-            </h3>
-            <motion.button
-              onClick={() => setShowVoiceSelector(!showVoiceSelector)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              style={{
-                padding: '0.4rem',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                color: colors.textPrimary,
-                display: 'flex',
-                alignItems: 'center'
-              }}
-            >
-              {showVoiceSelector ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-            </motion.button>
-          </div>
-
-          {/* Voz actual seleccionada */}
-          <div style={{
-            padding: '1.25rem',
-            background: colors.bgTertiary,
-            borderRadius: '8px',
-            marginBottom: showVoiceSelector ? '1.5rem' : 0,
-            border: `1px solid ${colors.border}`
-          }}>
-            <div style={{ fontSize: '0.75rem', color: colors.textSecondary, marginBottom: '0.5rem' }}>
-              Voz Actual:
-            </div>
-            <div style={{ fontSize: '0.95rem', fontWeight: 600, color: colors.textPrimary }}>
-              {selectedVoice?.name.substring(0, 35) || 'Predeterminada'}
-            </div>
-            <div style={{ fontSize: '0.75rem', color: colors.textSecondary, marginTop: '0.5rem' }}>
-              {selectedVoice?.lang}
-            </div>
-          </div>
-
-          {/* Lista de voces */}
-          <AnimatePresence>
-            {showVoiceSelector && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                style={{
-                  overflow: 'hidden',
-                  flex: 1
-                }}
-              >
-                <div style={{
-                  maxHeight: '500px',
-                  overflowY: 'auto',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.75rem',
-                  paddingRight: '0.5rem'
-                }}>
-                  {availableVoices.map((voice, index) => (
-                    <motion.div
-                      key={index}
-                      onClick={() => {
-                        setSelectedVoice(voice);
-                        toast.success(`Voz cambiada a: ${voice.name}`);
-                      }}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      style={{
-                        padding: '1rem',
-                        background: selectedVoice?.name === voice.name
-                          ? isDark ? 'rgba(102, 126, 234, 0.2)' : 'rgba(102, 126, 234, 0.1)'
-                          : colors.bgTertiary,
-                        border: selectedVoice?.name === voice.name
-                          ? `2px solid ${colors.accent}`
-                          : `1px solid ${colors.border}`,
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s'
-                      }}
-                    >
-                      <div style={{
-                        fontSize: '0.875rem',
-                        fontWeight: selectedVoice?.name === voice.name ? 600 : 500,
-                        color: colors.textPrimary,
-                        marginBottom: '0.25rem'
-                      }}>
-                        {voice.name}
-                      </div>
-                      <div style={{
-                        fontSize: '0.75rem',
-                        color: colors.textSecondary,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem'
-                      }}>
-                        <span>{voice.lang}</span>
-                        <span>•</span>
-                        <span>{voice.localService ? '📍 Local' : '🌐 Red'}</span>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
       </div>
 
       {/* Estilos para animaciones */}

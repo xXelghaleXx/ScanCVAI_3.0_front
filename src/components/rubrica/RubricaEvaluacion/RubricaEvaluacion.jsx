@@ -221,14 +221,16 @@ const RubricaEvaluacion = ({ embedded = false, onClose = null }) => {
             </div>
             <div className="cv-referencia-viewer">
               <iframe
-                src="http://localhost:3000/api/cv/reference/cv-ejemplo"
+                src="/api/cv/reference/cv-ejemplo"
                 title="CV de Referencia"
                 style={{ width: '100%', height: '600px', border: '1px solid #ddd' }}
               ></iframe>
               <div style={{ marginTop: '1rem', textAlign: 'center' }}>
                 <a
-                  href="http://localhost:3000/api/cv/reference/cv-ejemplo"
+                  href="/api/cv/reference/cv-ejemplo"
                   download="CV_ejemplo_TECSUP.docx"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
