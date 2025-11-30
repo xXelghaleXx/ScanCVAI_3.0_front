@@ -340,7 +340,7 @@ const EntrevistaChat = () => {
         // Preparar datos para enviar
         const datosResultados = {
           ...result.data,
-          puntuacion_general: evaluacion?.puntuacion_global || 0,
+          puntuacion_global: evaluacion?.puntuacion_global || 0,  // Mantener nombre original
           nivel_desempenio: evaluacion?.nivel_desempenio || 'Regular',
           fortalezas: evaluacion?.fortalezas || [],
           areas_mejora: evaluacion?.areas_mejora || [],
@@ -348,6 +348,7 @@ const EntrevistaChat = () => {
           carrera: estadisticas?.carrera || carreraSeleccionada?.nombre || 'Carrera',
           fecha_entrevista: new Date().toLocaleDateString('es-ES'),
           metricas_puntuacion: evaluacion?.metricas_puntuacion || null,
+          estadisticas: estadisticas,
           ai_disponible: aiDisponible
         };
 

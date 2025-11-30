@@ -8,8 +8,6 @@ import {
   Award,
   Target,
   BarChart3,
-  Download,
-  Save,
   Calendar,
   MessageSquare,
   Star,
@@ -44,42 +42,6 @@ const ResultadosEntrevista = () => {
 
   const handleVolverEntrevista = () => {
     navigate('/entrevista', { replace: true });
-  };
-
-  const handleDescargarResultados = () => {
-    if (!resultados) return;
-
-    const dataStr = JSON.stringify(resultados, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `resultados-entrevista-${Date.now()}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const handleGuardarResultados = async () => {
-    if (!resultados) return;
-    try {
-      // Aquí puedes agregar la lógica para guardar en el dashboard
-      const response = await fetch('/api/entrevista/guardar-resultado', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify(resultados)
-      });
-
-      if (response.ok) {
-        alert('✅ Resultados guardados exitosamente');
-        navigate('/dashboard', { replace: true });
-      }
-    } catch (error) {
-      console.error('Error al guardar resultados:', error);
-    }
   };
 
   if (cargando) {
@@ -337,25 +299,12 @@ const ResultadosEntrevista = () => {
               transition={{ delay: 0.9 }}
             >
               <button
-                onClick={handleDescargarResultados}
-                className="btn btn-primary"
-              >
-                <Download size={20} />
-                Descargar Resultados
-              </button>
-              <button
-                onClick={handleGuardarResultados}
-                className="btn btn-success"
-              >
-                <Save size={20} />
-                Guardar Resultados
-              </button>
-              <button
                 onClick={handleVolverEntrevista}
-                className="btn btn-secondary"
+                className="btn btn-primary"
+                style={{ width: '100%' }}
               >
                 <RefreshCw size={20} />
-                Otra Entrevista
+                Nueva Entrevista
               </button>
             </motion.div>
 
