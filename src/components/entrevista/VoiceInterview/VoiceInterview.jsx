@@ -201,8 +201,8 @@ const VoiceInterview = ({
     utteranceRef.current = new SpeechSynthesisUtterance(text);
     utteranceRef.current.voice = voiceToUse;
     utteranceRef.current.lang = 'es-ES';
-    utteranceRef.current.rate = 0.95;
-    utteranceRef.current.pitch = 1.1;
+    utteranceRef.current.rate = 0.85;    // Más lento para sonar más natural y calmado
+    utteranceRef.current.pitch = 0.95;   // Pitch más bajo para voz más dulce y humana
     utteranceRef.current.volume = 1.0;
 
     // Eventos

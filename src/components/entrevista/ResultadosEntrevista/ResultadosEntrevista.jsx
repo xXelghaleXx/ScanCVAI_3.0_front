@@ -7,10 +7,19 @@ import {
   RefreshCw,
   Award,
   Target,
-  BarChart3
+  BarChart3,
+  Download,
+  Save,
+  Calendar,
+  MessageSquare,
+  Star,
+  AlertCircle,
+  Lightbulb,
+  Trophy
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import '../../../styles/components/entrevista/ResultadosEntrevista.css';
 
 const ResultadosEntrevista = () => {
   const location = useLocation();
@@ -20,7 +29,7 @@ const ResultadosEntrevista = () => {
 
   useEffect(() => {
     console.log('📍 ResultadosEntrevista - location.state:', location.state);
-    
+
     if (location.state?.resultados) {
       console.log('✅ Datos recibidos:', location.state.resultados);
       setResultados(location.state.resultados);
@@ -39,7 +48,7 @@ const ResultadosEntrevista = () => {
 
   const handleDescargarResultados = () => {
     if (!resultados) return;
-    
+
     const dataStr = JSON.stringify(resultados, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);
@@ -63,7 +72,7 @@ const ResultadosEntrevista = () => {
         },
         body: JSON.stringify(resultados)
       });
-      
+
       if (response.ok) {
         alert('✅ Resultados guardados exitosamente');
         navigate('/dashboard', { replace: true });
@@ -143,7 +152,8 @@ const ResultadosEntrevista = () => {
             transition={{ duration: 0.5 }}
             className="resultado-header"
           >
-            <h1>📊 Resultados de tu Entrevista</h1>
+            <Trophy size={28} style={{ color: '#667eea' }} />
+            <h1>Resultados de tu Entrevista</h1>
             <p className="resultado-subtitle">Análisis detallado de tu desempeño</p>
           </motion.div>
 
@@ -157,7 +167,7 @@ const ResultadosEntrevista = () => {
 
             {/* SECCIÓN DE PUNTUACIÓN PRINCIPAL */}
             <div className="puntuacion-section">
-              <motion.div 
+              <motion.div
                 className="puntuacion-circle"
                 style={{ borderColor: colorPuntuacion }}
                 animate={{ scale: [1, 1.05, 1] }}
@@ -171,7 +181,7 @@ const ResultadosEntrevista = () => {
 
               <div className="nivel-desempenio">
                 <span className="nivel-label">Nivel de Desempeño</span>
-                <motion.span 
+                <motion.span
                   className={`nivel-badge nivel-${nivel.toLowerCase().replace(/\s+/g, '-')}`}
                   style={{ backgroundColor: colorPuntuacion }}
                   initial={{ opacity: 0 }}
@@ -180,11 +190,11 @@ const ResultadosEntrevista = () => {
                 >
                   {nivel}
                 </motion.span>
-                
+
                 <div className="progress-bar-container">
-                  <div 
+                  <div
                     className="progress-bar"
-                    style={{ 
+                    style={{
                       width: `${puntuacion}%`,
                       backgroundColor: colorPuntuacion
                     }}
@@ -195,7 +205,7 @@ const ResultadosEntrevista = () => {
 
             {/* SECCIÓN DE MÉTRICAS */}
             {metricas && Object.keys(metricas).length > 0 && (
-              <motion.div 
+              <motion.div
                 className="metricas-section"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -210,7 +220,7 @@ const ResultadosEntrevista = () => {
                       </div>
                       <div className="metrica-valor">{value}/20</div>
                       <div className="metrica-bar">
-                        <div 
+                        <div
                           className="metrica-fill"
                           style={{ width: `${(value / 20) * 100}%` }}
                         ></div>
@@ -223,15 +233,15 @@ const ResultadosEntrevista = () => {
 
             {/* SECCIÓN DE COMENTARIO */}
             {comentario && (
-              <motion.div 
+              <motion.div
                 className="feedback-section"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
               >
                 <div className="feedback-header">
-                  <Award size={24} />
-                  <h2>💭 Evaluación General</h2>
+                  <MessageSquare size={24} />
+                  <h2>Evaluación General</h2>
                 </div>
                 <p className="feedback-text">{comentario}</p>
               </motion.div>
@@ -239,20 +249,20 @@ const ResultadosEntrevista = () => {
 
             {/* SECCIÓN DE FORTALEZAS */}
             {fortalezas && fortalezas.length > 0 && (
-              <motion.div 
+              <motion.div
                 className="fortalezas-section"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.6 }}
               >
                 <div className="seccion-header">
-                  <CheckCircle size={24} />
-                  <h3>✅ Fortalezas Identificadas</h3>
+                  <Star size={24} />
+                  <h3>Fortalezas Identificadas</h3>
                 </div>
                 <ul className="lista-items">
                   {fortalezas.map((fortaleza, idx) => (
-                    <motion.li 
-                      key={idx} 
+                    <motion.li
+                      key={idx}
                       className="item-fortaleza"
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -268,20 +278,20 @@ const ResultadosEntrevista = () => {
 
             {/* SECCIÓN DE ÁREAS DE MEJORA */}
             {areasMejora && areasMejora.length > 0 && (
-              <motion.div 
+              <motion.div
                 className="mejora-section"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.7 }}
               >
                 <div className="seccion-header">
-                  <Target size={24} />
-                  <h3>🔧 Áreas de Mejora</h3>
+                  <Lightbulb size={24} />
+                  <h3>Áreas de Mejora</h3>
                 </div>
                 <ul className="lista-items">
                   {areasMejora.map((mejora, idx) => (
-                    <motion.li 
-                      key={idx} 
+                    <motion.li
+                      key={idx}
                       className="item-mejora"
                       initial={{ opacity: 0, x: 10 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -296,7 +306,7 @@ const ResultadosEntrevista = () => {
             )}
 
             {/* DETALLES */}
-            <motion.div 
+            <motion.div
               className="detalles-section"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -308,39 +318,44 @@ const ResultadosEntrevista = () => {
                 <span className="detalle-valor">{resultados.carrera || 'N/A'}</span>
               </div>
               <div className="detalle-item">
+                <Calendar size={20} />
                 <span className="detalle-label">Fecha:</span>
                 <span className="detalle-valor">{resultados.fecha_entrevista || new Date().toLocaleDateString('es-ES')}</span>
               </div>
               <div className="detalle-item">
+                <MessageSquare size={20} />
                 <span className="detalle-label">Preguntas Respondidas:</span>
                 <span className="detalle-valor">{resultados.estadisticas?.total_respuestas || 0}</span>
               </div>
             </motion.div>
 
             {/* BOTONES */}
-            <motion.div 
+            <motion.div
               className="botones-resultado"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9 }}
             >
-              <button 
+              <button
                 onClick={handleDescargarResultados}
                 className="btn btn-primary"
               >
-                📥 Descargar Resultados
+                <Download size={20} />
+                Descargar Resultados
               </button>
-              <button 
+              <button
                 onClick={handleGuardarResultados}
                 className="btn btn-success"
               >
-                💾 Guardar Resultados
+                <Save size={20} />
+                Guardar Resultados
               </button>
-              <button 
+              <button
                 onClick={handleVolverEntrevista}
                 className="btn btn-secondary"
               >
-                🔄 Otra Entrevista
+                <RefreshCw size={20} />
+                Otra Entrevista
               </button>
             </motion.div>
 
