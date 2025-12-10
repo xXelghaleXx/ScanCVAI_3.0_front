@@ -30,7 +30,7 @@ const VoiceInterview = ({
   const [availableVoices, setAvailableVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState(null);
   const [showVoiceSelector, setShowVoiceSelector] = useState(false);
-  const [showInitialVoiceSelection, setShowInitialVoiceSelection] = useState(true);
+  const [showInitialVoiceSelection, setShowInitialVoiceSelection] = useState(false);
   const [presetVoices, setPresetVoices] = useState([]);
 
   // Estados de detección de audio
@@ -154,6 +154,12 @@ const VoiceInterview = ({
         name: p.voice.name,
         lang: p.voice.lang
       })));
+
+      // Seleccionar automáticamente la primera voz disponible
+      if (foundPresets.length > 0 && !selectedVoice) {
+        setSelectedVoice(foundPresets[0].voice);
+        console.log('🔊 Voz seleccionada automáticamente:', foundPresets[0].voice.name);
+      }
     };
 
     loadVoices();
